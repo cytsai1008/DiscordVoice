@@ -2,6 +2,7 @@
 /db/
 config.json
 GCP Token.json
+/tts_temp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

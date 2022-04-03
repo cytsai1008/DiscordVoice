@@ -46,7 +46,7 @@ def process_voice(content: str, lang_code: str):
     )
 
     # The response's audio_content is binary.
-    with open(f"{os.environ['TEMP']}/output.mp3", "wb") as out:
+    with open("tts_temp/output.mp3", "wb") as out:
         # Write the response to the output file.
         out.write(response.audio_content)
         print('Audio content written to file "output.mp3"')

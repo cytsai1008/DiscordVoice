@@ -149,7 +149,7 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
 
             # play mp3
             print("play mp3")
-            voice_file = discord.FFmpegPCMAudio(f"{os.environ['TEMP']}/output.mp3")
+            voice_file = discord.FFmpegPCMAudio("tts_temp/output.mp3")
             if not ctx.voice_client.is_playing():
                 ctx.voice_client.play(voice_file, after=None)
 
