@@ -1,7 +1,8 @@
 import logging
 import os
 # import sys
-import subprocess
+# import subprocess
+from io import BytesIO
 
 import discord
 from discord.ext import commands
@@ -61,7 +62,7 @@ load_dotenv()
 # remove_zh_tw = load_command.read_description("remove", "zh-tw")
 # list_zh_tw = load_command.read_description("list", "zh-tw")
 # random_zh_tw = load_command.read_description("random", "zh-tw")
-
+'''
 def process_voice(content: str, lang_code: str):
     """Synthesizes speech from the input string of text or ssml.
     Make sure to be working in a virtual environment.
@@ -95,6 +96,7 @@ def process_voice(content: str, lang_code: str):
         input=synthesis_input, voice=voice, audio_config=audio_config
     )
     return response.audio_content
+'''
 
 
 @bot.event
@@ -151,14 +153,14 @@ async def setchannel(ctx, channel: discord.TextChannel):
     # get guild id
     guild_id = ctx.guild.id
     # write to db folder with guild id filename
-    if tool_function.check_file(f"db/{guild_id}"):
-        data = tool_function.read_json(f"db/{guild_id}")
+    if tool_function.check_file(f"db/{guild_id}.json"):
+        data = tool_function.read_json(f"db/{guild_id}.json")
         data["channel"] = channel_id
     else:
         data = {"channel": channel_id}
 
-    tool_function.write_json(f"db/{guild_id}", data)
-    ctx.send(f"channel set to {channel.name}")
+    tool_function.write_json(f"db/{guild_id}.json", data)
+    await ctx.send(f"channel set to {channel.name}")
 
 
 @bot.command(Name="say")
@@ -200,7 +202,8 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 print("init google tts api")
                 # tts_func.process_voice(content, db["lang"])
                 print("play mp3")
-                voice_file = discord.FFmpegPCMAudio(process_voice(content, db["lang"]))
+                mp3file = BytesIO(process_voice(content, db["lang"]))
+                voice_file = discord.FFmpegPCMAudio(mp3file)
                 if not ctx.voice_client.is_playing():
                     ctx.voice_client.play(voice_file, after=None)
             else:
