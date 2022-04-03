@@ -153,14 +153,14 @@ async def setchannel(ctx, channel: discord.TextChannel):
     # get guild id
     guild_id = ctx.guild.id
     # write to db folder with guild id filename
-    if tool_function.check_file(f"db/{guild_id}"):
-        data = tool_function.read_json(f"db/{guild_id}")
+    if tool_function.check_file(f"db/{guild_id}.json"):
+        data = tool_function.read_json(f"db/{guild_id}.json")
         data["channel"] = channel_id
     else:
         data = {"channel": channel_id}
 
-    tool_function.write_json(f"db/{guild_id}", data)
-    ctx.send(f"channel set to {channel.name}")
+    tool_function.write_json(f"db/{guild_id}.json", data)
+    await ctx.send(f"channel set to {channel.name}")
 
 
 @bot.command(Name="say")
@@ -202,8 +202,8 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 print("init google tts api")
                 # tts_func.process_voice(content, db["lang"])
                 print("play mp3")
-                mp3file = BytesIO(process_voice(content, db["lang"]))
-                voice_file = discord.FFmpegPCMAudio(mp3file.read())
+                subprocess.call(["python", "tts_alone.py", "--content", content, "--lang", db["lang"]])
+                voice_file = discord.FFmpegPCMAudio("tts_temp/output.mp3")
                 if not ctx.voice_client.is_playing():
                     ctx.voice_client.play(voice_file, after=None)
             else:
