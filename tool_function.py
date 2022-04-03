@@ -77,5 +77,5 @@ def lang_command(lang: str, command: str) -> str:
         return command_out
 """
 
-# TODO: time commands function
+
 # TODO: Merging functions to main.py
