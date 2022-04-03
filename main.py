@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 
 import tool_function
 
+from io import BytesIO
+
 # from google.cloud import texttospeech
 
 # import tts_func
@@ -200,7 +202,8 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 print("init google tts api")
                 # tts_func.process_voice(content, db["lang"])
                 print("play mp3")
-                voice_file = discord.FFmpegPCMAudio(process_voice(content, db["lang"]))
+                mp3file = BytesIO(process_voice(content, db["lang"]))
+                voice_file = discord.FFmpegPCMAudio(mp3file.read())
                 if not ctx.voice_client.is_playing():
                     ctx.voice_client.play(voice_file, after=None)
             else:
