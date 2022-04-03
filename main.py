@@ -13,7 +13,7 @@ from discord.ext import commands
 
 import load_command
 import tool_function
-import tts_func
+# import tts_func
 
 # logging
 logger = logging.getLogger("discord")
