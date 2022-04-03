@@ -1,6 +1,8 @@
 import logging
 import os
 # import sys
+import subprocess
+
 import pycld2
 # from datetime import datetime
 from dotenv import load_dotenv
@@ -142,11 +144,14 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
             """
             # export content to mp3 by google tts api
             print("init google tts api")
-            tts_func.process_voice(content, db["lang"])
+            # tts_func.process_voice(content, db["lang"])
+            subprocess.call(["python", "tts_alone.py", "--content", content, "--lang", db["lang"]])
 
             # play mp3
+            print("play mp3")
             voice_file = discord.FFmpegPCMAudio(f"{os.environ['TEMP']}/output.mp3")
-            await ctx.voice_client.play(voice_file)
+            if not ctx.voice_client.is_playing():
+                ctx.voice_client.play(voice_file, after=None)
 
 
 @bot.command(Name="setlang")
