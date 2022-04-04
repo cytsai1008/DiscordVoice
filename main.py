@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 import tool_function
 
-from io import BytesIO
+# from io import BytesIO
 
 # from google.cloud import texttospeech
 
@@ -64,7 +64,7 @@ load_dotenv()
 # list_zh_tw = load_command.read_description("list", "zh-tw")
 # random_zh_tw = load_command.read_description("random", "zh-tw")
 
-
+'''
 def process_voice(content: str, lang_code: str):
     """Synthesizes speech from the input string of text or ssml.
     Make sure to be working in a virtual environment.
@@ -99,7 +99,7 @@ def process_voice(content: str, lang_code: str):
         input=synthesis_input, voice=voice, audio_config=audio_config
     )
     return response.audio_content
-
+'''
 
 @bot.event
 # 當機器人完成啟動時
