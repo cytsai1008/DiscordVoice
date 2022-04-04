@@ -143,7 +143,7 @@ async def join(ctx):
             await user_voice_channel.connect()
         except discord.errors.ClientException:
             bot_voice_channel = ctx.guild.voice_client.channel
-            await ctx.send(f"I'm already in <#{bot_voice_channel}>.\n"
+            await ctx.send(f"I'm already in <#{bot_voice_channel.id}>.\n"
                            "To move, please use `$leave` first.")
 
 
