@@ -231,6 +231,9 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 # TODO: Multiple language split ( I can't split by number )
                 """
                 # export content to mp3 by google tts api
+                # get username
+                username = ctx.author.name
+                content = f'{username} said {content}'
                 print("init google tts api")
                 # tts_func.process_voice(content, db["lang"])
                 print("play mp3")
