@@ -235,7 +235,7 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 say_this = len(content) < 30
                 username = ctx.author.name
                 # get username length
-                if len(username) <= 10:
+                if len(username) <= 20:
                     content = f'{username} said {content}'
                 if say_this:
                     print("init google tts api")
