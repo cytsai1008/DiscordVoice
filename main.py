@@ -1,10 +1,12 @@
 import logging
 import os
+
 # import sys
 import subprocess
 
 import discord
 from discord.ext import commands
+
 # from datetime import datetime
 from dotenv import load_dotenv
 
@@ -21,11 +23,10 @@ logger = logging.getLogger("discord")
 logger.setLevel(logging.DEBUG)
 if not os.path.exists("Log"):
     os.mkdir("Log")
-handler = logging.FileHandler(filename="Log/discord.log",
-                              encoding="utf-8",
-                              mode="w")
+handler = logging.FileHandler(filename="Log/discord.log", encoding="utf-8", mode="w")
 handler.setFormatter(
-    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
+    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
+)
 logger.addHandler(handler)
 
 # check file
@@ -84,17 +85,19 @@ def process_voice(content: str, lang_code: str):
     # voice gender ("neutral")
     voice = texttospeech.VoiceSelectionParams(
         language_code=lang_code,
-        ssml_gender=texttospeech.SsmlVoiceGender.SSML_VOICE_GENDER_UNSPECIFIED)
+        ssml_gender=texttospeech.SsmlVoiceGender.SSML_VOICE_GENDER_UNSPECIFIED,
+    )
 
     # Select the type of audio file you want returned
     audio_config = texttospeech.AudioConfig(
-        audio_encoding=texttospeech.AudioEncoding.MP3)
+        audio_encoding=texttospeech.AudioEncoding.MP3
+    )
 
     # Perform the text-to-speech request on the text input with the selected
     # voice parameters and audio file type
-    response = client.synthesize_speech(input=synthesis_input,
-                                        voice=voice,
-                                        audio_config=audio_config)
+    response = client.synthesize_speech(
+        input=synthesis_input, voice=voice, audio_config=audio_config
+    )
     return response.audio_content
 
 
@@ -113,21 +116,25 @@ async def on_ready():
 async def on_guild_join(guild):
     general = guild.system_channel
     if general and general.permissions_for(guild.me).send_messages:
-        await general.send("Thanks for adding me!\n"
-                           "Please set a channel by `$setchannel`.\n"
-                           "Please set a language by `$setlang`.\n"
-                           "For more information, please type `$help`.")
+        await general.send(
+            "Thanks for adding me!\n"
+            "Please set a channel by `$setchannel`.\n"
+            "Please set a language by `$setlang`.\n"
+            "For more information, please type `$help`."
+        )
 
 
 @bot.command(Name="help")
 async def help(ctx):
-    await ctx.send("Use `$help` to see the help message.\n"
-                   "Use `$setchannel` to set a channel.\n"
-                   "Use `$setlang` to set a language.\n"
-                   "Use `$say` to speak in voice channel.\n"
-                   "Use `$join` to let me join to a voice channel.\n"
-                   "Use `$leave` to let me leave the voice channel.\n"
-                   "Use `$ping` to check my latency.\n")
+    await ctx.send(
+        "Use `$help` to see the help message.\n"
+        "Use `$setchannel` to set a channel.\n"
+        "Use `$setlang` to set a language.\n"
+        "Use `$say` to speak in voice channel.\n"
+        "Use `$join` to let me join to a voice channel.\n"
+        "Use `$leave` to let me leave the voice channel.\n"
+        "Use `$ping` to check my latency.\n"
+    )
 
 
 @bot.command(Name="join")
@@ -143,9 +150,10 @@ async def join(ctx):
             await user_voice_channel.connect()
         except discord.errors.ClientException:
             bot_voice_channel = ctx.guild.voice_client.channel
-            await ctx.send(f"I'm already in <#{bot_voice_channel.id}>.\n"
-                           "To move, please use `$leave` first.")
-
+            await ctx.send(
+                f"I'm already in <#{bot_voice_channel.id}>.\n"
+                "To move, please use `$leave` first."
+            )
 
 
 @bot.command(Name="leave")
@@ -154,7 +162,6 @@ async def leave(ctx):
         await ctx.voice_client.disconnect()
     except AttributeError:
         pass
-
 
 
 @bot.command(Name="setchannel")
@@ -217,7 +224,7 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                     # merge if adjacent key are same
                     if i != 0 and language[i][4] == language[i - 1][4]:
                         language[i - 1][2] += language[i][2]
-    
+
                 # separate text language
                 # TODO: Multiple language split ( I can't split by number )
                 """
@@ -225,20 +232,30 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 print("init google tts api")
                 # tts_func.process_voice(content, db["lang"])
                 print("play mp3")
-                subprocess.call([
-                    "python", "tts_alone.py", "--content", content, "--lang",
-                    db["lang"]
-                ])
+                subprocess.call(
+                    [
+                        "python",
+                        "tts_alone.py",
+                        "--content",
+                        content,
+                        "--lang",
+                        db["lang"],
+                    ]
+                )
                 voice_file = discord.FFmpegPCMAudio("tts_temp/output.mp3")
                 if not ctx.voice_client.is_playing():
                     ctx.voice_client.play(voice_file, after=None)
             else:
-                await ctx.send("Please set channel by `$setchannel`.\n"
-                         "Please set language by `$setlang`.\n"
-                         "Please join voice channel by `$join`.")
+                await ctx.send(
+                    "Please set channel by `$setchannel`.\n"
+                    "Please set language by `$setlang`.\n"
+                    "Please join voice channel by `$join`."
+                )
         else:
-            await ctx.send("Please set channel by `$setchannel`.\n"
-                     "Please set language by `$setlang`.\n")
+            await ctx.send(
+                "Please set channel by `$setchannel`.\n"
+                "Please set language by `$setlang`.\n"
+            )
 
 
 @bot.command(Name="setlang")
