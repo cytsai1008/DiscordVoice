@@ -3,7 +3,7 @@ import os
 
 # import sys
 import subprocess
-from io import BytesIO
+# from io import BytesIO
 
 import discord
 from discord.ext import commands
@@ -51,7 +51,6 @@ bot = commands.Bot(command_prefix=config["prefix"], help_command=None)
 # initialize some variable
 bot.remove_command("help")
 load_dotenv()
-
 
 # load command
 # help_zh_tw = load_command.read_description("help", "zh-tw")
@@ -149,7 +148,10 @@ async def join(ctx):
         try:
             await user_voice_channel.connect()
         except discord.errors.ClientException:
-            await ctx.send("I'm already in a voice channel.")
+            # get bot voice channel
+            bot_voice_channel = ctx.guild.voice_client.channel
+            await ctx.send(f"I'm already in <#{bot_voice_channel}>.\n"
+                           "To move, please use `$leave` first.")
 
 
 @bot.command(Name="leave")
@@ -174,7 +176,7 @@ async def setchannel(ctx, channel: discord.TextChannel):
         data = {"channel": channel_id}
 
     tool_function.write_json(f"db/{guild_id}.json", data)
-    await ctx.send(f"channel set to {channel.name}")
+    await ctx.send(f"channel set to <#{channel.id}>.")
 
 
 @bot.command(Name="say")
@@ -200,10 +202,10 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
             else:
                 is_connected = True
             if (
-                is_connected
-                and channel_id == db["channel"]
-                and tool_function.check_dict_data(db, "channel")
-                and tool_function.check_dict_data(db, "lang")
+                    is_connected
+                    and channel_id == db["channel"]
+                    and tool_function.check_dict_data(db, "channel")
+                    and tool_function.check_dict_data(db, "lang")
             ):
                 # use cld to detect language
                 """
@@ -263,7 +265,7 @@ async def setlang(ctx, lang: str):
         tool_function.write_json(f"db/{guild_id}.json", {"lang": lang})
     await ctx.send(
         f"Set language to {lang}\n"
-        f"Please make sure the code is same as https://cloud.google.com/text-to-speech/docs/voices."
+        f"Please make sure the code is same as https://cloud.google.com/text-to-speech/docs/voices or BCP 47."
     )
 
 
