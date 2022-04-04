@@ -1,11 +1,13 @@
 import logging
 import os
+
 # import sys
-# import subprocess
+import subprocess
 from io import BytesIO
 
 import discord
 from discord.ext import commands
+
 # from datetime import datetime
 from dotenv import load_dotenv
 
@@ -124,13 +126,15 @@ async def on_guild_join(guild):
 
 @bot.command(Name="help")
 async def help(ctx):
-    await ctx.send("Use `$help` to see the help message.\n"
-                   "Use `$setchannel` to set a channel.\n"
-                   "Use `$setlang` to set a language.\n"
-                   "Use `$say` to speak in voice channel.\n"
-                   "Use `$join` to let me join to a voice channel.\n"
-                   "Use `$leave` to let me leave the voice channel.\n"
-                   "Use `$ping` to check my latency.\n")
+    await ctx.send(
+        "Use `$help` to see the help message.\n"
+        "Use `$setchannel` to set a channel.\n"
+        "Use `$setlang` to set a language.\n"
+        "Use `$say` to speak in voice channel.\n"
+        "Use `$join` to let me join to a voice channel.\n"
+        "Use `$leave` to let me leave the voice channel.\n"
+        "Use `$ping` to check my latency.\n"
+    )
 
 
 @bot.command(Name="join")
@@ -178,9 +182,12 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
             # check channel id
             # check if is in voice channel
             # print(ctx.voice_client.is_connected())
-            if ctx.voice_client.is_connected() and channel_id == db["channel"] \
-                    and tool_function.check_dict_data(db, "channel") \
-                    and tool_function.check_dict_data(db, "lang"):
+            if (
+                ctx.voice_client.is_connected()
+                and channel_id == db["channel"]
+                and tool_function.check_dict_data(db, "channel")
+                and tool_function.check_dict_data(db, "lang")
+            ):
                 # use cld to detect language
                 """
                 _, _, _, language = pycld2.detect(content, returnVector=True, debugScoreAsQuads=True)
@@ -194,7 +201,7 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                     # merge if adjacent key are same
                     if i != 0 and language[i][4] == language[i - 1][4]:
                         language[i - 1][2] += language[i][2]
-    
+
                 # separate text language
                 # TODO: Multiple language split ( I can't split by number )
                 """
@@ -202,17 +209,26 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 print("init google tts api")
                 # tts_func.process_voice(content, db["lang"])
                 print("play mp3")
+                """
                 mp3file = BytesIO(process_voice(content, db["lang"]))
                 voice_file = discord.FFmpegPCMAudio(mp3file)
+                """
+                subprocess.call(["python", "tts_alone.py", "--content", content, "--lang", db["lang"]])
+                voice_file = discord.FFmpegPCMAudio("tts_temp/output.mp3")
+
                 if not ctx.voice_client.is_playing():
                     ctx.voice_client.play(voice_file, after=None)
             else:
-                ctx.send("Please set channel by `$setchannel`.\n"
-                         "Please set language by `$setlang`.\n"
-                         "Please join voice channel by `$join`.")
+                ctx.send(
+                    "Please set channel by `$setchannel`.\n"
+                    "Please set language by `$setlang`.\n"
+                    "Please join voice channel by `$join`."
+                )
         else:
-            ctx.send("Please set channel by `$setchannel`.\n"
-                     "Please set language by `$setlang`.\n")
+            ctx.send(
+                "Please set channel by `$setchannel`.\n"
+                "Please set language by `$setlang`.\n"
+            )
 
 
 @bot.command(Name="setlang")
@@ -228,8 +244,10 @@ async def setlang(ctx, lang: str):
         tool_function.write_json(f"db/{guild_id}.json", db)
     else:
         tool_function.write_json(f"db/{guild_id}.json", {"lang": lang})
-    await ctx.send(f"Set language to {lang}\n"
-                   f"Please make sure the code is same as https://cloud.google.com/text-to-speech/docs/voices.")
+    await ctx.send(
+        f"Set language to {lang}\n"
+        f"Please make sure the code is same as https://cloud.google.com/text-to-speech/docs/voices."
+    )
 
 
 @bot.command(Name="ping")
