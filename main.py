@@ -142,7 +142,9 @@ async def join(ctx):
         try:
             await user_voice_channel.connect()
         except discord.errors.ClientException:
-            await ctx.send("I'm already in a voice channel.")
+            bot_voice_channel = ctx.guild.voice_client.channel
+            await ctx.send(f"I'm already in <#{bot_voice_channel}>.\n"
+                           "To move, please use `$leave` first.")
 
 
 
@@ -169,7 +171,7 @@ async def setchannel(ctx, channel: discord.TextChannel):
         data = {"channel": channel_id}
 
     tool_function.write_json(f"db/{guild_id}.json", data)
-    await ctx.send(f"channel set to {channel.name}")
+    await ctx.send(f"channel set to <#{channel.id}>.")
 
 
 @bot.command(Name="say")
@@ -254,7 +256,7 @@ async def setlang(ctx, lang: str):
         tool_function.write_json(f"db/{guild_id}.json", {"lang": lang})
     await ctx.send(
         f"Set language to {lang}\n"
-        f"Please make sure the code is same as https://cloud.google.com/text-to-speech/docs/voices."
+        f"Please make sure the code is same as https://cloud.google.com/text-to-speech/docs/voices or BCP 47."
     )
 
 
