@@ -133,7 +133,10 @@ async def help(ctx):
 @bot.command(Name="join")
 async def join(ctx):
     # get user voice channel
-    user_voice_channel = ctx.author.voice.channel
+    try:
+        user_voice_channel = ctx.author.voice.channel
+    except AttributeError:
+        await ctx.send("Please join a voice channel first.")
     # join
     try:
         await user_voice_channel.connect()
