@@ -1,3 +1,4 @@
+# import asyncio
 import logging
 import os
 
@@ -100,6 +101,7 @@ def process_voice(content: str, lang_code: str):
     )
     return response.audio_content
 '''
+
 
 @bot.event
 # 當機器人完成啟動時
@@ -205,10 +207,10 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 is_connected = True
 
             if (
-                is_connected
-                and channel_id == db["channel"]
-                and tool_function.check_dict_data(db, "channel")
-                and tool_function.check_dict_data(db, "lang")
+                    is_connected
+                    and channel_id == db["channel"]
+                    and tool_function.check_dict_data(db, "channel")
+                    and tool_function.check_dict_data(db, "lang")
             ):
 
                 # use cld to detect language
@@ -245,6 +247,10 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 voice_file = discord.FFmpegPCMAudio("tts_temp/output.mp3")
                 if not ctx.voice_client.is_playing():
                     ctx.voice_client.play(voice_file, after=None)
+                    # avoid conflict?
+                else:
+                    # maybe fix next time
+                    pass
             else:
                 await ctx.send(
                     "Please set channel by `$setchannel`.\n"
