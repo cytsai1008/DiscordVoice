@@ -142,12 +142,18 @@ async def join(ctx):
     # get user voice channel
     user_voice_channel = ctx.author.voice.channel
     # join
-    await user_voice_channel.connect()
+    try:
+        await user_voice_channel.connect()
+    except discord.errors.ClientException:
+        await ctx.send("I'm already in a voice channel.")
 
 
 @bot.command(Name="leave")
 async def leave(ctx):
-    await ctx.voice_client.disconnect()
+    try:
+        await ctx.voice_client.disconnect()
+    except AttributeError:
+        pass
 
 
 @bot.command(Name="setchannel")
@@ -171,7 +177,7 @@ async def setchannel(ctx, channel: discord.TextChannel):
 async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
     # get message channel id
     if content is None:
-        ctx.send("Please input your message.")
+        await ctx.send("Please input your message.")
     else:
         channel_id = ctx.channel.id
         # get guild id
@@ -182,8 +188,15 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
             # check channel id
             # check if is in voice channel
             # print(ctx.voice_client.is_connected())
-            if (
+            try:
                 ctx.voice_client.is_connected()
+            except AttributeError:
+                # await ctx.send("Please join a voice channel first.")
+                is_connected = False
+            else:
+                is_connected = True
+            if (
+                is_connected
                 and channel_id == db["channel"]
                 and tool_function.check_dict_data(db, "channel")
                 and tool_function.check_dict_data(db, "lang")
@@ -219,13 +232,13 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 if not ctx.voice_client.is_playing():
                     ctx.voice_client.play(voice_file, after=None)
             else:
-                ctx.send(
+                await ctx.send(
                     "Please set channel by `$setchannel`.\n"
                     "Please set language by `$setlang`.\n"
                     "Please join voice channel by `$join`."
                 )
         else:
-            ctx.send(
+            await ctx.send(
                 "Please set channel by `$setchannel`.\n"
                 "Please set language by `$setlang`.\n"
             )
