@@ -232,28 +232,34 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 """
                 # export content to mp3 by google tts api
                 # get username
+                say_this = len(content) < 30
                 username = ctx.author.name
-                content = f'{username} said {content}'
-                print("init google tts api")
-                # tts_func.process_voice(content, db["lang"])
-                print("play mp3")
-                subprocess.call(
-                    [
-                        "python",
-                        "tts_alone.py",
-                        "--content",
-                        content,
-                        "--lang",
-                        db["lang"],
-                    ]
-                )
-                voice_file = discord.FFmpegPCMAudio("tts_temp/output.mp3")
-                if not ctx.voice_client.is_playing():
-                    ctx.voice_client.play(voice_file, after=None)
+                # get username length
+                if len(username) <= 10:
+                    content = f'{username} said {content}'
+                if say_this:
+                    print("init google tts api")
+                    # tts_func.process_voice(content, db["lang"])
+                    print("play mp3")
+                    subprocess.call(
+                        [
+                            "python",
+                            "tts_alone.py",
+                            "--content",
+                            content,
+                            "--lang",
+                            db["lang"],
+                        ]
+                    )
+                    voice_file = discord.FFmpegPCMAudio("tts_temp/output.mp3")
+                    if not ctx.voice_client.is_playing():
+                        ctx.voice_client.play(voice_file, after=None)
                     # avoid conflict?
+                    else:
+                        # maybe fix next time
+                        pass
                 else:
-                    # maybe fix next time
-                    pass
+                    await ctx.send("Too long to say.")
             else:
                 await ctx.send(
                     "Please set channel by `$setchannel`.\n"
