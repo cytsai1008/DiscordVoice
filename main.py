@@ -21,10 +21,11 @@ logger = logging.getLogger("discord")
 logger.setLevel(logging.DEBUG)
 if not os.path.exists("Log"):
     os.mkdir("Log")
-handler = logging.FileHandler(filename="Log/discord.log", encoding="utf-8", mode="w")
+handler = logging.FileHandler(filename="Log/discord.log",
+                              encoding="utf-8",
+                              mode="w")
 handler.setFormatter(
-    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
-)
+    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 logger.addHandler(handler)
 
 # check file
@@ -51,18 +52,17 @@ bot = commands.Bot(command_prefix=config["prefix"], help_command=None)
 bot.remove_command("help")
 load_dotenv()
 
-
 # load command
 # help_zh_tw = load_command.read_description("help", "zh-tw")
 
 # init google tts api
 # tts_client = texttospeech.TextToSpeechClient()
 
-
 # add_zh_tw = load_command.read_description("add", "zh-tw")
 # remove_zh_tw = load_command.read_description("remove", "zh-tw")
 # list_zh_tw = load_command.read_description("list", "zh-tw")
 # random_zh_tw = load_command.read_description("random", "zh-tw")
+
 
 def process_voice(content: str, lang_code: str):
     """Synthesizes speech from the input string of text or ssml.
@@ -83,19 +83,18 @@ def process_voice(content: str, lang_code: str):
     # Build the voice request, select the language code ("en-US") and the ssml
     # voice gender ("neutral")
     voice = texttospeech.VoiceSelectionParams(
-        language_code=lang_code, ssml_gender=texttospeech.SsmlVoiceGender.SSML_VOICE_GENDER_UNSPECIFIED
-    )
+        language_code=lang_code,
+        ssml_gender=texttospeech.SsmlVoiceGender.SSML_VOICE_GENDER_UNSPECIFIED)
 
     # Select the type of audio file you want returned
     audio_config = texttospeech.AudioConfig(
-        audio_encoding=texttospeech.AudioEncoding.MP3
-    )
+        audio_encoding=texttospeech.AudioEncoding.MP3)
 
     # Perform the text-to-speech request on the text input with the selected
     # voice parameters and audio file type
-    response = client.synthesize_speech(
-        input=synthesis_input, voice=voice, audio_config=audio_config
-    )
+    response = client.synthesize_speech(input=synthesis_input,
+                                        voice=voice,
+                                        audio_config=audio_config)
     return response.audio_content
 
 
@@ -114,12 +113,10 @@ async def on_ready():
 async def on_guild_join(guild):
     general = guild.system_channel
     if general and general.permissions_for(guild.me).send_messages:
-        await general.send(
-            "Thanks for adding me!\n"
-            "Please set a channel by `$setchannel`.\n"
-            "Please set a language by `$setlang`.\n"
-            "For more information, please type `$help`."
-        )
+        await general.send("Thanks for adding me!\n"
+                           "Please set a channel by `$setchannel`.\n"
+                           "Please set a language by `$setlang`.\n"
+                           "For more information, please type `$help`.")
 
 
 @bot.command(Name="help")
@@ -138,12 +135,20 @@ async def join(ctx):
     # get user voice channel
     user_voice_channel = ctx.author.voice.channel
     # join
-    await user_voice_channel.connect()
+    try:
+        await user_voice_channel.connect()
+    except discord.errors.ClientException:
+        await ctx.send("I'm already in a voice channel.")
+
 
 
 @bot.command(Name="leave")
 async def leave(ctx):
-    await ctx.voice_client.disconnect()
+    try:
+        await ctx.voice_client.disconnect()
+    except AttributeError:
+        pass
+
 
 
 @bot.command(Name="setchannel")
@@ -167,7 +172,7 @@ async def setchannel(ctx, channel: discord.TextChannel):
 async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
     # get message channel id
     if content is None:
-        ctx.send("Please input your message.")
+        await ctx.send("Please input your message.")
     else:
         channel_id = ctx.channel.id
         # get guild id
@@ -178,9 +183,21 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
             # check channel id
             # check if is in voice channel
             # print(ctx.voice_client.is_connected())
-            if ctx.voice_client.is_connected() and channel_id == db["channel"] \
-                    and tool_function.check_dict_data(db, "channel") \
-                    and tool_function.check_dict_data(db, "lang"):
+            try:
+                ctx.voice_client.is_connected()
+            except AttributeError:
+                # await ctx.send("Please join a voice channel first.")
+                is_connected = False
+            else:
+                is_connected = True
+
+            if (
+                is_connected
+                and channel_id == db["channel"]
+                and tool_function.check_dict_data(db, "channel")
+                and tool_function.check_dict_data(db, "lang")
+            ):
+
                 # use cld to detect language
                 """
                 _, _, _, language = pycld2.detect(content, returnVector=True, debugScoreAsQuads=True)
@@ -202,16 +219,19 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 print("init google tts api")
                 # tts_func.process_voice(content, db["lang"])
                 print("play mp3")
-                subprocess.call(["python", "tts_alone.py", "--content", content, "--lang", db["lang"]])
+                subprocess.call([
+                    "python", "tts_alone.py", "--content", content, "--lang",
+                    db["lang"]
+                ])
                 voice_file = discord.FFmpegPCMAudio("tts_temp/output.mp3")
                 if not ctx.voice_client.is_playing():
                     ctx.voice_client.play(voice_file, after=None)
             else:
-                ctx.send("Please set channel by `$setchannel`.\n"
+                await ctx.send("Please set channel by `$setchannel`.\n"
                          "Please set language by `$setlang`.\n"
                          "Please join voice channel by `$join`.")
         else:
-            ctx.send("Please set channel by `$setchannel`.\n"
+            await ctx.send("Please set channel by `$setchannel`.\n"
                      "Please set language by `$setlang`.\n")
 
 
@@ -228,8 +248,10 @@ async def setlang(ctx, lang: str):
         tool_function.write_json(f"db/{guild_id}.json", db)
     else:
         tool_function.write_json(f"db/{guild_id}.json", {"lang": lang})
-    await ctx.send(f"Set language to {lang}\n"
-                   f"Please make sure the code is same as https://cloud.google.com/text-to-speech/docs/voices.")
+    await ctx.send(
+        f"Set language to {lang}\n"
+        f"Please make sure the code is same as https://cloud.google.com/text-to-speech/docs/voices."
+    )
 
 
 @bot.command(Name="ping")
