@@ -138,10 +138,11 @@ async def join(ctx):
     except AttributeError:
         await ctx.send("Please join a voice channel first.")
     # join
-    try:
-        await user_voice_channel.connect()
-    except discord.errors.ClientException:
-        await ctx.send("I'm already in a voice channel.")
+    else:
+        try:
+            await user_voice_channel.connect()
+        except discord.errors.ClientException:
+            await ctx.send("I'm already in a voice channel.")
 
 
 
