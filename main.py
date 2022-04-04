@@ -140,12 +140,16 @@ async def help(ctx):
 @bot.command(Name="join")
 async def join(ctx):
     # get user voice channel
-    user_voice_channel = ctx.author.voice.channel
-    # join
     try:
-        await user_voice_channel.connect()
-    except discord.errors.ClientException:
-        await ctx.send("I'm already in a voice channel.")
+        user_voice_channel = ctx.author.voice.channel
+    except AttributeError:
+        await ctx.send("Please join a voice channel first.")
+    # join
+    else:
+        try:
+            await user_voice_channel.connect()
+        except discord.errors.ClientException:
+            await ctx.send("I'm already in a voice channel.")
 
 
 @bot.command(Name="leave")
