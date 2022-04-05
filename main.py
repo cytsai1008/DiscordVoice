@@ -297,4 +297,14 @@ async def ping(ctx):
     await ctx.send(f"Pong! {round(bot.latency * 1000)}ms")
 
 
+@bot.command(Name="shutdown")
+async def shutdown(ctx):
+    sender = ctx.message.author.id
+    owner = tool_function.read_json("token.json")
+    owner = owner["owner"]
+    if sender == owner:
+        await ctx.send("Shutting down...")
+        await bot.close()
+
+
 bot.run(config["token"])
