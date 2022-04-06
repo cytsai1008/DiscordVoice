@@ -103,6 +103,10 @@ def process_voice(content: str, lang_code: str):
 '''
 
 
+def remove_file(file_name):
+    os.remove(f"tts_temp/{file_name}")
+
+
 @bot.event
 # 當機器人完成啟動時
 async def on_ready():
@@ -239,10 +243,12 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                         content,
                         "--lang",
                         db["lang"],
+                        "--filename",
+                        f"{guild_id}.mp3"
                     ])
-                    voice_file = discord.FFmpegPCMAudio("tts_temp/output.mp3")
+                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                     if not ctx.voice_client.is_playing():
-                        ctx.voice_client.play(voice_file, after=None)
+                        ctx.voice_client.play(voice_file, after=remove_file(f"{guild_id}.mp3"))
                     # avoid conflict?
                     else:
                         # maybe fix next time

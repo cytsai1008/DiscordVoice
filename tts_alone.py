@@ -3,11 +3,14 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--content", required=True)
 parser.add_argument("--lang", required=True)
+parser.add_argument("--filename", required=True)
 
 content = parser.parse_args().content
 lang_code = parser.parse_args().lang
+filename = parser.parse_args().filename
 str(content)
 str(lang_code)
+str(filename)
 
 
 def process_voice(content: str, lang_code: str):
@@ -45,10 +48,10 @@ def process_voice(content: str, lang_code: str):
     )
 
     # The response's audio_content is binary.
-    with open("tts_temp/output.mp3", "wb") as out:
+    with open(f"tts_temp/{filename}.mp3", "wb") as out:
         # Write the response to the output file.
         out.write(response.audio_content)
-        print('Audio content written to file "output.mp3"')
+        print(f'Audio content written to file "{filename}.mp3"')
 
 
 process_voice(content, lang_code)
