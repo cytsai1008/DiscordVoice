@@ -24,10 +24,11 @@ logger = logging.getLogger("discord")
 logger.setLevel(logging.DEBUG)
 if not os.path.exists("Log"):
     os.mkdir("Log")
-handler = logging.FileHandler(filename="Log/discord.log", encoding="utf-8", mode="w")
+handler = logging.FileHandler(filename="Log/discord.log",
+                              encoding="utf-8",
+                              mode="w")
 handler.setFormatter(
-    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
-)
+    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 logger.addHandler(handler)
 
 # check file
@@ -64,7 +65,6 @@ load_dotenv()
 # remove_zh_tw = load_command.read_description("remove", "zh-tw")
 # list_zh_tw = load_command.read_description("list", "zh-tw")
 # random_zh_tw = load_command.read_description("random", "zh-tw")
-
 '''
 def process_voice(content: str, lang_code: str):
     """Synthesizes speech from the input string of text or ssml.
@@ -118,25 +118,21 @@ async def on_ready():
 async def on_guild_join(guild):
     general = guild.system_channel
     if general and general.permissions_for(guild.me).send_messages:
-        await general.send(
-            "Thanks for adding me!\n"
-            "Please set a channel by `$setchannel`.\n"
-            "Please set a language by `$setlang`.\n"
-            "For more information, please type `$help`."
-        )
+        await general.send("Thanks for adding me!\n"
+                           "Please set a channel by `$setchannel`.\n"
+                           "Please set a language by `$setlang`.\n"
+                           "For more information, please type `$help`.")
 
 
 @bot.command(Name="help")
 async def help(ctx):
-    await ctx.send(
-        "Use `$help` to see the help message.\n"
-        "Use `$setchannel` to set a channel.\n"
-        "Use `$setlang` to set a language.\n"
-        "Use `$say` to speak in voice channel.\n"
-        "Use `$join` to let me join to a voice channel.\n"
-        "Use `$leave` to let me leave the voice channel.\n"
-        "Use `$ping` to check my latency.\n"
-    )
+    await ctx.send("Use `$help` to see the help message.\n"
+                   "Use `$setchannel` to set a channel.\n"
+                   "Use `$setlang` to set a language.\n"
+                   "Use `$say` to speak in voice channel.\n"
+                   "Use `$join` to let me join to a voice channel.\n"
+                   "Use `$leave` to let me leave the voice channel.\n"
+                   "Use `$ping` to check my latency.\n")
 
 
 @bot.command(Name="join")
@@ -152,10 +148,8 @@ async def join(ctx):
             await user_voice_channel.connect()
         except discord.errors.ClientException:
             bot_voice_channel = ctx.guild.voice_client.channel
-            await ctx.send(
-                f"I'm already in <#{bot_voice_channel.id}>.\n"
-                "To move, please use `$leave` first."
-            )
+            await ctx.send(f"I'm already in <#{bot_voice_channel.id}>.\n"
+                           "To move, please use `$leave` first.")
 
 
 @bot.command(Name="leave")
@@ -206,12 +200,9 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
             else:
                 is_connected = True
 
-            if (
-                    is_connected
-                    and channel_id == db["channel"]
+            if (is_connected and channel_id == db["channel"]
                     and tool_function.check_dict_data(db, "channel")
-                    and tool_function.check_dict_data(db, "lang")
-            ):
+                    and tool_function.check_dict_data(db, "lang")):
 
                 # use cld to detect language
                 """
@@ -241,16 +232,14 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                     print("init google tts api")
                     # tts_func.process_voice(content, db["lang"])
                     print("play mp3")
-                    subprocess.call(
-                        [
-                            "python",
-                            "tts_alone.py",
-                            "--content",
-                            content,
-                            "--lang",
-                            db["lang"],
-                        ]
-                    )
+                    subprocess.call([
+                        "python",
+                        "tts_alone.py",
+                        "--content",
+                        content,
+                        "--lang",
+                        db["lang"],
+                    ])
                     voice_file = discord.FFmpegPCMAudio("tts_temp/output.mp3")
                     if not ctx.voice_client.is_playing():
                         ctx.voice_client.play(voice_file, after=None)
@@ -261,16 +250,12 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 else:
                     await ctx.send("Too long to say.")
             else:
-                await ctx.send(
-                    "Please set channel by `$setchannel`.\n"
-                    "Please set language by `$setlang`.\n"
-                    "Please join voice channel by `$join`."
-                )
+                await ctx.send("Please set channel by `$setchannel`.\n"
+                               "Please set language by `$setlang`.\n"
+                               "Please join voice channel by `$join`.")
         else:
-            await ctx.send(
-                "Please set channel by `$setchannel`.\n"
-                "Please set language by `$setlang`.\n"
-            )
+            await ctx.send("Please set channel by `$setchannel`.\n"
+                           "Please set language by `$setlang`.\n")
 
 
 @bot.command(Name="setlang")
@@ -300,7 +285,7 @@ async def ping(ctx):
 @bot.command(Name="shutdown")
 async def shutdown(ctx):
     sender = ctx.message.author.id
-    owner = tool_function.read_json("token.json")
+    owner = tool_function.read_json("config.json")
     owner = owner["owner"]
     if sender == owner:
         await ctx.send("Shutting down...")
