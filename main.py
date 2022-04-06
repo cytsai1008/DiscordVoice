@@ -248,11 +248,12 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                     ])
                     voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                     if not ctx.voice_client.is_playing():
-                        ctx.voice_client.play(voice_file, after=remove_file(f"{guild_id}.mp3"))
+                        ctx.voice_client.play(voice_file, after=None)
                     # avoid conflict?
                     else:
                         # maybe fix next time
                         pass
+                        # ctx.send("Please wait.")
                 else:
                     await ctx.send("Too long to say.")
             else:
