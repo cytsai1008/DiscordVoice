@@ -48,10 +48,10 @@ def process_voice(content: str, lang_code: str):
     )
 
     # The response's audio_content is binary.
-    with open(f"tts_temp/{filename}.mp3", "wb") as out:
+    with open(f"tts_temp/{filename}", "wb") as out:
         # Write the response to the output file.
         out.write(response.audio_content)
-        print(f'Audio content written to file "{filename}.mp3"')
+        print(f'Audio content written to file "{filename}"')
 
 
 process_voice(content, lang_code)
