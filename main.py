@@ -252,10 +252,13 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                     # avoid conflict?
                     else:
                         # maybe fix next time
-                        pass
+                        # if sender id == owner id then force play
+                        if ctx.author.id == config["owner_id"]:
+                            ctx.voice_client.play(voice_file, after=None)
                         # ctx.send("Please wait.")
                 else:
-                    await ctx.send("Too long to say.")
+                    await ctx.reply("Too long to say.")
+                    # reply to sender
             else:
                 await ctx.send("Please set channel by `$setchannel`.\n"
                                "Please set language by `$setlang`.\n"
