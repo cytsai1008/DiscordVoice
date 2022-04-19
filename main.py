@@ -246,14 +246,17 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                         "--filename",
                         f"{guild_id}.mp3"
                     ])
-                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                     if not ctx.voice_client.is_playing():
+                        voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                         ctx.voice_client.play(voice_file, after=None)
                     # avoid conflict?
                     else:
                         # maybe fix next time
                         # if sender id == owner id then force play
-                        if ctx.author.id == config["owner_id"]:
+                        if ctx.author.id == config["owner"]:
+                            voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                            # stop curreent audio
+                            ctx.voice_client.stop()
                             ctx.voice_client.play(voice_file, after=None)
                         # ctx.send("Please wait.")
                 else:
