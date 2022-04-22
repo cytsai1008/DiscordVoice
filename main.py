@@ -133,7 +133,7 @@ def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
         except:
             pass
 
-    else:
+    elif ctx.voice_client is not None and not ctx.voice_client.is_playing():
         convert_tts(list_id.get(), lang_id, guild_id)
         song = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
         ctx.voice_client.play(song, after=playnext(ctx, lang_id, guild_id, list_id))
@@ -307,7 +307,8 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                         ctx.voice_client.play(voice_file, after=playnext(ctx, db["lang"], guild_id, globals()[list_name]))
                     else:
                         globals()[list_name].put(content)
-                        ctx.add_reaction("⏯")
+                        # add reaction
+                        ctx.message.add_reaction("⏯")
                 else:
                     await ctx.reply("Too long to say.")
                     # reply to sender
