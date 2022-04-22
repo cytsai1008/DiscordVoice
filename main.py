@@ -285,6 +285,7 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                         ])
                         voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                         ctx.voice_client.play(voice_file, after=playnext(ctx, db["lang"], guild_id, globals()[list_name]))
+                        ctx.message.add_reaction("🔊")
                     elif ctx.author.id == config["owner"]:
                         print("init google tts api")
                         # tts_func.process_voice(content, db["lang"])
@@ -305,6 +306,7 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                         ctx.voice_client.stop()
                         await asyncio.sleep(0.5)
                         ctx.voice_client.play(voice_file, after=playnext(ctx, db["lang"], guild_id, globals()[list_name]))
+                        ctx.message.add_reaction("⁉")
                     else:
                         globals()[list_name].put(content)
                         # add reaction
