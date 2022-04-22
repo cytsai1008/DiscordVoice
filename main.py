@@ -1,8 +1,10 @@
 # import asyncio
+import asyncio
 import logging
 import os
 
 # import sys
+import queue
 import subprocess
 
 import discord
@@ -105,6 +107,36 @@ def process_voice(content: str, lang_code: str):
 
 def remove_file(file_name):
     os.remove(f"tts_temp/{file_name}")
+
+
+def convert_tts(content: str, lang_code: str, file_name: str):
+    print("init google tts api")
+    # tts_func.process_voice(content, db["lang"])
+    print("play mp3")
+    subprocess.call([
+        "python",
+        "tts_alone.py",
+        "--content",
+        content,
+        "--lang",
+        lang_code,
+        "--filename",
+        f"{file_name}.mp3"
+    ])
+
+
+def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
+    if list_id.empty():
+        try:
+            if os.path.exists(f"tts_temp/{guild_id}.mp3"):
+                os.remove("tts_temp/{guild_id}.mp3")
+        except:
+            pass
+
+    else:
+        convert_tts(list_id.get(), lang_id, guild_id)
+        song = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+        ctx.voice_client.play(song, after=playnext(ctx, lang_id, guild_id, list_id))
 
 
 @bot.event
@@ -233,32 +265,49 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 if len(username) <= 20:
                     content = f'{username} said {content}'
                 if say_this:
-                    print("init google tts api")
-                    # tts_func.process_voice(content, db["lang"])
-                    print("play mp3")
-                    subprocess.call([
-                        "python",
-                        "tts_alone.py",
-                        "--content",
-                        content,
-                        "--lang",
-                        db["lang"],
-                        "--filename",
-                        f"{guild_id}.mp3"
-                    ])
+                    list_name = f"list_{str(guild_id)}"
+                    if list_name not in globals():
+                        globals()[list_name] = queue.Queue(maxsize=10)
+
                     if not ctx.voice_client.is_playing():
+                        print("init google tts api")
+                        # tts_func.process_voice(content, db["lang"])
+                        print("play mp3")
+                        subprocess.call([
+                            "python",
+                            "tts_alone.py",
+                            "--content",
+                            content,
+                            "--lang",
+                            db["lang"],
+                            "--filename",
+                            f"{guild_id}.mp3"
+                        ])
                         voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
-                        ctx.voice_client.play(voice_file, after=None)
-                    # avoid conflict?
+                        ctx.voice_client.play(voice_file, after=playnext(ctx, db["lang"], guild_id, globals()[list_name]))
+                    elif ctx.author.id == config["owner"]:
+                        print("init google tts api")
+                        # tts_func.process_voice(content, db["lang"])
+                        print("play mp3")
+                        subprocess.call([
+                            "python",
+                            "tts_alone.py",
+                            "--content",
+                            content,
+                            "--lang",
+                            db["lang"],
+                            "--filename",
+                            f"{guild_id}.mp3"
+                        ])
+
+                        voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                        # stop curreent audio
+                        ctx.voice_client.stop()
+                        await asyncio.sleep(0.5)
+                        ctx.voice_client.play(voice_file, after=playnext(ctx, db["lang"], guild_id, globals()[list_name]))
                     else:
-                        # maybe fix next time
-                        # if sender id == owner id then force play
-                        if ctx.author.id == config["owner"]:
-                            voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
-                            # stop curreent audio
-                            ctx.voice_client.stop()
-                            ctx.voice_client.play(voice_file, after=None)
-                        # ctx.send("Please wait.")
+                        globals()[list_name].put(content)
+                        ctx.add_reaction("⏯")
                 else:
                     await ctx.reply("Too long to say.")
                     # reply to sender
@@ -268,7 +317,8 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                                "Please join voice channel by `$join`.")
         else:
             await ctx.send("Please set channel by `$setchannel`.\n"
-                           "Please set language by `$setlang`.\n")
+                           "Please set language by `$setlang`.\n"
+                           "Please join voice channel by `$join`.")
 
 
 @bot.command(Name="setlang")
