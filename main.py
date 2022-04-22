@@ -308,7 +308,7 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                     else:
                         globals()[list_name].put(content)
                         # add reaction
-                        ctx.message.add_reaction("⏯")
+                        await ctx.message.add_reaction("⏯")
                 else:
                     await ctx.reply("Too long to say.")
                     # reply to sender
