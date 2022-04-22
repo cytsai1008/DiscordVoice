@@ -358,4 +358,11 @@ async def shutdown(ctx):
         await bot.close()
 
 
+@bot.command(Name="clear")
+async def clear(ctx):
+    list_name = f"list_{ctx.guild.id}"
+    if list_name in globals():
+        globals()[list_name].queue.clear()
+        await ctx.reply("Cleared.")
+
 bot.run(config["token"])
