@@ -317,6 +317,8 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                             globals()[list_name].put(content)
                             # add reaction
                             await ctx.message.add_reaction("⏯")
+                            asyncio.ensure_future(check_is_not_playing(ctx))
+                            playnext(ctx, db["lang"], guild_id, globals()[list_name])
 
                     elif ctx.author.id == config["owner"]:
                         print("init google tts api")
