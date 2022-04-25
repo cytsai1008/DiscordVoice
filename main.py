@@ -57,6 +57,18 @@ bot = commands.Bot(command_prefix=config["prefix"], help_command=None)
 bot.remove_command("help")
 load_dotenv()
 
+
+import shutil
+folder = 'tts_temp'
+for filename in os.listdir(folder):
+    file_path = os.path.join(folder, filename)
+    try:
+        if os.path.isfile(file_path) or os.path.islink(file_path):
+            os.unlink(file_path)
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+    except Exception as e:
+        print('Failed to delete %s. Reason: %s' % (file_path, e))
 # load command
 # help_zh_tw = load_command.read_description("help", "zh-tw")
 
