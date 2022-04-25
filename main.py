@@ -134,10 +134,10 @@ def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
             pass
 
     elif ctx.voice_client is not None and not ctx.voice_client.is_playing():
-        while ctx.voice_client is not None and not ctx.voice_client.is_playing() and not list_id.empty():
-            convert_tts(list_id.get(), lang_id, guild_id)
-            song = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
-            ctx.voice_client.play(song, after=playnext(ctx, lang_id, guild_id, list_id))
+        asyncio.sleep(0.5)
+        convert_tts(list_id.get(), lang_id, guild_id)
+        song = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+        ctx.voice_client.play(song, after=playnext(ctx, lang_id, guild_id, list_id))
 
 
 async def check_is_not_playing(ctx):
