@@ -125,7 +125,21 @@ def convert_tts(content: str, lang_code: str, file_name: str):
     ])
 
 
-async def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
+def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
+    if list_id.empty():
+        try:
+            if os.path.exists(f"tts_temp/{guild_id}.mp3"):
+                os.remove("tts_temp/{guild_id}.mp3")
+        except:
+            pass
+
+    elif ctx.voice_client is not None and not ctx.voice_client.is_playing():
+        convert_tts(list_id.get(), lang_id, guild_id)
+        song = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+        ctx.voice_client.play(song, after=playnext2(ctx, lang_id, guild_id, list_id))
+
+
+def playnext2(ctx, lang_id: str, guild_id, list_id: queue.Queue):
     if list_id.empty():
         try:
             if os.path.exists(f"tts_temp/{guild_id}.mp3"):
@@ -137,7 +151,6 @@ async def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
         convert_tts(list_id.get(), lang_id, guild_id)
         song = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
         ctx.voice_client.play(song, after=playnext(ctx, lang_id, guild_id, list_id))
-
 
 
 async def check_is_not_playing(ctx):
