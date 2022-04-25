@@ -139,6 +139,14 @@ def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
         ctx.voice_client.play(song, after=playnext(ctx, lang_id, guild_id, list_id))
 
 
+async def check_is_not_playing(ctx):
+    while True:
+        if ctx.voice_client is not None and ctx.voice_client.is_playing():
+            await asyncio.sleep(0.5)
+        else:
+            break
+
+
 @bot.event
 # 當機器人完成啟動時
 async def on_ready():
@@ -284,8 +292,18 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                             f"{guild_id}.mp3"
                         ])
                         voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
-                        ctx.voice_client.play(voice_file, after=playnext(ctx, db["lang"], guild_id, globals()[list_name]))
-                        await ctx.message.add_reaction("🔊")
+                        try:
+                            ctx.voice_client.play(voice_file, after=playnext(
+                                ctx,
+                                db["lang"],
+                                guild_id,
+                                globals()[list_name]))
+                            await ctx.message.add_reaction("🔊")
+                        except discord.errors.ClientException:
+                            globals()[list_name].put(content)
+                            # add reaction
+                            await ctx.message.add_reaction("⏯")
+
                     elif ctx.author.id == config["owner"]:
                         print("init google tts api")
                         # tts_func.process_voice(content, db["lang"])
@@ -305,12 +323,15 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                         # stop curreent audio
                         ctx.voice_client.stop()
                         await asyncio.sleep(0.5)
-                        ctx.voice_client.play(voice_file, after=playnext(ctx, db["lang"], guild_id, globals()[list_name]))
+                        ctx.voice_client.play(voice_file,
+                                              after=playnext(ctx, db["lang"], guild_id, globals()[list_name]))
                         await ctx.message.add_reaction("⁉")
                     else:
                         globals()[list_name].put(content)
                         # add reaction
                         await ctx.message.add_reaction("⏯")
+                        asyncio.ensure_future(check_is_not_playing(ctx))
+                        playnext(ctx, db["lang"], guild_id, globals()[list_name])
                 else:
                     await ctx.reply("Too long to say.")
                     # reply to sender
@@ -364,5 +385,6 @@ async def clear(ctx):
     if list_name in globals():
         globals()[list_name].queue.clear()
         await ctx.reply("Cleared.")
+
 
 bot.run(config["token"])
