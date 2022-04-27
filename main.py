@@ -57,8 +57,8 @@ bot = commands.Bot(command_prefix=config["prefix"], help_command=None)
 bot.remove_command("help")
 load_dotenv()
 
-
 import shutil
+
 folder = 'tts_temp'
 for filename in os.listdir(folder):
     file_path = os.path.join(folder, filename)
@@ -178,6 +178,7 @@ async def on_guild_join(guild):
         await general.send("Thanks for adding me!\n"
                            "Please set a channel by `$setchannel`.\n"
                            "Please set a language by `$setlang`.\n"
+                           "To join a voice channel, please use `$join`.\n"
                            "For more information, please type `$help`.")
 
 
@@ -257,9 +258,11 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
             else:
                 is_connected = True
 
+            channelissetup = tool_function.check_dict_data(db, "channel")
+            langissetup = tool_function.check_dict_data(db, "lang")
+
             if (is_connected and channel_id == db["channel"]
-                    and tool_function.check_dict_data(db, "channel")
-                    and tool_function.check_dict_data(db, "lang")):
+                    and channelissetup and langissetup):
 
                 # use cld to detect language
                 """
@@ -313,11 +316,12 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                                 globals()[list_name]))
                             await ctx.message.add_reaction("🔊")
                         except discord.errors.ClientException:
-                            globals()[list_name].put(content)
-                            # add reaction
-                            await ctx.message.add_reaction("⏯")
-                            asyncio.ensure_future(check_is_not_playing(ctx))
-                            playnext(ctx, db["lang"], guild_id, globals()[list_name])
+                            if tool_function.check_dict_data(db, "queue") and db["queue"]:
+                                globals()[list_name].put(content)
+                                # add reaction
+                                await ctx.message.add_reaction("⏯")
+                                asyncio.ensure_future(check_is_not_playing(ctx))
+                                playnext(ctx, db["lang"], guild_id, globals()[list_name])
 
                     elif ctx.author.id == config["owner"]:
                         print("init google tts api")
@@ -341,7 +345,7 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                         ctx.voice_client.play(voice_file,
                                               after=playnext(ctx, db["lang"], guild_id, globals()[list_name]))
                         await ctx.message.add_reaction("⁉")
-                    else:
+                    elif tool_function.check_dict_data(db, "queue") and db["queue"]:
                         globals()[list_name].put(content)
                         # add reaction
                         await ctx.message.add_reaction("⏯")
@@ -351,13 +355,24 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                     await ctx.reply("Too long to say.")
                     # reply to sender
             else:
+                """
                 await ctx.send("Please set channel by `$setchannel`.\n"
                                "Please set language by `$setlang`.\n"
                                "Please join voice channel by `$join`.")
+                """
+                errormsg = ""
+                if not is_connected:
+                    errormsg = errormsg + "Please join voice channel by `$join`.\n"
+                if not channelissetup:
+                    errormsg = errormsg + "Please set channel by `$setchannel`.\n"
+                if not langissetup:
+                    errormsg = errormsg + "Please set language by `$setlang`.\n"
+                await ctx.reply(errormsg)
         else:
-            await ctx.send("Please set channel by `$setchannel`.\n"
+            await ctx.send("Setting file not exist.\n"
+                           "Please set channel by `$setchannel`.\n"
                            "Please set language by `$setlang`.\n"
-                           "Please join voice channel by `$join`.")
+                           )
 
 
 @bot.command(Name="setlang")
