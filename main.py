@@ -433,6 +433,7 @@ async def stop(ctx):
 
     if is_connected and ctx.voice_client.is_playing():
         ctx.voice_client.stop()
+        await ctx.message.add_reaction("⏹")
 
 
 bot.run(config["token"])
