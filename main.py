@@ -417,4 +417,22 @@ async def clear(ctx):
         await ctx.reply("Cleared.")
 
 
+@bot.command(Name="stop")
+async def stop(ctx):
+    list_name = f"list_{ctx.guild.id}"
+    if list_name in globals():
+        globals()[list_name].queue.clear()
+    # stop playing from voice channel
+    try:
+        ctx.voice_client.is_connected()
+    except AttributeError:
+        # await ctx.send("Please join a voice channel first.")
+        is_connected = False
+    else:
+        is_connected = True
+
+    if is_connected and ctx.voice_client.is_playing():
+        ctx.voice_client.stop()
+
+
 bot.run(config["token"])
