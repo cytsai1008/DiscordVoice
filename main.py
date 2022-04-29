@@ -297,11 +297,9 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 # get username
                 say_this = len(content) < 30
                 try:
-                    member = ctx.guild.get_member(ctx.author.id)
-                    username = member.display_name
+                    username = ctx.author.display_name
                 except AttributeError:
                     username = ctx.author.name
-                    traceback.print_exc()
                 # get username length
                 if len(username) <= 20:
                     content = f"{username} said {content}"
