@@ -284,7 +284,10 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 # export content to mp3 by google tts api
                 # get username
                 say_this = len(content) < 30
-                username = ctx.author.name
+                try:
+                    username = ctx.member.display_name
+                except AttributeError:
+                    username = ctx.author.name
                 # get username length
                 if len(username) <= 20:
                     content = f'{username} said {content}'
