@@ -12,6 +12,7 @@ py-cord = "^1.7.3"
 discord = "^1.7.3"
 PyNaCl = "^1.5.0"
 google-cloud-texttospeech = "^2.11.0"
+black = "^22.3.0"
 
 [tool.poetry.dev-dependencies]
 

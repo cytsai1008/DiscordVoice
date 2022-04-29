@@ -26,11 +26,10 @@ logger = logging.getLogger("discord")
 logger.setLevel(logging.DEBUG)
 if not os.path.exists("Log"):
     os.mkdir("Log")
-handler = logging.FileHandler(filename="Log/discord.log",
-                              encoding="utf-8",
-                              mode="w")
+handler = logging.FileHandler(filename="Log/discord.log", encoding="utf-8", mode="w")
 handler.setFormatter(
-    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
+    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
+)
 logger.addHandler(handler)
 
 # check file
@@ -59,7 +58,7 @@ load_dotenv()
 
 import shutil
 
-folder = 'tts_temp'
+folder = "tts_temp"
 for filename in os.listdir(folder):
     file_path = os.path.join(folder, filename)
     try:
@@ -68,7 +67,7 @@ for filename in os.listdir(folder):
         elif os.path.isdir(file_path):
             shutil.rmtree(file_path)
     except Exception as e:
-        print('Failed to delete %s. Reason: %s' % (file_path, e))
+        print("Failed to delete %s. Reason: %s" % (file_path, e))
 # load command
 # help_zh_tw = load_command.read_description("help", "zh-tw")
 
@@ -125,16 +124,18 @@ def convert_tts(content: str, lang_code: str, file_name: str):
     print("init google tts api")
     # tts_func.process_voice(content, db["lang"])
     print("play mp3")
-    subprocess.call([
-        "python",
-        "tts_alone.py",
-        "--content",
-        content,
-        "--lang",
-        lang_code,
-        "--filename",
-        f"{file_name}.mp3"
-    ])
+    subprocess.call(
+        [
+            "python",
+            "tts_alone.py",
+            "--content",
+            content,
+            "--lang",
+            lang_code,
+            "--filename",
+            f"{file_name}.mp3",
+        ]
+    )
 
 
 def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
@@ -175,22 +176,26 @@ async def on_ready():
 async def on_guild_join(guild):
     general = guild.system_channel
     if general and general.permissions_for(guild.me).send_messages:
-        await general.send("Thanks for adding me!\n"
-                           "Please set a channel by `$setchannel`.\n"
-                           "Please set a language by `$setlang`.\n"
-                           "To join a voice channel, please use `$join`.\n"
-                           "For more information, please type `$help`.")
+        await general.send(
+            "Thanks for adding me!\n"
+            "Please set a channel by `$setchannel`.\n"
+            "Please set a language by `$setlang`.\n"
+            "To join a voice channel, please use `$join`.\n"
+            "For more information, please type `$help`."
+        )
 
 
 @bot.command(Name="help")
 async def help(ctx):
-    await ctx.send("Use `$help` to see the help message.\n"
-                   "Use `$setchannel` to set a channel.\n"
-                   "Use `$setlang` to set a language.\n"
-                   "Use `$say` to speak in voice channel.\n"
-                   "Use `$join` to let me join to a voice channel.\n"
-                   "Use `$leave` to let me leave the voice channel.\n"
-                   "Use `$ping` to check my latency.\n")
+    await ctx.send(
+        "Use `$help` to see the help message.\n"
+        "Use `$setchannel` to set a channel.\n"
+        "Use `$setlang` to set a language.\n"
+        "Use `$say` to speak in voice channel.\n"
+        "Use `$join` to let me join to a voice channel.\n"
+        "Use `$leave` to let me leave the voice channel.\n"
+        "Use `$ping` to check my latency.\n"
+    )
 
 
 @bot.command(Name="join")
@@ -206,8 +211,10 @@ async def join(ctx):
             await user_voice_channel.connect()
         except discord.errors.ClientException:
             bot_voice_channel = ctx.guild.voice_client.channel
-            await ctx.send(f"I'm already in <#{bot_voice_channel.id}>.\n"
-                           "To move, please use `$leave` first.")
+            await ctx.send(
+                f"I'm already in <#{bot_voice_channel.id}>.\n"
+                "To move, please use `$leave` first."
+            )
 
 
 @bot.command(Name="leave")
@@ -261,8 +268,12 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
             channelissetup = tool_function.check_dict_data(db, "channel")
             langissetup = tool_function.check_dict_data(db, "lang")
 
-            if (is_connected and channel_id == db["channel"]
-                    and channelissetup and langissetup):
+            if (
+                is_connected
+                and channelissetup
+                and langissetup
+                and channel_id == db["channel"]
+            ):
 
                 # use cld to detect language
                 """
@@ -290,7 +301,7 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                     username = ctx.author.name
                 # get username length
                 if len(username) <= 20:
-                    content = f'{username} said {content}'
+                    content = f"{username} said {content}"
                 if say_this:
                     list_name = f"list_{str(guild_id)}"
                     if list_name not in globals():
@@ -300,53 +311,67 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                         print("init google tts api")
                         # tts_func.process_voice(content, db["lang"])
                         print("play mp3")
-                        subprocess.call([
-                            "python",
-                            "tts_alone.py",
-                            "--content",
-                            content,
-                            "--lang",
-                            db["lang"],
-                            "--filename",
-                            f"{guild_id}.mp3"
-                        ])
+                        subprocess.call(
+                            [
+                                "python",
+                                "tts_alone.py",
+                                "--content",
+                                content,
+                                "--lang",
+                                db["lang"],
+                                "--filename",
+                                f"{guild_id}.mp3",
+                            ]
+                        )
                         voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                         try:
-                            ctx.voice_client.play(voice_file, after=playnext(
-                                ctx,
-                                db["lang"],
-                                guild_id,
-                                globals()[list_name]))
+                            ctx.voice_client.play(
+                                voice_file,
+                                after=playnext(
+                                    ctx, db["lang"], guild_id, globals()[list_name]
+                                ),
+                            )
                             await ctx.message.add_reaction("🔊")
                         except discord.errors.ClientException:
-                            if tool_function.check_dict_data(db, "queue") and db["queue"]:
+                            if (
+                                tool_function.check_dict_data(db, "queue")
+                                and db["queue"]
+                            ):
                                 globals()[list_name].put(content)
                                 # add reaction
                                 await ctx.message.add_reaction("⏯")
                                 asyncio.ensure_future(check_is_not_playing(ctx))
-                                playnext(ctx, db["lang"], guild_id, globals()[list_name])
+                                playnext(
+                                    ctx, db["lang"], guild_id, globals()[list_name]
+                                )
 
                     elif ctx.author.id == config["owner"]:
                         print("init google tts api")
                         # tts_func.process_voice(content, db["lang"])
                         print("play mp3")
-                        subprocess.call([
-                            "python",
-                            "tts_alone.py",
-                            "--content",
-                            content,
-                            "--lang",
-                            db["lang"],
-                            "--filename",
-                            f"{guild_id}.mp3"
-                        ])
+                        subprocess.call(
+                            [
+                                "python",
+                                "tts_alone.py",
+                                "--content",
+                                content,
+                                "--lang",
+                                db["lang"],
+                                "--filename",
+                                f"{guild_id}.mp3",
+                            ]
+                        )
 
                         voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                         # stop curreent audio
                         ctx.voice_client.stop()
                         await asyncio.sleep(0.5)
-                        ctx.voice_client.play(voice_file,
-                                              after=playnext(ctx, db["lang"], guild_id, globals()[list_name]))
+                        ctx.voice_client.play(
+                            voice_file,
+                            after=playnext(
+                                ctx, db["lang"], guild_id, globals()[list_name]
+                            ),
+                        )
                         await ctx.message.add_reaction("⁉")
                     elif tool_function.check_dict_data(db, "queue") and db["queue"]:
                         globals()[list_name].put(content)
@@ -372,10 +397,11 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                     errormsg = errormsg + "Please set language by `$setlang`.\n"
                 await ctx.reply(errormsg)
         else:
-            await ctx.send("Setting file not exist.\n"
-                           "Please set channel by `$setchannel`.\n"
-                           "Please set language by `$setlang`.\n"
-                           )
+            await ctx.send(
+                "Setting file not exist.\n"
+                "Please set channel by `$setchannel`.\n"
+                "Please set language by `$setlang`.\n"
+            )
 
 
 @bot.command(Name="setlang")
@@ -436,6 +462,7 @@ async def stop(ctx):
 
     if is_connected and ctx.voice_client.is_playing():
         ctx.voice_client.stop()
+        await ctx.message.add_reaction("⏹")
 
 
 bot.run(config["token"])
