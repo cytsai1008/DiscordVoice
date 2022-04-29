@@ -2,6 +2,7 @@
 import asyncio
 import logging
 import os
+import traceback
 
 # import sys
 import queue
@@ -300,6 +301,7 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                     username = member.display_name
                 except AttributeError:
                     username = ctx.author.name
+                    traceback.print_exc()
                 # get username length
                 if len(username) <= 20:
                     content = f"{username} said {content}"
