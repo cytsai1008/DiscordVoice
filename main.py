@@ -1,8 +1,6 @@
-# import asyncio
 import asyncio
 import logging
 import os
-import time
 import traceback
 
 # import sys
@@ -140,7 +138,6 @@ def convert_tts(content: str, lang_code: str, file_name: str):
 
 
 def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
-    time.sleep(0.5)
     if list_id.empty():
         try:
             if os.path.exists(f"tts_temp/{guild_id}.mp3"):
@@ -149,7 +146,6 @@ def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
             pass
 
     elif ctx.voice_client is not None and not ctx.voice_client.is_playing():
-        asyncio.sleep(0.5)
         convert_tts(list_id.get(), lang_id, guild_id)
         song = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
         ctx.voice_client.play(song, after=playnext(ctx, lang_id, guild_id, list_id))
