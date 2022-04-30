@@ -7,6 +7,7 @@ import traceback
 # import sys
 import queue
 import subprocess
+import shutil
 
 import discord
 from discord.ext import commands
@@ -57,8 +58,6 @@ bot = commands.Bot(command_prefix=config["prefix"], help_command=None)
 bot.remove_command("help")
 load_dotenv()
 
-import shutil
-
 folder = "tts_temp"
 for filename in os.listdir(folder):
     file_path = os.path.join(folder, filename)
@@ -68,7 +67,7 @@ for filename in os.listdir(folder):
         elif os.path.isdir(file_path):
             shutil.rmtree(file_path)
     except Exception as e:
-        print("Failed to delete %s. Reason: %s" % (file_path, e))
+        print(f"Failed to delete {file_path}. Reason: {e}")
 # load command
 # help_zh_tw = load_command.read_description("help", "zh-tw")
 
@@ -140,6 +139,7 @@ def convert_tts(content: str, lang_code: str, file_name: str):
 
 
 def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
+    await asyncio.sleep(0.5)
     if list_id.empty():
         try:
             if os.path.exists(f"tts_temp/{guild_id}.mp3"):
@@ -270,10 +270,10 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
             langissetup = tool_function.check_dict_data(db, "lang")
 
             if (
-                is_connected
-                and channelissetup
-                and langissetup
-                and channel_id == db["channel"]
+                    is_connected
+                    and channelissetup
+                    and langissetup
+                    and channel_id == db["channel"]
             ):
 
                 # use cld to detect language
@@ -335,8 +335,8 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                             await ctx.message.add_reaction("🔊")
                         except discord.errors.ClientException:
                             if (
-                                tool_function.check_dict_data(db, "queue")
-                                and db["queue"]
+                                    tool_function.check_dict_data(db, "queue")
+                                    and db["queue"]
                             ):
                                 globals()[list_name].put(content)
                                 # add reaction
@@ -391,11 +391,11 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 """
                 errormsg = ""
                 if not is_connected:
-                    errormsg = errormsg + "Please join voice channel by `$join`.\n"
+                    errormsg += "Please join voice channel by `$join`.\n"
                 if not channelissetup:
-                    errormsg = errormsg + "Please set channel by `$setchannel`.\n"
+                    errormsg += "Please set channel by `$setchannel`.\n"
                 if not langissetup:
-                    errormsg = errormsg + "Please set language by `$setlang`.\n"
+                    errormsg += "Please set language by `$setlang`.\n"
                 await ctx.reply(errormsg)
         else:
             await ctx.send(
