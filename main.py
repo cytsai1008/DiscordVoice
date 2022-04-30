@@ -216,6 +216,8 @@ async def join(ctx):
                 f"I'm already in <#{bot_voice_channel.id}>.\n"
                 "To move, please use `$leave` first."
             )
+        else:
+            await ctx.message.add_reaction("✅")
 
 
 @bot.command(Name="leave")
@@ -224,6 +226,8 @@ async def leave(ctx):
         await ctx.voice_client.disconnect()
     except AttributeError:
         pass
+    else:
+        await ctx.message.add_reaction("🖐")
 
 
 @bot.command(Name="setchannel")
@@ -435,7 +439,7 @@ async def shutdown(ctx):
     owner = tool_function.read_json("config.json")
     owner = owner["owner"]
     if sender == owner:
-        await ctx.send("Shutting down...")
+        await ctx.reply("Shutting down...")
         await bot.close()
 
 
