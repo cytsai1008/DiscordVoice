@@ -139,7 +139,7 @@ def convert_tts(content: str, lang_code: str, file_name: str):
 
 
 def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
-    await asyncio.sleep(0.5)
+    time.sleep(0.5)
     if list_id.empty():
         try:
             if os.path.exists(f"tts_temp/{guild_id}.mp3"):
