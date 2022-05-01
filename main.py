@@ -296,7 +296,7 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                 """
                 # export content to mp3 by google tts api
                 # get username
-                say_this = len(content) < 30
+                say_this = ctx.author.id == config["owner"] or len(content) < 30
                 try:
                     username = ctx.author.display_name
                 except AttributeError:
