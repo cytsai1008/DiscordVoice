@@ -303,7 +303,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     username = ctx.author.name
                 # get username length
                 if len(username) <= 20:
-                    if ctx.member.voice is not None:
+                    if ctx.author.voice is not None:
                         content = f"{username} said {content}"
                     else:
                         content = f"{username} from outside said {content}"
