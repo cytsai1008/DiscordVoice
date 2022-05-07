@@ -245,7 +245,7 @@ async def setchannel(ctx, channel: discord.TextChannel):
 
 
 @bot.command(Name="say")
-async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
+async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # get message channel id
     if content is None:
         await ctx.send("Please input your message.")
@@ -303,7 +303,10 @@ async def say(ctx, *, content: str):  # sourcery skip: for-index-replacement
                     username = ctx.author.name
                 # get username length
                 if len(username) <= 20:
-                    content = f"{username} said {content}"
+                    if ctx.member.voice is not None:
+                        content = f"{username} said {content}"
+                    else:
+                        content = f"{username} from outside said {content}"
                 if say_this:
                     list_name = f"list_{str(guild_id)}"
                     if list_name not in globals():
