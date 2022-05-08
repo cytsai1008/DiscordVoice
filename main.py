@@ -7,6 +7,7 @@ import traceback
 import queue
 import subprocess
 import shutil
+from datetime import datetime
 
 import discord
 from discord.ext import commands
@@ -181,6 +182,34 @@ async def on_guild_join(guild):
             "To join a voice channel, please use `$join`.\n"
             "For more information, please type `$help`."
         )
+
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, discord.ext.commands.errors.CommandNotFound):
+        await ctx.reply("Command not found.")
+        await ctx.message.add_reaction("❌")
+    elif isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
+        await ctx.reply("Missing required argument.")
+        await ctx.message.add_reaction("❓")
+    elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
+        await ctx.reply("You're too fast! Please wait a bit.")
+        await ctx.message.add_reaction("⏳")
+
+
+@bot.event
+async def on_error(event, *args, **kwargs):
+    with open("error.log", "a") as f:
+        f.write(f"{datetime.now()}\n")
+        f.write(f"{event}\n")
+        f.write(f"{args}\n")
+        f.write(f"{kwargs}\n")
+        f.write("\n")
+    # send message to owner
+    owner = await bot.fetch_user(config["owner"])
+    await owner.send(f"Error event on: {event}\n"
+                     f"Error args on: {args}\n"
+                     f"Error kwargs on: {kwargs}\n")
 
 
 @bot.command(Name="help")
