@@ -456,7 +456,7 @@ async def setlang(ctx, lang: str):
             tool_function.write_json(f"db/{guild_id}.json", db)
         else:
             tool_function.write_json(f"db/{guild_id}.json", {"lang": lang})
-        await ctx.reply(f"Language set to {lang}.")
+        await ctx.reply(f"Language set to `{lang}`.")
         await ctx.message.add_reaction("✅")
     else:
         await ctx.reply(
