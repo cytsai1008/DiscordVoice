@@ -29,4 +29,5 @@ def list_languages():
 
 
 if __name__ == "__main__":
+    print("Updating languages.json...")
     list_languages()

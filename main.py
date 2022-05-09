@@ -12,7 +12,6 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 
-# from datetime import datetime
 from dotenv import load_dotenv
 
 import tool_function
@@ -122,7 +121,6 @@ def remove_file(file_name):
 
 def convert_tts(content: str, lang_code: str, file_name: str):
     print("init google tts api")
-    # tts_func.process_voice(content, db["lang"])
     print("play mp3")
     subprocess.call(
         [
@@ -289,11 +287,9 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
         db = tool_function.read_json(f"db/{guild_id}.json")
         # check channel id
         # check if is in voice channel
-        # print(ctx.voice_client.is_connected())
         try:
             ctx.voice_client.is_connected()
         except AttributeError:
-            # await ctx.send("Please join a voice channel first.")
             is_connected = False
         else:
             is_connected = True
@@ -399,7 +395,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     )
 
                     voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
-                    # stop curreent audio
+                    # stop current audio
                     ctx.voice_client.stop()
                     await asyncio.sleep(0.5)
                     ctx.voice_client.play(
@@ -500,7 +496,6 @@ async def stop(ctx):
     try:
         ctx.voice_client.is_connected()
     except AttributeError:
-        # await ctx.send("Please join a voice channel first.")
         is_connected = False
     else:
         is_connected = True
