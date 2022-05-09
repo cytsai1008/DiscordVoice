@@ -207,9 +207,11 @@ async def on_error(event, *args, **kwargs):
         f.write("\n")
     # send message to owner
     owner = await bot.fetch_user(config["owner"])
-    await owner.send(f"Error event on: {event}\n"
-                     f"Error args on: {args}\n"
-                     f"Error kwargs on: {kwargs}\n")
+    await owner.send(
+        f"Error event on: {event}\n"
+        f"Error args on: {args}\n"
+        f"Error kwargs on: {kwargs}\n"
+    )
 
 
 @bot.command(Name="help")
@@ -457,9 +459,11 @@ async def setlang(ctx, lang: str):
         await ctx.reply(f"Language set to {lang}.")
         await ctx.message.add_reaction("✅")
     else:
-        await ctx.reply(f"{lang} is not supported.\n"
-                        f"Current supported languages: \n"
-                        f"```{support_lang}```")
+        await ctx.reply(
+            f"{lang} is not supported.\n"
+            f"Current supported languages: \n"
+            f"```{', '.join(support_lang['Support_Language'])}```"
+        )
         await ctx.message.add_reaction("❌")
 
 
