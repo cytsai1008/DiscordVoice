@@ -460,7 +460,7 @@ async def setlang(ctx, lang: str):
         await ctx.message.add_reaction("✅")
     else:
         await ctx.reply(
-            f"{lang} is not supported.\n"
+            f"`{lang}` is not supported.\n"
             f"Current supported languages: \n"
             f"```{', '.join(support_lang['Support_Language'])}```"
         )
