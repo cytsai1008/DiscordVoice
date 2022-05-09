@@ -377,7 +377,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                                 ctx, db["lang"], guild_id, globals()[list_name]
                             )
                         else:
-                            await ctx.reply("Sorry, Queue function is under development and current not supported.")
+                            await ctx.reply("Sorry, queue function is under development and current not supported.")
 
                 elif ctx.author.id == config["owner"]:
                     print("init google tts api")
@@ -414,7 +414,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     asyncio.ensure_future(check_is_not_playing(ctx))
                     playnext(ctx, db["lang"], guild_id, globals()[list_name])
                 else:
-                    await ctx.reply("Sorry, Queue function is under development and current not supported.")
+                    await ctx.reply("Sorry, queue function is under development and current not supported.")
             else:
                 await ctx.reply("Too long to say.")
                 # reply to sender
