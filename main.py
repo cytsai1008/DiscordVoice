@@ -221,6 +221,7 @@ async def help(ctx):
         "Use `$setchannel` to set a channel.\n"
         "Use `$setlang` to set a language.\n"
         "Use `$say` to speak in voice channel.\n"
+        "Use `$stop` to stop speaking.\n"
         "Use `$join` to let me join to a voice channel.\n"
         "Use `$leave` to let me leave the voice channel.\n"
         "Use `$ping` to check my latency.\n"
@@ -233,14 +234,14 @@ async def join(ctx):
     try:
         user_voice_channel = ctx.author.voice.channel
     except AttributeError:
-        await ctx.send("Please join a voice channel first.")
+        await ctx.reply("Please join a voice channel first.")
     # join
     else:
         try:
             await user_voice_channel.connect()
         except discord.errors.ClientException:
             bot_voice_channel = ctx.guild.voice_client.channel
-            await ctx.send(
+            await ctx.reply(
                 f"I'm already in <#{bot_voice_channel.id}>.\n"
                 "To move, please use `$leave` first."
             )
@@ -272,172 +273,170 @@ async def setchannel(ctx, channel: discord.TextChannel):
         data = {"channel": channel_id}
 
     tool_function.write_json(f"db/{guild_id}.json", data)
-    await ctx.send(f"channel set to <#{channel.id}>.")
+    await ctx.reply(f"channel set to <#{channel.id}>.")
 
 
 @bot.command(Name="say")
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # get message channel id
-    if content is None:
-        await ctx.send("Please input your message.")
-    else:
-        channel_id = ctx.channel.id
-        # get guild id
-        guild_id = ctx.guild.id
-        if tool_function.check_file(f"db/{guild_id}.json"):
-            # read db file
-            db = tool_function.read_json(f"db/{guild_id}.json")
-            # check channel id
-            # check if is in voice channel
-            # print(ctx.voice_client.is_connected())
+
+    channel_id = ctx.channel.id
+    # get guild id
+    guild_id = ctx.guild.id
+    if tool_function.check_file(f"db/{guild_id}.json"):
+        # read db file
+        db = tool_function.read_json(f"db/{guild_id}.json")
+        # check channel id
+        # check if is in voice channel
+        # print(ctx.voice_client.is_connected())
+        try:
+            ctx.voice_client.is_connected()
+        except AttributeError:
+            # await ctx.send("Please join a voice channel first.")
+            is_connected = False
+        else:
+            is_connected = True
+
+        channelissetup = tool_function.check_dict_data(db, "channel")
+        langissetup = tool_function.check_dict_data(db, "lang")
+
+        if (
+                is_connected
+                and channelissetup
+                and langissetup
+                and channel_id == db["channel"]
+        ):
+
+            # use cld to detect language
+            """
+            _, _, _, language = pycld2.detect(content, returnVector=True, debugScoreAsQuads=True)
+            # separate multiple tuples as list
+            language = list(language)
+            # find unknown language as english in all key
+            for i in range(len(language)):
+                if language[i][4] == "un":
+                    language[i][4] = "en"
+                    language[i][3] = "ENGLISH"
+                # merge if adjacent key are same
+                if i != 0 and language[i][4] == language[i - 1][4]:
+                    language[i - 1][2] += language[i][2]
+
+            # separate text language
+            # TODO: Multiple language split ( I can't split by number )
+            """
+            # export content to mp3 by google tts api
+            # get username
+            say_this = ctx.author.id == config["owner"] or len(content) < 30
             try:
-                ctx.voice_client.is_connected()
+                username = ctx.author.display_name
             except AttributeError:
-                # await ctx.send("Please join a voice channel first.")
-                is_connected = False
-            else:
-                is_connected = True
+                username = ctx.author.name
+            # get username length
+            if len(username) <= 20:
+                if ctx.author.voice is not None:
+                    content = f"{username} said {content}"
+                else:
+                    content = f"{username} from outside said {content}"
+            if say_this:
+                list_name = f"list_{str(guild_id)}"
+                if list_name not in globals():
+                    globals()[list_name] = queue.Queue(maxsize=10)
 
-            channelissetup = tool_function.check_dict_data(db, "channel")
-            langissetup = tool_function.check_dict_data(db, "lang")
-
-            if (
-                    is_connected
-                    and channelissetup
-                    and langissetup
-                    and channel_id == db["channel"]
-            ):
-
-                # use cld to detect language
-                """
-                _, _, _, language = pycld2.detect(content, returnVector=True, debugScoreAsQuads=True)
-                # separate multiple tuples as list
-                language = list(language)
-                # find unknown language as english in all key
-                for i in range(len(language)):
-                    if language[i][4] == "un":
-                        language[i][4] = "en"
-                        language[i][3] = "ENGLISH"
-                    # merge if adjacent key are same
-                    if i != 0 and language[i][4] == language[i - 1][4]:
-                        language[i - 1][2] += language[i][2]
-
-                # separate text language
-                # TODO: Multiple language split ( I can't split by number )
-                """
-                # export content to mp3 by google tts api
-                # get username
-                say_this = ctx.author.id == config["owner"] or len(content) < 30
-                try:
-                    username = ctx.author.display_name
-                except AttributeError:
-                    username = ctx.author.name
-                # get username length
-                if len(username) <= 20:
-                    if ctx.author.voice is not None:
-                        content = f"{username} said {content}"
-                    else:
-                        content = f"{username} from outside said {content}"
-                if say_this:
-                    list_name = f"list_{str(guild_id)}"
-                    if list_name not in globals():
-                        globals()[list_name] = queue.Queue(maxsize=10)
-
-                    if not ctx.voice_client.is_playing():
-                        print("init google tts api")
-                        # tts_func.process_voice(content, db["lang"])
-                        print("play mp3")
-                        subprocess.call(
-                            [
-                                "python",
-                                "tts_alone.py",
-                                "--content",
-                                content,
-                                "--lang",
-                                db["lang"],
-                                "--filename",
-                                f"{guild_id}.mp3",
-                            ]
-                        )
-                        voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
-                        try:
-                            ctx.voice_client.play(
-                                voice_file,
-                                after=playnext(
-                                    ctx, db["lang"], guild_id, globals()[list_name]
-                                ),
-                            )
-                            await ctx.message.add_reaction("🔊")
-                        except discord.errors.ClientException:
-                            if (
-                                    tool_function.check_dict_data(db, "queue")
-                                    and db["queue"]
-                            ):
-                                globals()[list_name].put(content)
-                                # add reaction
-                                await ctx.message.add_reaction("⏯")
-                                asyncio.ensure_future(check_is_not_playing(ctx))
-                                playnext(
-                                    ctx, db["lang"], guild_id, globals()[list_name]
-                                )
-
-                    elif ctx.author.id == config["owner"]:
-                        print("init google tts api")
-                        # tts_func.process_voice(content, db["lang"])
-                        print("play mp3")
-                        subprocess.call(
-                            [
-                                "python",
-                                "tts_alone.py",
-                                "--content",
-                                content,
-                                "--lang",
-                                db["lang"],
-                                "--filename",
-                                f"{guild_id}.mp3",
-                            ]
-                        )
-
-                        voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
-                        # stop curreent audio
-                        ctx.voice_client.stop()
-                        await asyncio.sleep(0.5)
+                if not ctx.voice_client.is_playing():
+                    print("init google tts api")
+                    # tts_func.process_voice(content, db["lang"])
+                    print("play mp3")
+                    subprocess.call(
+                        [
+                            "python",
+                            "tts_alone.py",
+                            "--content",
+                            content,
+                            "--lang",
+                            db["lang"],
+                            "--filename",
+                            f"{guild_id}.mp3",
+                        ]
+                    )
+                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                    try:
                         ctx.voice_client.play(
                             voice_file,
                             after=playnext(
                                 ctx, db["lang"], guild_id, globals()[list_name]
                             ),
                         )
-                        await ctx.message.add_reaction("⁉")
-                    elif tool_function.check_dict_data(db, "queue") and db["queue"]:
-                        globals()[list_name].put(content)
-                        # add reaction
-                        await ctx.message.add_reaction("⏯")
-                        asyncio.ensure_future(check_is_not_playing(ctx))
-                        playnext(ctx, db["lang"], guild_id, globals()[list_name])
-                else:
-                    await ctx.reply("Too long to say.")
-                    # reply to sender
+                        await ctx.message.add_reaction("🔊")
+                    except discord.errors.ClientException:
+                        if (
+                                tool_function.check_dict_data(db, "queue")
+                                and db["queue"]
+                        ):
+                            globals()[list_name].put(content)
+                            # add reaction
+                            await ctx.message.add_reaction("⏯")
+                            asyncio.ensure_future(check_is_not_playing(ctx))
+                            playnext(
+                                ctx, db["lang"], guild_id, globals()[list_name]
+                            )
+
+                elif ctx.author.id == config["owner"]:
+                    print("init google tts api")
+                    # tts_func.process_voice(content, db["lang"])
+                    print("play mp3")
+                    subprocess.call(
+                        [
+                            "python",
+                            "tts_alone.py",
+                            "--content",
+                            content,
+                            "--lang",
+                            db["lang"],
+                            "--filename",
+                            f"{guild_id}.mp3",
+                        ]
+                    )
+
+                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                    # stop curreent audio
+                    ctx.voice_client.stop()
+                    await asyncio.sleep(0.5)
+                    ctx.voice_client.play(
+                        voice_file,
+                        after=playnext(
+                            ctx, db["lang"], guild_id, globals()[list_name]
+                        ),
+                    )
+                    await ctx.message.add_reaction("⁉")
+                elif tool_function.check_dict_data(db, "queue") and db["queue"]:
+                    globals()[list_name].put(content)
+                    # add reaction
+                    await ctx.message.add_reaction("⏯")
+                    asyncio.ensure_future(check_is_not_playing(ctx))
+                    playnext(ctx, db["lang"], guild_id, globals()[list_name])
             else:
-                """
-                await ctx.send("Please set channel by `$setchannel`.\n"
-                               "Please set language by `$setlang`.\n"
-                               "Please join voice channel by `$join`.")
-                """
-                errormsg = ""
-                if not is_connected:
-                    errormsg += "Please join voice channel by `$join`.\n"
-                if not channelissetup:
-                    errormsg += "Please set channel by `$setchannel`.\n"
-                if not langissetup:
-                    errormsg += "Please set language by `$setlang`.\n"
-                await ctx.reply(errormsg)
+                await ctx.reply("Too long to say.")
+                # reply to sender
         else:
-            await ctx.send(
-                "Setting file not exist.\n"
-                "Please set channel by `$setchannel`.\n"
-                "Please set language by `$setlang`.\n"
-            )
+            """
+            await ctx.send("Please set channel by `$setchannel`.\n"
+                           "Please set language by `$setlang`.\n"
+                           "Please join voice channel by `$join`.")
+            """
+            errormsg = ""
+            if not is_connected:
+                errormsg += "Please join voice channel by `$join`.\n"
+            if not channelissetup:
+                errormsg += "Please set channel by `$setchannel`.\n"
+            if not langissetup:
+                errormsg += "Please set language by `$setlang`.\n"
+            await ctx.reply(errormsg)
+    else:
+        await ctx.send(
+            "Setting file not exist.\n"
+            "Please set channel by `$setchannel`.\n"
+            "Please set language by `$setlang`.\n"
+        )
 
 
 @bot.command(Name="setlang")
