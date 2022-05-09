@@ -193,7 +193,7 @@ async def on_command_error(ctx, error):
         await ctx.reply("Missing required argument.")
         await ctx.message.add_reaction("❓")
     elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
-        await ctx.reply("You're too fast! Please wait a bit.")
+        await ctx.reply(f"You're too fast! Please wait for {round(error.retry_after)} seconds.")
         await ctx.message.add_reaction("⏳")
 
 
@@ -280,6 +280,7 @@ async def setchannel(ctx, channel: discord.TextChannel):
 
 
 @bot.command(Name="say")
+@commands.cooldown(1, 5, commands.BucketType.user)
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # get message channel id
 
@@ -473,6 +474,7 @@ async def setlang(ctx, lang: str):
 
 
 @bot.command(Name="ping")
+@commands.cooldown(1, 5, commands.BucketType.user)
 async def ping(ctx):
     await ctx.reply(f"Pong! {round(bot.latency * 1000)}ms")
 
