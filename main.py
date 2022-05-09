@@ -280,7 +280,7 @@ async def setchannel(ctx, channel: discord.TextChannel):
 
 
 @bot.command(Name="say")
-@commands.cooldown(1, 5, commands.BucketType.user)
+@commands.cooldown(1, 3, commands.BucketType.user)
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # get message channel id
 
