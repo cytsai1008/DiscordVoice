@@ -235,6 +235,7 @@ async def join(ctx):
         user_voice_channel = ctx.author.voice.channel
     except AttributeError:
         await ctx.reply("Please join a voice channel first.")
+        await ctx.message.add_reaction("❌")
     # join
     else:
         try:
@@ -431,6 +432,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             if not langissetup:
                 errormsg += "Please set language by `$setlang`.\n"
             await ctx.reply(errormsg)
+            await ctx.message.add_reaction("❌")
     else:
         await ctx.send(
             "Setting file not exist.\n"
