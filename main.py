@@ -175,9 +175,11 @@ async def on_guild_join(guild):
     if general and general.permissions_for(guild.me).send_messages:
         await general.send(
             "Thanks for adding me!\n"
-            "Please set a channel by `$setchannel`.\n"
-            "Please set a language by `$setlang`.\n"
+            "Please set a channel by `$setchannel`. (ex. `$setchannel #general`)\n"
+            "Please set a language by `$setlang`. (ex. `$setlang en-us`)\n"
+            "To speak something, please use `$say`. (ex. `$say ABCD`)\n"
             "To join a voice channel, please use `$join`.\n"
+            "To leave a voice channel, please use `$leave`.\n"
             "For more information, please type `$help`."
         )
 
@@ -214,11 +216,11 @@ async def on_error(event, *args, **kwargs):
 
 @bot.command(Name="help")
 async def help(ctx):
-    await ctx.send(
+    await ctx.reply(
         "Use `$help` to see the help message.\n"
-        "Use `$setchannel` to set a channel.\n"
-        "Use `$setlang` to set a language.\n"
-        "Use `$say` to speak in voice channel.\n"
+        "Use `$setchannel` to set a channel. (ex. `$setchannel #general`)\n"
+        "Use `$setlang` to set a language. (ex. `$setlang en-us`)\n"
+        "Use `$say` to speak in voice channel. (ex. `$say ABCD`)\n"
         "Use `$stop` to stop speaking.\n"
         "Use `$join` to let me join to a voice channel.\n"
         "Use `$leave` to let me leave the voice channel.\n"
@@ -244,6 +246,7 @@ async def join(ctx):
                 f"I'm already in <#{bot_voice_channel.id}>.\n"
                 "To move, please use `$leave` first."
             )
+            await ctx.message.add_reaction("❌")
         else:
             await ctx.message.add_reaction("✅")
 
@@ -259,6 +262,7 @@ async def leave(ctx):
 
 
 @bot.command(Name="setchannel")
+# Won't return error if type not `discord.TextChannel`
 async def setchannel(ctx, channel: discord.TextChannel):
     # get channel id
     channel_id = channel.id
@@ -470,7 +474,7 @@ async def setlang(ctx, lang: str):
 
 @bot.command(Name="ping")
 async def ping(ctx):
-    await ctx.send(f"Pong! {round(bot.latency * 1000)}ms")
+    await ctx.reply(f"Pong! {round(bot.latency * 1000)}ms")
 
 
 @bot.command(Name="shutdown")
