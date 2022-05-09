@@ -442,19 +442,25 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
 async def setlang(ctx, lang: str):
     # get guild id
     guild_id = ctx.guild.id
-    if tool_function.check_file(f"db/{guild_id}.json"):
-        # read db file
-        db = tool_function.read_json(f"db/{guild_id}.json")
-        # add lang to db
-        db["lang"] = lang
-        # write to db file
-        tool_function.write_json(f"db/{guild_id}.json", db)
+    support_lang = tool_function.read_json("languages.json")
+    lang = lang.lower()
+    if lang in support_lang["Support_Language"]:
+        if tool_function.check_file(f"db/{guild_id}.json"):
+            # read db file
+            db = tool_function.read_json(f"db/{guild_id}.json")
+            # add lang to db
+            db["lang"] = lang
+            # write to db file
+            tool_function.write_json(f"db/{guild_id}.json", db)
+        else:
+            tool_function.write_json(f"db/{guild_id}.json", {"lang": lang})
+        await ctx.reply(f"Language set to {lang}.")
+        await ctx.message.add_reaction("✅")
     else:
-        tool_function.write_json(f"db/{guild_id}.json", {"lang": lang})
-    await ctx.send(
-        f"Set language to {lang}\n"
-        f"Please make sure the code is same as https://cloud.google.com/text-to-speech/docs/voices or BCP 47."
-    )
+        await ctx.reply(f"{lang} is not supported.\n"
+                        f"Current supported languages: \n"
+                        f"```{support_lang}```")
+        await ctx.message.add_reaction("❌")
 
 
 @bot.command(Name="ping")
@@ -499,4 +505,5 @@ async def stop(ctx):
         await ctx.message.add_reaction("⏹")
 
 
+subprocess.call(["python", "get_lang_code.py"])
 bot.run(config["token"])
