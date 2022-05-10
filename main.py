@@ -194,7 +194,11 @@ async def on_command_error(ctx, error):
         if command == "setchannel":
             await ctx.reply("No channel providing, please set by `$setchannel #some-channel`.")
         elif command == "setlang":
-            await ctx.reply("No language providing, please set by `$setlang supported-language`.")
+            support_lang = tool_function.read_json("languages.json")
+            await ctx.reply("No language providing, please set by `$setlang some-lang-code`."
+                            f"Current supported languages: \n"
+                            f"```{', '.join(support_lang['Support_Language'])}```"
+                            )
         elif command == "say":
             await ctx.reply("What can I say? :(")
         else:
@@ -240,7 +244,10 @@ async def help(ctx):
         if tool_function.check_dict_data(data, "lang"):
             lang_msg = f"Use `$setlang` to set a language. (Current: `{data['lang']}`)\n"
         else:
-            lang_msg = "Use `$setlang` to set a language. (ex. `$setlang en-us`)\n"
+            support_lang = tool_function.read_json("languages.json")
+            lang_msg = "Use `$setlang` to set a language. (ex. `$setlang en-us`)\n" \
+                       f"Current supported languages: \n" \
+                       f"```{', '.join(support_lang['Support_Language'])}```"
 
         if tool_function.check_dict_data(data, "channel"):
             channel_msg = f"Use `$setchannel` to set a channel. (Current: <#{data['channel']}>)\n"
@@ -514,6 +521,11 @@ async def setlang(ctx, lang: str):
             tool_function.write_json(f"db/{guild_id}.json", {"lang": lang})
         await ctx.reply(f"Language set to `{lang}`.")
         await ctx.message.add_reaction("✅")
+    elif lang == "supported-languages":
+        await ctx.reply(
+            f"Current supported languages: \n"
+            f"```{', '.join(support_lang['Support_Language'])}```"
+        )
     else:
         await ctx.reply(
             f"`{lang}` is not supported.\n"
