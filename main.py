@@ -186,11 +186,17 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_command_error(ctx, error):
+    command = ctx.invoked_with
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
         await ctx.reply("Command not found.")
         await ctx.message.add_reaction("❌")
     elif isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
-        await ctx.reply("Missing required argument.")
+        if command == "setchannel":
+            await ctx.reply("No channel providing, please set by `$setchannel #some-channel`.")
+        elif command == "setlang":
+            await ctx.reply("No language providing, please set by `$setlang supported-language`.")
+        else:
+            await ctx.reply("Missing required argument.")
         await ctx.message.add_reaction("❓")
     elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
         await ctx.reply(f"You're too fast! Please wait for {round(error.retry_after)} seconds.")
@@ -306,6 +312,14 @@ async def setchannel(ctx, channel: discord.TextChannel):
 
     tool_function.write_json(f"db/{guild_id}.json", data)
     await ctx.reply(f"channel set to <#{channel.id}>.")
+
+
+@setchannel.error
+async def setchannel_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        await ctx.reply("Please enter a valid channel. (Must have blue background and is clickable, ex. `$setchannel "
+                        "#general`)")
+        await ctx.message.add_reaction("❌")
 
 
 @bot.command(Name="say")

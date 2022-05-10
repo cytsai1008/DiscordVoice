@@ -35,7 +35,7 @@ def id_check(self) -> str:
     try:
         server_id = str(self.guild.id)
     except:
-        server_id = "user_" + str(self.author.id)
+        server_id = f"user_{str(self.author.id)}"
     return server_id
 
 
