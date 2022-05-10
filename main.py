@@ -203,6 +203,11 @@ async def on_command_error(ctx, error):
     elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
         await ctx.reply(f"You're too fast! Please wait for {round(error.retry_after)} seconds.")
         await ctx.message.add_reaction("⏳")
+    else:
+        await ctx.reply(f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
+                        "```"
+                        f"{error}"
+                        "```")
 
 
 @bot.event
