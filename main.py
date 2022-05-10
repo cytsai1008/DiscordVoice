@@ -561,4 +561,4 @@ async def stop(ctx):
 
 
 subprocess.call(["python", "get_lang_code.py"])
-bot.run(config["token"])
+bot.run(os.environ['DiscordToken'])
