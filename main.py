@@ -51,7 +51,7 @@ config = tool_function.read_json("config.json")
 if not tool_function.check_file("db"):
     os.mkdir("db")
 
-bot = commands.Bot(command_prefix=config["prefix"], help_command=None)
+bot = commands.Bot(command_prefix=config["prefix"], help_command=None, case_insensitive=True, owner_id=config["owner"])
 
 # initialize some variable
 bot.remove_command("help")
