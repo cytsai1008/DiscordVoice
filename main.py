@@ -197,7 +197,7 @@ async def on_command_error(ctx, error):
             support_lang = tool_function.read_json("languages.json")
             await ctx.reply("No language providing, please set by `$setlang some-lang-code`."
                             f"Current supported languages: \n"
-                            f"```{', '.join(support_lang['Support_Language'])}```"
+                            f"```{', '.join(support_lang['Support_Language'])}```\n"
                             )
         elif command == "say":
             await ctx.reply("What can I say? :(")
@@ -247,7 +247,7 @@ async def help(ctx):
             support_lang = tool_function.read_json("languages.json")
             lang_msg = "Use `$setlang` to set a language. (ex. `$setlang en-us`)\n" \
                        f"Current supported languages: \n" \
-                       f"```{', '.join(support_lang['Support_Language'])}```"
+                       f"```{', '.join(support_lang['Support_Language'])}```\n"
 
         if tool_function.check_dict_data(data, "channel"):
             channel_msg = f"Use `$setchannel` to set a channel. (Current: <#{data['channel']}>)\n"
@@ -271,7 +271,7 @@ async def help(ctx):
             "Use `$setchannel` to set a channel. (ex. `$setchannel #general`)\n"
             "Use `$setlang` to set a language. (ex. `$setlang en-us`)\n"
             f"Current supported languages: \n"
-            f"```{', '.join(support_lang['Support_Language'])}```"
+            f"```{', '.join(support_lang['Support_Language'])}```\n"
             "Use `$say` to speak in voice channel. (ex. `$say ABCD`)\n"
             "Use `$stop` to stop speaking.\n"
             "Use `$join` to let me join to a voice channel.\n"
