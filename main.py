@@ -216,7 +216,13 @@ async def on_error(event, *args, **kwargs):
 
 @bot.command(Name="help")
 async def help(ctx):
-    if tool_function.check_file(f"db/{ctx.guild.id}.json"):
+    try:
+        guild_id = ctx.guild.id
+    except:
+        guild_msg = False
+    else:
+        guild_msg = True
+    if guild_msg and tool_function.check_file(f"db/{ctx.guild.id}.json"):
         data = tool_function.read_json(f"db/{ctx.guild.id}.json")
         if tool_function.check_dict_data(data, "lang"):
             lang_msg = f"Use `$setlang` to set a language. (Current: `{data['lang']}`)\n"
