@@ -216,16 +216,39 @@ async def on_error(event, *args, **kwargs):
 
 @bot.command(Name="help")
 async def help(ctx):
-    await ctx.reply(
-        "Use `$help` to see the help message.\n"
-        "Use `$setchannel` to set a channel. (ex. `$setchannel #general`)\n"
-        "Use `$setlang` to set a language. (ex. `$setlang en-us`)\n"
-        "Use `$say` to speak in voice channel. (ex. `$say ABCD`)\n"
-        "Use `$stop` to stop speaking.\n"
-        "Use `$join` to let me join to a voice channel.\n"
-        "Use `$leave` to let me leave the voice channel.\n"
-        "Use `$ping` to check my latency.\n"
-    )
+    if tool_function.check_file(f"db/{ctx.guild.id}.json"):
+        data = tool_function.read_json(f"db/{ctx.guild.id}.json")
+        if tool_function.check_dict_data(data, "lang"):
+            lang_msg = f"Use `$setlang` to set a language. (Current: `{data['lang']}`)\n"
+        else:
+            lang_msg = "Use `$setlang` to set a language. (ex. `$setlang en-us`)\n"
+
+        if tool_function.check_dict_data(data, "channel"):
+            channel_msg = f"Use `$setchannel` to set a channel. (Current: <#{data['channel']}>)\n"
+        else:
+            channel_msg = "Use `$setchannel` to set a channel. (ex. `$setchannel #general`)\n"
+
+        await ctx.reply(
+            "Use `$help` to see the help message.\n"
+            f"{channel_msg}"
+            f"{lang_msg}"
+            "Use `$say` to speak in voice channel. (ex. `$say ABCD`)\n"
+            "Use `$stop` to stop speaking.\n"
+            "Use `$join` to let me join to a voice channel.\n"
+            "Use `$leave` to let me leave the voice channel.\n"
+            "Use `$ping` to check my latency.\n"
+        )
+    else:
+        await ctx.reply(
+            "Use `$help` to see the help message.\n"
+            "Use `$setchannel` to set a channel. (ex. `$setchannel #general`)\n"
+            "Use `$setlang` to set a language. (ex. `$setlang en-us`)\n"
+            "Use `$say` to speak in voice channel. (ex. `$say ABCD`)\n"
+            "Use `$stop` to stop speaking.\n"
+            "Use `$join` to let me join to a voice channel.\n"
+            "Use `$leave` to let me leave the voice channel.\n"
+            "Use `$ping` to check my latency.\n"
+        )
 
 
 @bot.command(Name="join")
