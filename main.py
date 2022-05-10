@@ -195,6 +195,8 @@ async def on_command_error(ctx, error):
             await ctx.reply("No channel providing, please set by `$setchannel #some-channel`.")
         elif command == "setlang":
             await ctx.reply("No language providing, please set by `$setlang supported-language`.")
+        elif command == "say":
+            await ctx.reply("What can I say? :(")
         else:
             await ctx.reply("Missing required argument.")
         await ctx.message.add_reaction("❓")
