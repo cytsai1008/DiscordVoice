@@ -207,7 +207,7 @@ async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
     elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
         await ctx.reply(f"You're too fast! Please wait for {round(error.retry_after)} seconds.")
         await ctx.message.add_reaction("⏳")
-    elif isinstance(error, discord.ext.commands.errors.ChannelNotFound):
+    elif command == "setchannel" and isinstance(error, discord.ext.commands.errors.ChannelNotFound):
         pass
     else:
         try:
