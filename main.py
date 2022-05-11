@@ -253,32 +253,6 @@ async def on_error(event, *args, **kwargs):
     )
 
 
-@bot.event
-async def on_voice_state_update(member, before, after):
-    if member.id != bot.user.id:
-        return
-
-    elif before.channel is None:
-        voice = after.channel.guild.voice_client
-        time = 0
-        while True:
-            await asyncio.sleep(1)
-            time = 0 if voice.is_playing() and not voice.is_paused() else time + 1
-            if time == 600:
-                await voice.disconnect()
-                # get voice channel guild id
-                guild_id = after.channel.guild.id
-                # read channel id from json
-                channel_id = tool_function.read_json(f"db/{guild_id}.json")["channel"]
-                # send message to channel
-                channel = bot.get_channel(channel_id)
-                await channel.send(
-                    "Auto disconnected from voice channel because of inactivity."
-                )
-            if not voice.is_connected():
-                break
-
-
 @bot.command(Name="help")
 async def help(ctx):
     try:
