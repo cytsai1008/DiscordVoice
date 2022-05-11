@@ -6,12 +6,14 @@ import os
 
 
 def read_json(filename) -> dict:
+    """Returns dictionary from a json file"""
     with open(filename, "r") as f:
         data = json.load(f)
     return data
 
 
 def write_json(filename, data) -> None:
+    """Writes dictionary to json file"""
     with open(filename, "w") as f:
         json.dump(data, f, indent=4)
 
@@ -32,6 +34,7 @@ def check_args_zero(args, arg_list) -> bool:
 
 
 def id_check(self) -> str:
+    """If server id not exist, use user id"""
     try:
         server_id = str(self.guild.id)
     except:
@@ -45,6 +48,7 @@ def check_args_one(args) -> bool:
 
 
 def check_dict_data(data: dict, arg) -> bool:
+    """Check if arg is in data"""
     try:
         print(f"data in {arg} is {data[arg]}")
     except KeyError:
@@ -64,6 +68,7 @@ def check_duplicate_data(existing_data, new_data: list) -> list:
 
 
 def check_file(filename) -> bool:
+    """Check if file exists"""
     return bool(os.path.exists(filename))
 
 
