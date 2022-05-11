@@ -227,6 +227,7 @@ async def on_error(event, *args, **kwargs):
         f.write(f"{event}\n")
         f.write(f"{args}\n")
         f.write(f"{kwargs}\n")
+        f.write(f"{traceback.print_exc()}\n")
         f.write("\n")
     # send message to owner
     owner = await bot.fetch_user(config["owner"])
@@ -234,6 +235,7 @@ async def on_error(event, *args, **kwargs):
         f"Error event on: {event}\n"
         f"Error args on: {args}\n"
         f"Error kwargs on: {kwargs}\n"
+        f"Error traceback on: {traceback.print_exc()}"
     )
 
 
