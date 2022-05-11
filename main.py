@@ -115,10 +115,6 @@ def process_voice(content: str, lang_code: str):
 '''
 
 
-class ChannelNotFoundError:
-    pass
-
-
 def remove_file(file_name):
     os.remove(f"tts_temp/{file_name}")
 
@@ -211,7 +207,7 @@ async def on_command_error(ctx, error):
     elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
         await ctx.reply(f"You're too fast! Please wait for {round(error.retry_after)} seconds.")
         await ctx.message.add_reaction("⏳")
-    elif isinstance(error, ChannelNotFoundError):
+    elif isinstance(error, discord.ext.commands.errors.ChannelNotFound):
         pass
     else:
         await ctx.reply(f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
@@ -343,7 +339,6 @@ async def setchannel_error(ctx, error):
         await ctx.reply("Please enter a valid channel. (Must have blue background and is clickable, ex. `$setchannel "
                         "#general`)")
         await ctx.message.add_reaction("❌")
-        raise ChannelNotFoundError
 
 
 @bot.command(Name="say")
