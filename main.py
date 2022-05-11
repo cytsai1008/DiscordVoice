@@ -185,7 +185,7 @@ async def on_guild_join(guild):
 
 
 @bot.event
-async def on_command_error(ctx, error):
+async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
     command = ctx.invoked_with
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
         await ctx.reply("Command not found.")
@@ -210,10 +210,30 @@ async def on_command_error(ctx, error):
     elif isinstance(error, discord.ext.commands.errors.ChannelNotFound):
         pass
     else:
-        await ctx.reply(f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
-                        "```"
-                        f"{error}"
-                        "```")
+        try:
+            await ctx.reply(
+                f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
+                "```"
+                f"{error}"
+                "```"
+            )
+        except:
+            try:
+                ctx.send(
+                    f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
+                    "```"
+                    f"{error}"
+                    "```"
+                )
+            except:
+                # send to owner
+                owner = await bot.fetch_user(config["owner"])
+                await owner.send(
+                    f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
+                    "```"
+                    f"{error}"
+                    "```"
+                )
 
 
 @bot.event
@@ -233,10 +253,36 @@ async def on_error(event, *args, **kwargs):
     )
 
 
+@bot.event
+async def on_voice_state_update(member, before, after):
+    if member.id != bot.user.id:
+        return
+
+    elif before.channel is None:
+        voice = after.channel.guild.voice_client
+        time = 0
+        while True:
+            await asyncio.sleep(1)
+            time = 0 if voice.is_playing() and not voice.is_paused() else time + 1
+            if time == 600:
+                await voice.disconnect()
+                # get voice channel guild id
+                guild_id = after.channel.guild.id
+                # read channel id from json
+                channel_id = tool_function.read_json(f"db/{guild_id}.json")["channel"]
+                # send message to channel
+                channel = bot.get_channel(channel_id)
+                await channel.send(
+                    "Auto disconnected from voice channel because of inactivity."
+                )
+            if not voice.is_connected():
+                break
+
+
 @bot.command(Name="help")
 async def help(ctx):
     try:
-        guild_id = ctx.guild.id
+        _ = ctx.guild.id
     except:
         guild_msg = False
     else:
