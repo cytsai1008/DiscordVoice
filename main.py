@@ -228,6 +228,7 @@ async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
                 f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                 "```"
                 f"{error}\n"
+                f"{error.__traceback__.format_exc()}"
                 "```"
             )
         except:
@@ -236,6 +237,7 @@ async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
                     f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                     "```"
                     f"{error}\n"
+                    f"{error.__traceback__.format_exc()}"
                     "```"
                 )
             except:
@@ -245,6 +247,7 @@ async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
                     f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                     "```"
                     f"{error}\n"
+                    f"{error.__traceback__.format_exc()}"
                     "```"
                 )
 
