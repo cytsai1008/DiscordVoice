@@ -370,7 +370,7 @@ async def setchannel_error(ctx, error):
 @bot.command(Name="say")
 @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
-@commands.has_permissions(voice_connect=True, voice_speak=True)
+@commands.has_permissions(connect=True, speak=True)
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # get message channel id
 
