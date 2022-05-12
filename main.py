@@ -189,7 +189,7 @@ async def on_guild_join(guild):
 
 
 @bot.event
-async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
+async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass-elif
     command = ctx.invoked_with
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
         await ctx.reply("Command not found.")
