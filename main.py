@@ -189,7 +189,7 @@ async def on_guild_join(guild):
 
 
 @bot.event
-async def on_command_error(ctx, error, exception):  # sourcery skip: remove-pass-elif
+async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
     command = ctx.invoked_with
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
         await ctx.reply("Command not found.")
@@ -228,7 +228,6 @@ async def on_command_error(ctx, error, exception):  # sourcery skip: remove-pass
                 f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                 "```"
                 f"{error}\n"
-                f"{exception}\n"
                 "```"
             )
         except:
@@ -237,7 +236,6 @@ async def on_command_error(ctx, error, exception):  # sourcery skip: remove-pass
                     f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                     "```"
                     f"{error}\n"
-                    f"{exception}\n"
                     "```"
                 )
             except:
@@ -247,7 +245,6 @@ async def on_command_error(ctx, error, exception):  # sourcery skip: remove-pass
                     f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                     "```"
                     f"{error}\n"
-                    f"{exception}\n"
                     "```"
                 )
 
