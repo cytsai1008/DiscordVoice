@@ -440,7 +440,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             """
             # export content to mp3 by google tts api
             # get username
-            content = await commands.clean_content(fix_channel_mentions=True).convert(
+            content = await commands.clean_content(fix_channel_mentions=True, use_nicknames=True).convert(
                 ctx, content
             )
             say_this = ctx.author.id == config["owner"] or len(content) < 30
