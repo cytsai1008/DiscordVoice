@@ -222,33 +222,44 @@ async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
     elif isinstance(error, discord.ext.commands.errors.NotOwner):
         pass
     else:
+        NotAbleReply = ""
+        NotAbleSend = ""
+        server_name = ctx.guild.name
+        sender_name = ctx.author.name
+        command_name = ctx.invoked_with
         try:
             await ctx.reply(
                 f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                 "```"
-                f"{error}\n"
-                f"{type(error)}\n"
+                f"Error: {error}\n"
+                f"Error Type: {type(error)}\n"
                 "```"
             )
         except:
+            NotAbleReply = traceback.format_exc()
             try:
                 await ctx.send(
                     f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                     "```"
-                    f"{error}\n"
-                    f"{type(error)}\n"
+                    f"Error: {error}\n"
+                    f"Error Type: {type(error)}\n"
                     "```"
                 )
             except:
-                # send to owner
-                owner = await bot.fetch_user(config["owner"])
-                await owner.send(
-                    f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
-                    "```"
-                    f"{error}\n"
-                    f"{type(error)}\n"
-                    "```"
-                )
+                NotAbleSend = traceback.format_exc()
+        owner = await bot.fetch_user(config["owner"])
+        await owner.send(
+            f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
+            "```"
+            f"Command: {command_name}\n"
+            f"Error: {error}\n"
+            f"Error Type: {type(error)}\n"
+            f"Unable to reply: {NotAbleReply}\n"
+            f"Unable to send: {NotAbleSend}\n"
+            f"Server: {server_name}\n"
+            f"Sender: {sender_name}\n"
+            "```"
+        )
 
 
 @bot.event
