@@ -167,6 +167,10 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online, activity=game)
     owner = await bot.fetch_user(config["owner"])
     await owner.send("bot online.")
+    # get all guilds
+    print("目前登入的伺服器：")
+    for guild in bot.guilds:
+        print(guild.name + "\n")
 
 
 @bot.event
@@ -303,6 +307,8 @@ async def help(ctx):
 
 
 @bot.command(Name="join")
+@commands.guild_only()
+@commands.has_permissions(voice_connect=True, voice_speak=True)
 async def join(ctx):
     # get user voice channel
     try:
@@ -336,7 +342,7 @@ async def leave(ctx):
 
 
 @bot.command(Name="setchannel")
-# Won't return error if type not `discord.TextChannel`
+@commands.guild_only()
 async def setchannel(ctx, channel: discord.TextChannel):
     # get channel id
     channel_id = channel.id
@@ -363,6 +369,8 @@ async def setchannel_error(ctx, error):
 
 @bot.command(Name="say")
 @commands.cooldown(1, 3, commands.BucketType.user)
+@commands.guild_only()
+@commands.has_permissions(voice_connect=True, voice_speak=True)
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # get message channel id
 
@@ -529,6 +537,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
 
 
 @bot.command(Name="setlang")
+@commands.guild_only()
 async def setlang(ctx, lang: str):
     # get guild id
     guild_id = ctx.guild.id
@@ -567,6 +576,7 @@ async def ping(ctx):
 
 
 @bot.command(Name="shutdown")
+@commands.is_owner()
 async def shutdown(ctx):
     sender = ctx.message.author.id
     owner = tool_function.read_json("config.json")
@@ -577,6 +587,7 @@ async def shutdown(ctx):
 
 
 @bot.command(Name="clear")
+@commands.guild_only()
 async def clear(ctx):
     list_name = f"list_{ctx.guild.id}"
     if list_name in globals():
@@ -585,6 +596,7 @@ async def clear(ctx):
 
 
 @bot.command(Name="stop")
+@commands.guild_only()
 async def stop(ctx):
     list_name = f"list_{ctx.guild.id}"
     if list_name in globals():
