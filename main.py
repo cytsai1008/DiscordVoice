@@ -319,7 +319,7 @@ async def help(ctx):
 
 @bot.command(Name="join")
 @commands.guild_only()
-@commands.has_permissions(connect=True, speak=True)
+@commands.bot_has_permissions(connect=True, speak=True)
 async def join(ctx):
     # get user voice channel
     try:
@@ -381,7 +381,7 @@ async def setchannel_error(ctx, error):
 @bot.command(Name="say")
 @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
-@commands.has_permissions(connect=True, speak=True)
+@commands.bot_has_permissions(connect=True, speak=True)
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # get message channel id
 
