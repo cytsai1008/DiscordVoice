@@ -189,7 +189,7 @@ async def on_guild_join(guild):
 
 
 @bot.event
-async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
+async def on_command_error(ctx, error, exception):  # sourcery skip: remove-pass-elif
     command = ctx.invoked_with
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
         await ctx.reply("Command not found.")
@@ -213,12 +213,22 @@ async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
         await ctx.message.add_reaction("⏳")
     elif command == "setchannel" and isinstance(error, discord.ext.commands.errors.ChannelNotFound):
         pass
+    elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
+        await ctx.reply("This command cannot be used in private messages.")
+        await ctx.message.add_reaction("❌")
+    elif isinstance(error, discord.ext.commands.errors.TooManyArguments):
+        await ctx.reply("Too many arguments.")
+        await ctx.message.add_reaction("❌")
+    elif isinstance(error, discord.ext.commands.errors.NotOwner):
+        pass
+
     else:
         try:
             await ctx.reply(
                 f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                 "```"
-                f"{error}"
+                f"{error}\n"
+                f"{exception}\n"
                 "```"
             )
         except:
@@ -226,7 +236,8 @@ async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
                 ctx.send(
                     f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                     "```"
-                    f"{error}"
+                    f"{error}\n"
+                    f"{exception}\n"
                     "```"
                 )
             except:
@@ -235,7 +246,8 @@ async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
                 await owner.send(
                     f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                     "```"
-                    f"{error}"
+                    f"{error}\n"
+                    f"{exception}\n"
                     "```"
                 )
 
