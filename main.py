@@ -257,7 +257,7 @@ async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
             f"Unable to reply: {NotAbleReply}\n"
             f"Unable to send: {NotAbleSend}\n"
             f"Server: {server_name}\n"
-            f"Sender: {sender_name}\n"
+            f"Sender: {sender_name}#{ctx.author.discriminator}\n"
             "```"
         )
 
