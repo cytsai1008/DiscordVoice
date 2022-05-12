@@ -308,7 +308,7 @@ async def help(ctx):
 
 @bot.command(Name="join")
 @commands.guild_only()
-@commands.has_permissions(voice_connect=True, voice_speak=True)
+@commands.has_permissions(connect=True, speak=True)
 async def join(ctx):
     # get user voice channel
     try:
