@@ -221,7 +221,6 @@ async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
         await ctx.message.add_reaction("❌")
     elif isinstance(error, discord.ext.commands.errors.NotOwner):
         pass
-
     else:
         try:
             await ctx.reply(
@@ -233,11 +232,11 @@ async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
             )
         except:
             try:
-                ctx.send(
+                await ctx.send(
                     f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                     "```"
                     f"{error}\n"
-                    f"{error.__traceback__.format_exc()}"
+                    f"{type(error)}"
                     "```"
                 )
             except:
@@ -247,7 +246,7 @@ async def on_command_error(ctx, error):  # sourcery skip: remove-pass-elif
                     f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
                     "```"
                     f"{error}\n"
-                    f"{error.__traceback__.format_exc()}"
+                    f"{type(error)}"
                     "```"
                 )
 
