@@ -51,7 +51,12 @@ config = tool_function.read_json("config.json")
 if not tool_function.check_file("db"):
     os.mkdir("db")
 
-bot = commands.Bot(command_prefix=config["prefix"], help_command=None, case_insensitive=True, owner_id=config["owner"])
+bot = commands.Bot(
+    command_prefix=config["prefix"],
+    help_command=None,
+    case_insensitive=True,
+    owner_id=config["owner"],
+)
 
 # initialize some variable
 bot.remove_command("help")
@@ -196,22 +201,29 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         await ctx.message.add_reaction("❌")
     elif isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
         if command == "setchannel":
-            await ctx.reply("No channel providing, please set by `$setchannel #some-channel`.")
+            await ctx.reply(
+                "No channel providing, please set by `$setchannel #some-channel`."
+            )
         elif command == "setlang":
             support_lang = tool_function.read_json("languages.json")
-            await ctx.reply("No language providing, please set by `$setlang some-lang-code`.\n"
-                            f"Current supported languages: \n"
-                            f"```{', '.join(support_lang['Support_Language'])}```\n"
-                            )
+            await ctx.reply(
+                "No language providing, please set by `$setlang some-lang-code`.\n"
+                f"Current supported languages: \n"
+                f"```{', '.join(support_lang['Support_Language'])}```\n"
+            )
         elif command == "say":
             await ctx.reply("What can I say? :(")
         else:
             await ctx.reply("Missing required argument.")
         await ctx.message.add_reaction("❓")
     elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
-        await ctx.reply(f"You're too fast! Please wait for {round(error.retry_after)} seconds.")
+        await ctx.reply(
+            f"You're too fast! Please wait for {round(error.retry_after)} seconds."
+        )
         await ctx.message.add_reaction("⏳")
-    elif command == "setchannel" and isinstance(error, discord.ext.commands.errors.ChannelNotFound):
+    elif command == "setchannel" and isinstance(
+            error, discord.ext.commands.errors.ChannelNotFound
+    ):
         pass
     elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
         await ctx.reply("This command cannot be used in private messages.")
@@ -290,17 +302,25 @@ async def help(ctx):
     if guild_msg and tool_function.check_file(f"db/{ctx.guild.id}.json"):
         data = tool_function.read_json(f"db/{ctx.guild.id}.json")
         if tool_function.check_dict_data(data, "lang"):
-            lang_msg = f"Use `$setlang` to set a language. (Current: `{data['lang']}`)\n"
+            lang_msg = (
+                f"Use `$setlang` to set a language. (Current: `{data['lang']}`)\n"
+            )
         else:
             support_lang = tool_function.read_json("languages.json")
-            lang_msg = "Use `$setlang` to set a language. (ex. `$setlang en-us`)\n" \
-                       f"Current supported languages: \n" \
-                       f"```{', '.join(support_lang['Support_Language'])}```\n"
+            lang_msg = (
+                "Use `$setlang` to set a language. (ex. `$setlang en-us`)\n"
+                f"Current supported languages: \n"
+                f"```{', '.join(support_lang['Support_Language'])}```\n"
+            )
 
         if tool_function.check_dict_data(data, "channel"):
-            channel_msg = f"Use `$setchannel` to set a channel. (Current: <#{data['channel']}>)\n"
+            channel_msg = (
+                f"Use `$setchannel` to set a channel. (Current: <#{data['channel']}>)\n"
+            )
         else:
-            channel_msg = "Use `$setchannel` to set a channel. (ex. `$setchannel #general`)\n"
+            channel_msg = (
+                "Use `$setchannel` to set a channel. (ex. `$setchannel #general`)\n"
+            )
 
         await ctx.reply(
             "Use `$help` to see the help message.\n"
@@ -311,6 +331,7 @@ async def help(ctx):
             "Use `$join` to let me join to a voice channel.\n"
             "Use `$leave` to let me leave the voice channel.\n"
             "Use `$ping` to check my latency.\n"
+            "Use `$invite` to get the bot's invite link.\n"
         )
     else:
         support_lang = tool_function.read_json("languages.json")
@@ -325,6 +346,7 @@ async def help(ctx):
             "Use `$join` to let me join to a voice channel.\n"
             "Use `$leave` to let me leave the voice channel.\n"
             "Use `$ping` to check my latency.\n"
+            "Use `$invite` to get the bot's invite link.\n"
         )
 
 
@@ -384,8 +406,10 @@ async def setchannel(ctx, channel: discord.TextChannel):
 @setchannel.error
 async def setchannel_error(ctx, error):
     if isinstance(error, commands.BadArgument):
-        await ctx.reply("Please enter a valid channel. (Must have blue background and is clickable, ex. `$setchannel "
-                        "#general`)")
+        await ctx.reply(
+            "Please enter a valid channel. (Must have blue background and is clickable, ex. `$setchannel "
+            "#general`)"
+        )
         await ctx.message.add_reaction("❌")
 
 
@@ -440,9 +464,9 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             """
             # export content to mp3 by google tts api
             # get username
-            content = await commands.clean_content(fix_channel_mentions=True, use_nicknames=True).convert(
-                ctx, content
-            )
+            content = await commands.clean_content(
+                fix_channel_mentions=True, use_nicknames=True
+            ).convert(ctx, content)
             say_this = ctx.author.id == config["owner"] or len(content) < 30
             try:
                 username = ctx.author.display_name
@@ -485,19 +509,16 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         )
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
-                        if (
-                                tool_function.check_dict_data(db, "queue")
-                                and db["queue"]
-                        ):
+                        if tool_function.check_dict_data(db, "queue") and db["queue"]:
                             globals()[list_name].put(content)
                             # add reaction
                             await ctx.message.add_reaction("⏯")
                             asyncio.ensure_future(check_is_not_playing(ctx))
-                            playnext(
-                                ctx, db["lang"], guild_id, globals()[list_name]
-                            )
+                            playnext(ctx, db["lang"], guild_id, globals()[list_name])
                         else:
-                            await ctx.reply("Sorry, queue function is under development and current not supported.")
+                            await ctx.reply(
+                                "Sorry, queue function is under development and current not supported."
+                            )
 
                 elif ctx.author.id == config["owner"]:
                     print("init google tts api")
@@ -522,9 +543,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     await asyncio.sleep(0.5)
                     ctx.voice_client.play(
                         voice_file,
-                        after=playnext(
-                            ctx, db["lang"], guild_id, globals()[list_name]
-                        ),
+                        after=playnext(ctx, db["lang"], guild_id, globals()[list_name]),
                     )
                     await ctx.message.add_reaction("⁉")
                 elif tool_function.check_dict_data(db, "queue") and db["queue"]:
@@ -534,7 +553,9 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     asyncio.ensure_future(check_is_not_playing(ctx))
                     playnext(ctx, db["lang"], guild_id, globals()[list_name])
                 else:
-                    await ctx.reply("Sorry, queue function is under development and current not supported.")
+                    await ctx.reply(
+                        "Sorry, queue function is under development and current not supported."
+                    )
             else:
                 await ctx.reply("Too long to say.")
                 # reply to sender
@@ -639,5 +660,13 @@ async def stop(ctx):
         await ctx.message.add_reaction("⏹")
 
 
+@bot.command(Name="invite")
+async def invite(ctx):
+    await ctx.reply(
+        f"Invite me to your server: \n"
+        f"{discord.utils.oauth_url(client_id='960004225713201172', permissions=discord.Permissions(36817920), scopes=('bot', 'applications.commands'))}"
+    )
+
+
 subprocess.call(["python", "get_lang_code.py"])
-bot.run(os.environ['DiscordToken'])
+bot.run(os.environ["DiscordToken"])
