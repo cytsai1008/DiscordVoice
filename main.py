@@ -559,7 +559,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             else:
                 await ctx.reply("Too long to say.")
 
-        elif channel_id != db["channel"] and db["not_this_channel_msg"] != False:
+        elif channel_id != db["channel"] and tool_function.check_dict_data(db, "not_this_channel_msg") and db[
+            "not_this_channel_msg"] != False:
             channel_msg = ""
             if tool_function.check_dict_data(db, "not_this_channel_msg"):
                 channel_msg = f"Current channel is <#{db['channel']}>.\n"
