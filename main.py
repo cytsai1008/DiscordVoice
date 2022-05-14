@@ -184,12 +184,12 @@ async def on_guild_join(guild):
     if general and general.permissions_for(guild.me).send_messages:
         await general.send(
             "Thanks for adding me!\n"
-            "Please set a channel by `$setchannel`. (ex. `$setchannel #general`)\n"
-            "Please set a language by `$setlang`. (ex. `$setlang en-us`)\n"
-            "To speak something, please use `$say`. (ex. `$say ABCD`)\n"
-            "To join a voice channel, please use `$join`.\n"
-            "To leave a voice channel, please use `$leave`.\n"
-            "For more information, please type `$help`."
+            f"Please set a channel by `{config['prefix']}setchannel`. (ex. `{config['prefix']}setchannel #general`)\n"
+            f"Please set a language by `{config['prefix']}setlang`. (ex. `{config['prefix']}setlang en-us`)\n"
+            f"To speak something, please use `{config['prefix']}say`. (ex. `{config['prefix']}say ABCD`)\n"
+            f"To join a voice channel, please use `{config['prefix']}join`.\n"
+            f"To leave a voice channel, please use `{config['prefix']}leave`.\n"
+            f"For more information, please type `{config['prefix']}help`."
         )
 
 
@@ -202,17 +202,20 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     elif isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
         if command == "setchannel":
             await ctx.reply(
-                "No channel providing, please set by `$setchannel #some-channel`."
+                f"No channel providing, please set by `{config['prefix']}setchannel #some-channel`."
             )
         elif command == "setlang":
             support_lang = tool_function.read_json("languages.json")
             await ctx.reply(
-                "No language providing, please set by `$setlang some-lang-code`.\n"
+                f"No language providing, please set by `{config['prefix']}setlang some-lang-code`.\n"
                 f"Current supported languages: \n"
                 f"```{', '.join(support_lang['Support_Language'])}```\n"
             )
         elif command == "say":
             await ctx.reply("What can I say? :(")
+        elif command == "say_lang":
+            await ctx.reply("What can I say? :(\n"
+                            f"`{config['prefix']}say_lang some-lang-code say-something`")
         else:
             await ctx.reply("Missing required argument.")
         await ctx.message.add_reaction("❓")
@@ -310,51 +313,47 @@ async def help(ctx):
     if guild_msg and tool_function.check_file(f"db/{ctx.guild.id}.json"):
         data = tool_function.read_json(f"db/{ctx.guild.id}.json")
         if tool_function.check_dict_data(data, "lang"):
-            lang_msg = (
-                f"Use `$setlang` to set a language. (Current: `{data['lang']}`)\n"
-            )
+            lang_msg = f"Use `{config['prefix']}setlang` to set a language. (Current: `{data['lang']}`)\n"
         else:
             support_lang = tool_function.read_json("languages.json")
             lang_msg = (
-                "Use `$setlang` to set a language. (ex. `$setlang en-us`)\n"
+                f"Use `{config['prefix']}setlang` to set a language. (ex. `{config['prefix']}setlang en-us`)\n"
                 f"Current supported languages: \n"
                 f"```{', '.join(support_lang['Support_Language'])}```\n"
             )
 
         if tool_function.check_dict_data(data, "channel"):
-            channel_msg = (
-                f"Use `$setchannel` to set a channel. (Current: <#{data['channel']}>)\n"
-            )
+            channel_msg = f"Use `{config['prefix']}setchannel` to set a channel. (Current: <#{data['channel']}>)\n"
         else:
-            channel_msg = (
-                "Use `$setchannel` to set a channel. (ex. `$setchannel #general`)\n"
-            )
+            channel_msg = f"Use `{config['prefix']}setchannel` to set a channel. (ex. `{config['prefix']}setchannel #general`)\n"
 
         await ctx.reply(
-            "Use `$help` to see the help message.\n"
+            f"Use `{config['prefix']}help` to see the help message.\n"
             f"{channel_msg}"
             f"{lang_msg}"
-            "Use `$say` to speak in voice channel. (ex. `$say ABCD`)\n"
-            "Use `$stop` to stop speaking.\n"
-            "Use `$join` to let me join to a voice channel.\n"
-            "Use `$leave` to let me leave the voice channel.\n"
-            "Use `$ping` to check my latency.\n"
-            "Use `$invite` to get the bot's invite link.\n"
+            f"Use `{config['prefix']}say` to speak in voice channel. (ex. `{config['prefix']}say ABCD`)\n"
+            f"Use `{config['prefix']}say_lang` to speak in voice channel with another language. (ex. `{config['prefix']}say_lang en-us ABCD`)\n"
+            f"Use `{config['prefix']}stop` to stop speaking.\n"
+            f"Use `{config['prefix']}join` to let me join to a voice channel.\n"
+            f"Use `{config['prefix']}leave` to let me leave the voice channel.\n"
+            f"Use `{config['prefix']}ping` to check my latency.\n"
+            f"Use `{config['prefix']}invite` to get the bot's invite link.\n"
         )
     else:
         support_lang = tool_function.read_json("languages.json")
         await ctx.reply(
-            "Use `$help` to see the help message.\n"
-            "Use `$setchannel` to set a channel. (ex. `$setchannel #general`)\n"
-            "Use `$setlang` to set a language. (ex. `$setlang en-us`)\n"
-            f"Current supported languages: \n"
+            f"Use `{config['prefix']}help` to see the help message.\n"
+            f"Use `{config['prefix']}setchannel` to set a channel. (ex. `{config['prefix']}setchannel #general`)\n"
+            f"Use `{config['prefix']}setlang` to set a language. (ex. `{config['prefix']}setlang en-us`)\n"
+            "Current supported languages: \n"
             f"```{', '.join(support_lang['Support_Language'])}```\n"
-            "Use `$say` to speak in voice channel. (ex. `$say ABCD`)\n"
-            "Use `$stop` to stop speaking.\n"
-            "Use `$join` to let me join to a voice channel.\n"
-            "Use `$leave` to let me leave the voice channel.\n"
-            "Use `$ping` to check my latency.\n"
-            "Use `$invite` to get the bot's invite link.\n"
+            f"Use `{config['prefix']}say` to speak in voice channel. (ex. `{config['prefix']}say ABCD`)\n"
+            f"Use `{config['prefix']}say_lang` to speak in voice channel with another language. (ex. `{config['prefix']}say_lang en-us ABCD`)\n"
+            f"Use `{config['prefix']}stop` to stop speaking.\n"
+            f"Use `{config['prefix']}join` to let me join to a voice channel.\n"
+            f"Use `{config['prefix']}leave` to let me leave the voice channel.\n"
+            f"Use `{config['prefix']}ping` to check my latency.\n"
+            f"Use `{config['prefix']}invite` to get the bot's invite link.\n"
         )
 
 
@@ -376,7 +375,7 @@ async def join(ctx):
             bot_voice_channel = ctx.guild.voice_client.channel
             await ctx.reply(
                 f"I'm already in <#{bot_voice_channel.id}>.\n"
-                "To move, please use `$leave` first."
+                f"To move, please use `{config['prefix']}leave` first."
             )
             await ctx.message.add_reaction("❌")
         else:
@@ -415,8 +414,8 @@ async def setchannel(ctx, channel: discord.TextChannel):
 async def setchannel_error(ctx, error):
     if isinstance(error, commands.BadArgument):
         await ctx.reply(
-            "Please enter a valid channel. (Must have blue background and is clickable, ex. `$setchannel "
-            "#general`)"
+            f"Please enter a valid channel. (Must have blue background and is clickable, ex. `{config['prefix']}setchannel "
+            f"#general`)"
         )
         await ctx.message.add_reaction("❌")
 
@@ -569,7 +568,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 await ctx.reply("Too long to say.")
 
         elif (
-                tool_function.check_dict_data(db, "channel")
+                channelissetup
                 and channel_id != db["channel"]
                 and (
                         not tool_function.check_dict_data(db, "not_this_channel_msg")
@@ -596,18 +595,18 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
         else:
             errormsg = ""
             if not is_connected:
-                errormsg += "Please join voice channel by `$join`.\n"
+                errormsg += f"Please join voice channel by `{config['prefix']}join`.\n"
             if not channelissetup:
-                errormsg += "Please set channel by `$setchannel`.\n"
+                errormsg += f"Please set channel by `{config['prefix']}setchannel`.\n"
             if not langissetup:
-                errormsg += "Please set language by `$setlang`.\n"
+                errormsg += f"Please set language by `{config['prefix']}setlang`.\n"
             await ctx.reply(errormsg)
             await ctx.message.add_reaction("❌")
     else:
         await ctx.send(
             "Setting file not exist.\n"
-            "Please set channel by `$setchannel`.\n"
-            "Please set language by `$setlang`.\n"
+            f"Please set channel by `{config['prefix']}setchannel`.\n"
+            f"Please set language by `{config['prefix']}setlang`.\n"
         )
 
 
@@ -723,6 +722,210 @@ async def wrong_msg(ctx, msg: str):
     else:
         await ctx.reply("You haven't set up anything yet.\n")
         await ctx.message.add_reaction("🤔")
+
+
+@bot.command(Name="move")
+@commands.guild_only()
+# @commands.bot_has_permissions(connect=True, speak=True)
+async def move(ctx):
+    # get user voice channel
+    try:
+        user_voice_channel = ctx.author.voice.channel
+    except AttributeError:
+        await ctx.reply("Please join a voice channel first.")
+        await ctx.message.add_reaction("❌")
+    # join
+    else:
+        try:
+            try:
+                await ctx.voice_client.disconnect()
+            except AttributeError:
+                pass
+            await user_voice_channel.connect()
+        except discord.errors.ClientException:
+            pass
+        else:
+            await ctx.message.add_reaction("✅")
+
+
+@bot.command(Name="say_lang")
+@commands.cooldown(1, 3, commands.BucketType.user)
+@commands.guild_only()
+async def say_lang(ctx, *, lang, content: str):  # sourcery no-metrics
+    # get message channel id
+
+    channel_id = ctx.channel.id
+    # get guild id
+    guild_id = ctx.guild.id
+    if tool_function.check_file(f"db/{guild_id}.json"):
+        # read db file
+        db = tool_function.read_json(f"db/{guild_id}.json")
+        # check channel id
+        # check if is in voice channel
+        try:
+            ctx.voice_client.is_connected()
+        except AttributeError:
+            is_connected = False
+        else:
+            is_connected = True
+
+        lang_code_list = tool_function.read_json("languages.json")["Support_Language"]
+
+        if lang in lang_code_list:
+            lang_code_is_right = True
+        else:
+            lang_code_is_right = False
+
+        channelissetup = tool_function.check_dict_data(db, "channel")
+
+        if (
+                is_connected
+                and channelissetup
+                and lang_code_is_right
+                and channel_id == db["channel"]
+        ):
+
+            # export content to mp3 by google tts api
+            # get username
+            content = await commands.clean_content(
+                fix_channel_mentions=True, use_nicknames=True
+            ).convert(ctx, content)
+            say_this = ctx.author.id == config["owner"] or len(content) < 30
+            try:
+                username = ctx.author.display_name
+            except AttributeError:
+                username = ctx.author.name
+            # get username length
+            if len(username) > 20:
+                username = "someone"
+            if ctx.author.voice is not None:
+                content = f"{username} said {content}"
+            else:
+                content = f"{username} from outside said {content}"
+            if say_this:
+                list_name = f"list_{str(guild_id)}"
+                if list_name not in globals():
+                    globals()[list_name] = queue.Queue(maxsize=10)
+
+                if not ctx.voice_client.is_playing():
+                    print("init google tts api")
+                    # tts_func.process_voice(content, db["lang"])
+                    print("play mp3")
+                    subprocess.call(
+                        [
+                            "python",
+                            "tts_alone.py",
+                            "--content",
+                            content,
+                            "--lang",
+                            lang,
+                            "--filename",
+                            f"{guild_id}.mp3",
+                        ]
+                    )
+                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                    try:
+                        ctx.voice_client.play(
+                            voice_file,
+                            after=playnext(
+                                ctx, db["lang"], guild_id, globals()[list_name]
+                            ),
+                        )
+                        await ctx.message.add_reaction("🔊")
+                    except discord.errors.ClientException:
+                        if tool_function.check_dict_data(db, "queue") and db["queue"]:
+                            globals()[list_name].put(content)
+                            # add reaction
+                            await ctx.message.add_reaction("⏯")
+                            asyncio.ensure_future(check_is_not_playing(ctx))
+                            playnext(ctx, db["lang"], guild_id, globals()[list_name])
+                        else:
+                            await ctx.reply(
+                                "Sorry, queue function is under development and current not supported."
+                            )
+
+                elif ctx.author.id == config["owner"]:
+                    print("init google tts api")
+                    # tts_func.process_voice(content, db["lang"])
+                    print("play mp3")
+                    subprocess.call(
+                        [
+                            "python",
+                            "tts_alone.py",
+                            "--content",
+                            content,
+                            "--lang",
+                            lang,
+                            "--filename",
+                            f"{guild_id}.mp3",
+                        ]
+                    )
+
+                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                    # stop current audio
+                    ctx.voice_client.stop()
+                    await asyncio.sleep(0.5)
+                    ctx.voice_client.play(
+                        voice_file,
+                        after=playnext(ctx, db["lang"], guild_id, globals()[list_name]),
+                    )
+                    await ctx.message.add_reaction("⁉")
+                elif tool_function.check_dict_data(db, "queue") and db["queue"]:
+                    globals()[list_name].put(content)
+                    # add reaction
+                    await ctx.message.add_reaction("⏯")
+                    asyncio.ensure_future(check_is_not_playing(ctx))
+                    playnext(ctx, db["lang"], guild_id, globals()[list_name])
+                else:
+                    await ctx.reply(
+                        "Sorry, queue function is under development and current not supported."
+                    )
+            else:
+                await ctx.reply("Too long to say.")
+
+        elif (
+                channelissetup
+                and channel_id != db["channel"]
+                and (
+                        not tool_function.check_dict_data(db, "not_this_channel_msg")
+                        or db["not_this_channel_msg"] != "off"
+                )
+        ):
+            channel_msg = ""
+            if tool_function.check_dict_data(db, "not_this_channel_msg"):
+                channel_msg = f"Current channel is <#{db['channel']}>.\n"
+            await ctx.reply(
+                "This channel is not made for me to speaking.\n"
+                f"{channel_msg}"
+                f"To change channel, use {config['prefix']}channel <#{channel_id}>.\n"
+                f"To disable this message, use `{config['prefix']}wrong_msg off`."
+            )
+            await ctx.message.add_reaction("🤔")
+
+        elif (
+                tool_function.check_dict_data(db, "not_this_channel_msg")
+                and db["not_this_channel_msg"] == "off"
+        ):
+            return
+            # reply to sender
+        else:
+            errormsg = ""
+            if not is_connected:
+                errormsg += f"Please join voice channel by `{config['prefix']}join`.\n"
+            if not channelissetup:
+                errormsg += f"Please set channel by `{config['prefix']}setchannel`.\n"
+            if not lang_code_is_right:
+                errormsg += f"Not supported language.\n" \
+                            f"Current supported languages: \n" \
+                            f"```{', '.join(lang_code_list)}```\n"
+            await ctx.reply(errormsg)
+            await ctx.message.add_reaction("❌")
+    else:
+        await ctx.send(
+            "Setting file not exist.\n"
+            f"Please set channel by `{config['prefix']}setchannel`.\n"
+            f"Please set language by `{config['prefix']}setlang`. (This command does not required in `{config['prefix']}say_lang`)\n"
+        )
 
 
 subprocess.call(["python", "get_lang_code.py"])
