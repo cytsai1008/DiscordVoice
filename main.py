@@ -558,7 +558,17 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     )
             else:
                 await ctx.reply("Too long to say.")
-                # reply to sender
+
+        elif channel_id != db["channel"] and db["not_this_channel_msg"] != False:
+            channel_msg = ""
+            if tool_function.check_dict_data(db, "not_this_channel_msg"):
+                channel_msg = f"Current channel is <#{db['channel']}>.\n"
+            await ctx.reply("This channel is not made for me to speaking.\n"
+                            f"{channel_msg}"
+                            f"To change channel, use {config['prefix']}channel <#{channel_id}>.\n"
+                            f"To disable this message, use {config['prefix']}wrong_msg off.")
+            await ctx.message.add_reaction("🤔")
+            # reply to sender
         else:
             """
             await ctx.send("Please set channel by `$setchannel`.\n"
@@ -666,6 +676,31 @@ async def invite(ctx):
         f"Invite me to your server: \n"
         f"{discord.utils.oauth_url(client_id='960004225713201172', permissions=discord.Permissions(36817920), scopes=('bot', 'applications.commands'))}"
     )
+
+
+@bot.command(Name="wrong_msg")
+@commands.guild_only()
+async def wrong_msg(ctx, msg: str):
+    if tool_function.check_file(f"db/{ctx.guild.id}.json"):
+        db = tool_function.read_json(f"db/{ctx.guild.id}.json")
+        if msg in {"on", "off"}:
+            db["not_this_channel_msg"] = msg
+            tool_function.write_json(f"db/{ctx.guild.id}.json", db)
+            if msg == "on":
+                reply_msg = "From now on I will tell if you sent to an wrong channel."
+            elif msg == "off":
+                reply_msg = "From now on I will not tell if you sent to an wrong channel."
+            else:
+                reply_msg = "How did you trigger this?"
+            await ctx.reply(f"{reply_msg}")
+            await ctx.message.add_reaction("✅")
+        else:
+            await ctx.reply("Not recognized command.\n"
+                            "Usage: `wrong_msg on` or `wrong_msg off`")
+            await ctx.message.add_reaction("❌")
+    else:
+        await ctx.reply("You haven't set up anything yet.\n")
+        await ctx.message.add_reaction("🤔")
 
 
 subprocess.call(["python", "get_lang_code.py"])
