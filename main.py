@@ -481,11 +481,12 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             except AttributeError:
                 username = ctx.author.name
             # get username length
-            if len(username) <= 20:
-                if ctx.author.voice is not None:
-                    content = f"{username} said {content}"
-                else:
-                    content = f"{username} from outside said {content}"
+            if len(username) > 20:
+                username = "someone"
+            if ctx.author.voice is not None:
+                content = f"{username} said {content}"
+            else:
+                content = f"{username} from outside said {content}"
             if say_this:
                 list_name = f"list_{str(guild_id)}"
                 if list_name not in globals():
