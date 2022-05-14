@@ -236,7 +236,14 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     else:
         NotAbleReply = ""
         NotAbleSend = ""
-        server_name = ctx.guild.name
+        try:
+            server_name = ctx.guild.name
+        except AttributeError:
+            server_name = ""
+        try:
+            server_id = ctx.guild.id
+        except AttributeError:
+            server_id = ""
         sender_name = ctx.author.name
         command_name = ctx.invoked_with
         try:
@@ -269,7 +276,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             f"Unable to reply: {NotAbleReply}\n"
             f"Unable to send: {NotAbleSend}\n"
             f"Server Name: {server_name}\n"
-            f"Server ID: {ctx.guild.id}\n"
+            f"Server ID: {server_id}\n"
             f"Sender: {sender_name}#{ctx.author.discriminator}\n"
             "```"
         )
