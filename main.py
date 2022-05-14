@@ -268,7 +268,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             f"Error Type: {type(error)}\n"
             f"Unable to reply: {NotAbleReply}\n"
             f"Unable to send: {NotAbleSend}\n"
-            f"Server: {server_name}\n"
+            f"Server Name: {server_name}\n"
+            f"Server ID: {ctx.guild.id}\n"
             f"Sender: {sender_name}#{ctx.author.discriminator}\n"
             "```"
         )
@@ -559,7 +560,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             else:
                 await ctx.reply("Too long to say.")
 
-        elif channel_id != db["channel"] and (
+        elif tool_function.check_dict_data(db, "channel") and channel_id != db["channel"] and (
                 not tool_function.check_dict_data(db, "not_this_channel_msg")
                 or db["not_this_channel_msg"] != "off"
         ):
