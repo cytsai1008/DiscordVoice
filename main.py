@@ -582,7 +582,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 "This channel is not made for me to speaking.\n"
                 f"{channel_msg}"
                 f"To change channel, use {config['prefix']}channel <#{channel_id}>.\n"
-                f"To disable this message, use {config['prefix']}wrong_msg off."
+                f"To disable this message, use `{config['prefix']}wrong_msg off`."
             )
             await ctx.message.add_reaction("🤔")
 
@@ -593,11 +593,6 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             return
             # reply to sender
         else:
-            """
-            await ctx.send("Please set channel by `$setchannel`.\n"
-                           "Please set language by `$setlang`.\n"
-                           "Please join voice channel by `$join`.")
-            """
             errormsg = ""
             if not is_connected:
                 errormsg += "Please join voice channel by `$join`.\n"
