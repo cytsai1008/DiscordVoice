@@ -559,16 +559,26 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             else:
                 await ctx.reply("Too long to say.")
 
-        elif channel_id != db["channel"] and tool_function.check_dict_data(db, "not_this_channel_msg") and db[
-            "not_this_channel_msg"] != False:
+        elif channel_id != db["channel"] and (
+                not tool_function.check_dict_data(db, "not_this_channel_msg")
+                or db["not_this_channel_msg"] != "off"
+        ):
             channel_msg = ""
             if tool_function.check_dict_data(db, "not_this_channel_msg"):
                 channel_msg = f"Current channel is <#{db['channel']}>.\n"
-            await ctx.reply("This channel is not made for me to speaking.\n"
-                            f"{channel_msg}"
-                            f"To change channel, use {config['prefix']}channel <#{channel_id}>.\n"
-                            f"To disable this message, use {config['prefix']}wrong_msg off.")
+            await ctx.reply(
+                "This channel is not made for me to speaking.\n"
+                f"{channel_msg}"
+                f"To change channel, use {config['prefix']}channel <#{channel_id}>.\n"
+                f"To disable this message, use {config['prefix']}wrong_msg off."
+            )
             await ctx.message.add_reaction("🤔")
+
+        elif (
+                tool_function.check_dict_data(db, "not_this_channel_msg")
+                and db["not_this_channel_msg"] == "off"
+        ):
+            return
             # reply to sender
         else:
             """
@@ -690,14 +700,17 @@ async def wrong_msg(ctx, msg: str):
             if msg == "on":
                 reply_msg = "From now on I will tell if you sent to an wrong channel."
             elif msg == "off":
-                reply_msg = "From now on I will not tell if you sent to an wrong channel."
+                reply_msg = (
+                    "From now on I will not tell if you sent to an wrong channel."
+                )
             else:
                 reply_msg = "How did you trigger this?"
             await ctx.reply(f"{reply_msg}")
             await ctx.message.add_reaction("✅")
         else:
-            await ctx.reply("Not recognized command.\n"
-                            "Usage: `wrong_msg on` or `wrong_msg off`")
+            await ctx.reply(
+                "Not recognized command.\n" "Usage: `wrong_msg on` or `wrong_msg off`"
+            )
             await ctx.message.add_reaction("❌")
     else:
         await ctx.reply("You haven't set up anything yet.\n")
