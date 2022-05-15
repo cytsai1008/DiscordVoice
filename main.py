@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 # import sys
@@ -31,23 +32,14 @@ handler.setFormatter(
 )
 logger.addHandler(handler)
 
+load_dotenv()
 # check file
-if not tool_function.check_file("config.json"):
-    print(
-        "No token detected\n"
-        "please input your token from https://discord.com/developers/applications:"
-    )
-    config_json = input()
-    print("Please input your user id:")
-    user_id = input()
-    print("Please input your bot prefix:")
-    prefix = input()
-    config_dump = {"token": config_json, "owner": user_id, "prefix": prefix}
-    tool_function.write_json("config.json", config_dump)
-    del config_json, user_id, prefix, config_dump
-config = tool_function.read_json("config.json")
-if not tool_function.check_file("db"):
-    os.mkdir("db")
+config = {
+    "prefix": f"{os.getenv('DISCORD_PREFIX')}",
+    "owner": int(os.getenv('DISCORD_OWNER')),
+}
+
+config = json.loads(json.dumps(config))
 
 bot = commands.Bot(
     command_prefix=config["prefix"],
@@ -58,7 +50,6 @@ bot = commands.Bot(
 
 # initialize some variable
 bot.remove_command("help")
-load_dotenv()
 
 folder = "tts_temp"
 for filename in os.listdir(folder):
@@ -168,7 +159,7 @@ async def on_ready():
     game = discord.Game(f"{config['prefix']}help")
     # discord.Status.<狀態>，可以是online,offline,idle,dnd,invisible
     await bot.change_presence(status=discord.Status.online, activity=game)
-    owner = await bot.fetch_user(config["owner"])
+    owner = await bot.fetch_user(int(config["owner"]))
     await owner.send("bot online.")
     # get all guilds
     print("目前登入的伺服器：")
@@ -203,7 +194,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 f"No channel providing, please set by `{config['prefix']}setchannel #some-channel`."
             )
         elif command == "setlang":
-            support_lang = tool_function.read_json("languages.json")
+            support_lang = tool_function.new_read_json("languages.json")
             await ctx.reply(
                 f"No language providing, please set by `{config['prefix']}setlang some-lang-code`.\n"
                 f"Current supported languages: \n"
@@ -249,8 +240,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         command_name = ctx.invoked_with
         try:
             # get owner name
-            owner_name = await bot.get_user(config["owner_id"]).name
-            owner_full_id = f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
+            owner_name = await bot.get_user(int(config["owner_id"])).name
+            owner_full_id = f"{owner_name}#{await bot.get_user(int(config['owner_id'])).discriminator}"
             await ctx.reply(
                 f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
                 "```"
@@ -260,7 +251,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             )
         except:
             NotAbleReply = traceback.format_exc()
-            owner_name = await bot.get_user(config["owner_id"]).name
+            owner_name = await bot.get_user(int(config["owner_id"])).name
             owner_full_id = f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
             try:
                 await ctx.send(
@@ -272,7 +263,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 )
             except:
                 NotAbleSend = traceback.format_exc()
-        owner = await bot.fetch_user(config["owner"])
+        owner = await bot.fetch_user(int(config["owner"]))
         owner_name = await bot.get_user(config["owner_id"]).name
         owner_full_id = f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
         await owner.send(
@@ -299,7 +290,7 @@ async def on_error(event, *args, **kwargs):
         f.write(f"{kwargs}\n")
         f.write("\n")
     # send message to owner
-    owner = await bot.fetch_user(config["owner"])
+    owner = await bot.fetch_user(int(config["owner"]))
     await owner.send(
         f"Error event on: {event}\n"
         f"Error args on: {args}\n"
@@ -316,12 +307,12 @@ async def help(ctx):
         guild_msg = False
     else:
         guild_msg = True
-    if guild_msg and tool_function.check_file(f"db/{ctx.guild.id}.json"):
-        data = tool_function.read_json(f"db/{ctx.guild.id}.json")
+    if guild_msg and tool_function.check_file(f"{ctx.guild.id}"):
+        data = tool_function.read_json(f"{ctx.guild.id}")
         if tool_function.check_dict_data(data, "lang"):
             lang_msg = f"Use `{config['prefix']}setlang` to set a language. (Current: `{data['lang']}`)\n"
         else:
-            support_lang = tool_function.read_json("languages.json")
+            support_lang = tool_function.new_read_json("languages.json")
             lang_msg = (
                 f"Use `{config['prefix']}setlang` to set a language. (ex. `{config['prefix']}setlang en-us`)\n"
                 f"Current supported languages: \n"
@@ -347,7 +338,7 @@ async def help(ctx):
             f"Use `{config['prefix']}invite` to get the bot's invite link.\n"
         )
     else:
-        support_lang = tool_function.read_json("languages.json")
+        support_lang = tool_function.new_read_json("languages.json")
         await ctx.reply(
             f"Use `{config['prefix']}help` to see the help message.\n"
             f"Use `{config['prefix']}setchannel` to set a channel. (ex. `{config['prefix']}setchannel #general`)\n"
@@ -408,13 +399,13 @@ async def setchannel(ctx, channel: discord.TextChannel):
     # get guild id
     guild_id = ctx.guild.id
     # write to db folder with guild id filename
-    if tool_function.check_file(f"db/{guild_id}.json"):
-        data = tool_function.read_json(f"db/{guild_id}.json")
+    if tool_function.check_file(f"{guild_id}"):
+        data = tool_function.read_json(f"{guild_id}")
         data["channel"] = channel_id
     else:
         data = {"channel": channel_id}
 
-    tool_function.write_json(f"db/{guild_id}.json", data)
+    tool_function.write_json(f"{guild_id}", data)
     await ctx.reply(f"channel set to <#{channel.id}>.")
 
 
@@ -438,9 +429,9 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
     channel_id = ctx.channel.id
     # get guild id
     guild_id = ctx.guild.id
-    if tool_function.check_file(f"db/{guild_id}.json"):
+    if tool_function.check_file(f"{guild_id}"):
         # read db file
-        db = tool_function.read_json(f"db/{guild_id}.json")
+        db = tool_function.read_json(f"{guild_id}")
         # check channel id
         # check if is in voice channel
         try:
@@ -621,18 +612,18 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
 async def setlang(ctx, lang: str):
     # get guild id
     guild_id = ctx.guild.id
-    support_lang = tool_function.read_json("languages.json")
+    support_lang = tool_function.new_read_json("languages.json")
     lang = lang.lower()
     if lang in support_lang["Support_Language"]:
-        if tool_function.check_file(f"db/{guild_id}.json"):
+        if tool_function.check_file(f"{guild_id}"):
             # read db file
-            db = tool_function.read_json(f"db/{guild_id}.json")
+            db = tool_function.read_json(f"{guild_id}")
             # add lang to db
             db["lang"] = lang
             # write to db file
-            tool_function.write_json(f"db/{guild_id}.json", db)
+            tool_function.write_json(f"{guild_id}", db)
         else:
-            tool_function.write_json(f"db/{guild_id}.json", {"lang": lang})
+            tool_function.write_json(f"{guild_id}", {"lang": lang})
         await ctx.reply(f"Language set to `{lang}`.")
         await ctx.message.add_reaction("✅")
     elif lang == "supported-languages":
@@ -658,9 +649,8 @@ async def ping(ctx):
 @bot.command(Name="shutdown")
 @commands.is_owner()
 async def shutdown(ctx):
-    sender = ctx.message.author.id
-    owner = tool_function.read_json("config.json")
-    owner = owner["owner"]
+    sender = int(ctx.message.author.id)
+    owner = int(config["owner"])
     if sender == owner:
         await ctx.reply("Shutting down...")
         await bot.close()
@@ -705,11 +695,11 @@ async def invite(ctx):
 @bot.command(Name="wrong_msg")
 @commands.guild_only()
 async def wrong_msg(ctx, msg: str):
-    if tool_function.check_file(f"db/{ctx.guild.id}.json"):
-        db = tool_function.read_json(f"db/{ctx.guild.id}.json")
+    if tool_function.check_file(f"{ctx.guild.id}"):
+        db = tool_function.read_json(f"{ctx.guild.id}")
         if msg in {"on", "off"}:
             db["not_this_channel_msg"] = msg
-            tool_function.write_json(f"db/{ctx.guild.id}.json", db)
+            tool_function.write_json(f"{ctx.guild.id}", db)
             if msg == "on":
                 reply_msg = "From now on I will tell if you sent to an wrong channel."
             elif msg == "off":
@@ -763,9 +753,9 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
     channel_id = ctx.channel.id
     # get guild id
     guild_id = ctx.guild.id
-    if tool_function.check_file(f"db/{guild_id}.json"):
+    if tool_function.check_file(f"{guild_id}"):
         # read db file
-        db = tool_function.read_json(f"db/{guild_id}.json")
+        db = tool_function.read_json(f"{guild_id}")
         # check channel id
         # check if is in voice channel
         try:
@@ -775,15 +765,11 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         else:
             is_connected = True
 
-        lang_code_list = tool_function.read_json("languages.json")["Support_Language"]
+        lang_code_list = tool_function.new_read_json("languages.json")["Support_Language"]
 
         lang = lang.lower()
 
-        if lang in lang_code_list:
-            lang_code_is_right = True
-        else:
-            lang_code_is_right = False
-
+        lang_code_is_right = lang in lang_code_list
         channelissetup = tool_function.check_dict_data(db, "channel")
 
         if (

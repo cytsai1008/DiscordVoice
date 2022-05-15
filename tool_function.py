@@ -1,11 +1,31 @@
 import json
 import os
 
+import redis
+from redis.commands.json.path import Path
+
 
 # import load_command
 
 
+def redis_client() -> redis.Redis:
+    """Returns redis client"""
+    return redis.Redis(
+        host=os.environ["REDIS_URL"],
+        port=16704,
+        username=os.environ["REDIS_USER"],
+        password=os.environ["REDIS_PASSWD"],
+        decode_responses=True
+    )
+
+
 def read_json(filename) -> dict:
+    """Reads json value from redis (key: filename, value: data)"""
+    client = redis_client()
+    return client.json().get(filename)
+
+
+def new_read_json(filename) -> dict:
     """Returns dictionary from a json file"""
     with open(filename, "r") as f:
         data = json.load(f)
@@ -13,37 +33,8 @@ def read_json(filename) -> dict:
 
 
 def write_json(filename, data) -> None:
-    """Writes dictionary to json file"""
-    with open(filename, "w") as f:
-        json.dump(data, f, indent=4)
-
-
-"""
-def check_json(filename) -> dict:
-    try:
-        with open(filename, "r") as f:
-            data = json.load(f)
-    except FileNotFoundError:
-        data = {}
-    return data
-"""
-
-
-def check_args_zero(args, arg_list) -> bool:
-    return args in arg_list
-
-
-def id_check(self) -> str:
-    """If server id not exist, use user id"""
-    try:
-        server_id = str(self.guild.id)
-    except:
-        server_id = f"user_{str(self.author.id)}"
-    return server_id
-
-
-def check_args_one(args) -> bool:
-    return args is not type(None)
+    """Writes dictionary to redis json (key: filename, value: data)"""
+    redis_client().json().set(filename, Path.root_path(), data)
     # return False if args is type(None)
 
 
@@ -57,19 +48,9 @@ def check_dict_data(data: dict, arg) -> bool:
         return True
 
 
-def check_duplicate_data(existing_data, new_data: list) -> list:
-    # sourcery skip: for-index-replacement
-    del_key = []
-    for i in range(len(existing_data)):
-        for j in range(len(new_data)):
-            if existing_data[i] == new_data[j]:
-                del_key.append(new_data[j])
-    return del_key
-
-
 def check_file(filename) -> bool:
-    """Check if file exists"""
-    return bool(os.path.exists(filename))
+    """Check if filename exist in redis key"""
+    return bool(redis_client().exists(filename))
 
 
 """
@@ -81,6 +62,3 @@ def lang_command(lang: str, command: str) -> str:
     finally:
         return command_out
 """
-
-
-# TODO: Merging functions to main.py
