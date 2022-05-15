@@ -751,7 +751,7 @@ async def move(ctx):
 @bot.command(Name="say_lang")
 @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
-async def say_lang(ctx, *, lang, content: str):  # sourcery no-metrics
+async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
     # get message channel id
 
     channel_id = ctx.channel.id
