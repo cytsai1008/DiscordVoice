@@ -1,17 +1,15 @@
 import asyncio
 import logging
 import os
-import traceback
-
 # import sys
 import queue
-import subprocess
 import shutil
+import subprocess
+import traceback
 from datetime import datetime
 
 import discord
 from discord.ext import commands
-
 from dotenv import load_dotenv
 
 import tool_function
@@ -937,4 +935,4 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 
 
 subprocess.call(["python", "get_lang_code.py"])
-bot.run(os.environ["DiscordToken"])
+bot.run(os.environ["DISCORD_TOKEN"])
