@@ -250,8 +250,11 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         sender_name = ctx.author.name
         command_name = ctx.invoked_with
         try:
+            # get owner name
+            owner_name = await bot.get_user(config["owner_id"]).name
+            owner_full_id = f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
             await ctx.reply(
-                f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
+                f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
                 "```"
                 f"Error: {error}\n"
                 f"Error Type: {type(error)}\n"
@@ -259,9 +262,11 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             )
         except:
             NotAbleReply = traceback.format_exc()
+            owner_name = await bot.get_user(config["owner_id"]).name
+            owner_full_id = f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
             try:
                 await ctx.send(
-                    f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
+                    f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
                     "```"
                     f"Error: {error}\n"
                     f"Error Type: {type(error)}\n"
@@ -270,8 +275,10 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             except:
                 NotAbleSend = traceback.format_exc()
         owner = await bot.fetch_user(config["owner"])
+        owner_name = await bot.get_user(config["owner_id"]).name
+        owner_full_id = f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
         await owner.send(
-            f"Unknown command error, please report to developer (<@{config['owner']}> or `(⊙ｏ⊙)#0001`).\n"
+            f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
             "```"
             f"Command: {command_name}\n"
             f"Error: {error}\n"
