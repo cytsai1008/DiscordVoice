@@ -14,6 +14,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 import tool_function
+from website import alive
 
 # from io import BytesIO
 
@@ -36,7 +37,7 @@ load_dotenv()
 # check file
 config = {
     "prefix": f"{os.getenv('DISCORD_PREFIX')}",
-    "owner": int(os.getenv('DISCORD_OWNER')),
+    "owner": int(os.getenv("DISCORD_OWNER")),
 }
 
 config = json.loads(json.dumps(config))
@@ -203,8 +204,10 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         elif command == "say":
             await ctx.reply("What can I say? :(")
         elif command == "say_lang":
-            await ctx.reply("What can I say? :(\n"
-                            f"`{config['prefix']}say_lang some-lang-code say-something`")
+            await ctx.reply(
+                "What can I say? :(\n"
+                f"`{config['prefix']}say_lang some-lang-code say-something`"
+            )
         else:
             await ctx.reply("Missing required argument.")
         await ctx.message.add_reaction("❓")
@@ -252,7 +255,9 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         except:
             NotAbleReply = traceback.format_exc()
             owner_name = await bot.get_user(int(config["owner_id"])).name
-            owner_full_id = f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
+            owner_full_id = (
+                f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
+            )
             try:
                 await ctx.send(
                     f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
@@ -265,7 +270,9 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 NotAbleSend = traceback.format_exc()
         owner = await bot.fetch_user(int(config["owner"]))
         owner_name = await bot.get_user(config["owner_id"]).name
-        owner_full_id = f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
+        owner_full_id = (
+            f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
+        )
         await owner.send(
             f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
             "```"
@@ -765,7 +772,9 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         else:
             is_connected = True
 
-        lang_code_list = tool_function.new_read_json("languages.json")["Support_Language"]
+        lang_code_list = tool_function.new_read_json("languages.json")[
+            "Support_Language"
+        ]
 
         lang = lang.lower()
 
@@ -907,9 +916,11 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             if not channelissetup:
                 errormsg += f"Please set channel by `{config['prefix']}setchannel`.\n"
             if not lang_code_is_right:
-                errormsg += f"Not supported language.\n" \
-                            f"Current supported languages: \n" \
-                            f"```{', '.join(lang_code_list)}```\n"
+                errormsg += (
+                    f"Not supported language.\n"
+                    f"Current supported languages: \n"
+                    f"```{', '.join(lang_code_list)}```\n"
+                )
             await ctx.reply(errormsg)
             await ctx.message.add_reaction("❌")
     else:
@@ -920,5 +931,6 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         )
 
 
+alive()
 subprocess.call(["python", "get_lang_code.py"])
 bot.run(os.environ["DISCORD_TOKEN"])
