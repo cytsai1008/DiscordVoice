@@ -25,7 +25,7 @@ def list_languages():
     languages = sorted(languages)
     json_lang = {"Support_Language": languages}
     with open("languages.json", "w") as f:
-        json.dump(json_lang, f)
+        json.dump(json_lang, f, indent=4)
 
 
 if __name__ == "__main__":
