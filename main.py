@@ -335,6 +335,7 @@ async def help(ctx):
             f"Use `{config['prefix']}say_lang` to speak in voice channel with another language. (ex. `{config['prefix']}say_lang en-us ABCD`)\n"
             f"Use `{config['prefix']}stop` to stop speaking.\n"
             f"Use `{config['prefix']}join` to let me join to a voice channel.\n"
+            f"Use `{config['prefix']}move` to let me move to another voice channel.\n"
             f"Use `{config['prefix']}leave` to let me leave the voice channel.\n"
             f"Use `{config['prefix']}ping` to check my latency.\n"
             f"Use `{config['prefix']}invite` to get the bot's invite link.\n"
@@ -351,6 +352,7 @@ async def help(ctx):
             f"Use `{config['prefix']}say_lang` to speak in voice channel with another language. (ex. `{config['prefix']}say_lang en-us ABCD`)\n"
             f"Use `{config['prefix']}stop` to stop speaking.\n"
             f"Use `{config['prefix']}join` to let me join to a voice channel.\n"
+            f"Use `{config['prefix']}move` to let me move to another voice channel.\n"
             f"Use `{config['prefix']}leave` to let me leave the voice channel.\n"
             f"Use `{config['prefix']}ping` to check my latency.\n"
             f"Use `{config['prefix']}invite` to get the bot's invite link.\n"
@@ -575,9 +577,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         or db["not_this_channel_msg"] != "off"
                 )
         ):
-            channel_msg = ""
-            if tool_function.check_dict_data(db, "not_this_channel_msg"):
-                channel_msg = f"Current channel is <#{db['channel']}>.\n"
+            channel_msg = f"Please run this command in <#{db['channel']}>.\n"
             await ctx.reply(
                 "This channel is not made for me to speaking.\n"
                 f"{channel_msg}"
@@ -893,9 +893,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         or db["not_this_channel_msg"] != "off"
                 )
         ):
-            channel_msg = ""
-            if tool_function.check_dict_data(db, "not_this_channel_msg"):
-                channel_msg = f"Current channel is <#{db['channel']}>.\n"
+            channel_msg = f"Please run this command in <#{db['channel']}>.\n"
             await ctx.reply(
                 "This channel is not made for me to speaking.\n"
                 f"{channel_msg}"
