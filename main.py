@@ -692,7 +692,7 @@ async def stop(ctx):
 async def invite(ctx):
     await ctx.reply(
         f"Invite me to your server: \n"
-        f"{discord.utils.oauth_url(client_id='960004225713201172', permissions=discord.Permissions(36817920), scopes=('bot', 'applications.commands'))}"
+        f"{discord.utils.oauth_url(client_id='960004225713201172', permissions=discord.Permissions(139690626112), scopes=('bot', 'applications.commands'))}"
     )
 
 
