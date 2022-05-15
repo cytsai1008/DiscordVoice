@@ -934,6 +934,6 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 
 
 alive()
-subprocess.call(["python", "get_lang_code.py"])
 subprocess.call(["python", "gcp-token-generator.py"])
+subprocess.call(["python", "get_lang_code.py"])
 bot.run(os.environ["DISCORD_TOKEN"])
