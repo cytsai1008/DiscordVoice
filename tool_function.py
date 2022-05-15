@@ -2,7 +2,6 @@ import json
 import os
 
 import redis
-from redis.commands.json.path import Path
 
 
 # import load_command
@@ -34,7 +33,7 @@ def new_read_json(filename) -> dict:
 
 def write_json(filename, data) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
-    redis_client().json().set(filename, Path.root_path(), data)
+    redis_client().json().set(filename, ".", data)
     # return False if args is type(None)
 
 
