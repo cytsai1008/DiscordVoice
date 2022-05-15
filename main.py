@@ -771,6 +771,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 
         lang_code_list = tool_function.read_json("languages.json")["Support_Language"]
 
+        lang = lang.lower()
+
         if lang in lang_code_list:
             lang_code_is_right = True
         else:
