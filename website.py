@@ -1,8 +1,8 @@
 from threading import Thread
 
-from flask import Flask
+import flask
 
-app = Flask("")
+app: flask.Flask = flask.Flask("")
 
 
 @app.route("/")
