@@ -1,2 +1,2 @@
 web: gunicorn website:app
-worker: python main.py
+worker: python dv_main.py
