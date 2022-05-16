@@ -10,10 +10,10 @@ import redis
 def redis_client() -> redis.Redis:
     """Returns redis client"""
     return redis.Redis(
-        host=os.environ["REDIS_URL"],
+        host=os.environ["REDIS_DV_URL"],
         port=16704,
         username=os.environ["REDIS_USER"],
-        password=os.environ["REDIS_PASSWD"],
+        password=os.environ["REDIS_DV_PASSWD"],
         decode_responses=True,
     )
 

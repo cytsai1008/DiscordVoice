@@ -37,7 +37,7 @@ logger.addHandler(handler)
 load_dotenv()
 # check file
 config = {
-    "prefix": f"{os.getenv('DISCORD_PREFIX')}",
+    "prefix": f"{os.getenv('DISCORD_DV_PREFIX')}",
     "owner": int(os.getenv("DISCORD_OWNER")),
 }
 
@@ -73,42 +73,6 @@ for filename in os.listdir(folder):
 # remove_zh_tw = load_command.read_description("remove", "zh-tw")
 # list_zh_tw = load_command.read_description("list", "zh-tw")
 # random_zh_tw = load_command.read_description("random", "zh-tw")
-'''
-def process_voice(content: str, lang_code: str):
-    """Synthesizes speech from the input string of text or ssml.
-    Make sure to be working in a virtual environment.
-
-    Note: ssml must be well-formed according to:
-        https://www.w3.org/TR/speech-synthesis/
-    """
-    import os
-    from google.cloud import texttospeech
-
-    # Instantiates a client
-    client = texttospeech.TextToSpeechClient()
-
-    # Set the text input to be synthesized
-    synthesis_input = texttospeech.SynthesisInput(text=content)
-
-    # Build the voice request, select the language code ("en-US") and the ssml
-    # voice gender ("neutral")
-    voice = texttospeech.VoiceSelectionParams(
-        language_code=lang_code,
-        ssml_gender=texttospeech.SsmlVoiceGender.SSML_VOICE_GENDER_UNSPECIFIED,
-    )
-
-    # Select the type of audio file you want returned
-    audio_config = texttospeech.AudioConfig(
-        audio_encoding=texttospeech.AudioEncoding.MP3
-    )
-
-    # Perform the text-to-speech request on the text input with the selected
-    # voice parameters and audio file type
-    response = client.synthesize_speech(
-        input=synthesis_input, voice=voice, audio_config=audio_config
-    )
-    return response.audio_content
-'''
 
 
 def remove_file(file_name):
@@ -934,4 +898,4 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 
 subprocess.call(["python", "gcp-token-generator.py"])
 subprocess.call(["python", "get_lang_code.py"])
-bot.run(os.environ["DISCORD_TOKEN"])
+bot.run(os.environ["DISCORD_DV_TOKEN"])
