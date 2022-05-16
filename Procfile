@@ -1,2 +1,1 @@
-web gunicorn website:app
-worker: python main.py
+web: bin/runsvdir-dyno
