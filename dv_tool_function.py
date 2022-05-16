@@ -15,7 +15,6 @@ def redis_client() -> redis.Redis:
         username=os.environ["REDIS_USER"],
         password=os.environ["REDIS_DV_PASSWD"],
         decode_responses=True,
-        ssl=True,
     )
 
 
