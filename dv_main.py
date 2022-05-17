@@ -143,7 +143,7 @@ async def on_ready():
         try:
             await bot.get_channel(int(j)).connect()
         except:
-            del joined_vc[i]
+            del joined_vc[str(i)]
             print(f"Failed to connect to {j} in {i}.\n")
             print(f"Reason: {traceback.format_exc()}")
         else:
@@ -384,7 +384,7 @@ async def leave(ctx):
         await ctx.message.add_reaction("🖐")
         # delete channel id from joined_vc dict
     joined_vc = dv_tool_function.read_json("joined_vc")
-    del joined_vc[ctx.guild.id]
+    del joined_vc[str(ctx.guild.id)]
     dv_tool_function.write_json("joined_vc", joined_vc)
 
 
@@ -440,7 +440,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
 
         if not is_connected:
             joined_vc = dv_tool_function.read_json("joined_vc")
-            del joined_vc[guild_id]
+            del joined_vc[str(guild_id)]
             dv_tool_function.write_json("joined_vc", joined_vc)
 
         channelissetup = dv_tool_function.check_dict_data(db, "channel")
@@ -786,7 +786,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 
         if not is_connected:
             joined_vc = dv_tool_function.read_json("joined_vc")
-            del joined_vc[guild_id]
+            del joined_vc[str(guild_id)]
             dv_tool_function.write_json("joined_vc", joined_vc)
 
         lang_code_list = dv_tool_function.new_read_json("languages.json")[
