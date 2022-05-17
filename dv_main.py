@@ -738,7 +738,7 @@ async def wrong_msg(ctx, msg: str):
 # @commands.bot_has_permissions(connect=True, speak=True)
 async def move(ctx):
     joined_vc = dv_tool_function.read_json("joined_vc")
-    del joined_vc[ctx.guild.id]
+    del joined_vc[str(ctx.guild.id)]
     # get user voice channel
     try:
         user_voice_channel = ctx.author.voice.channel
