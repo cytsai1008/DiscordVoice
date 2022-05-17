@@ -1,2 +1,3 @@
 web: gunicorn website:app
 worker: python dv_main.py
+worker: python wfnm_main.py
