@@ -135,6 +135,19 @@ async def on_ready():
     for guild in bot.guilds:
         print(guild.name + "\n")
 
+    joined_vc = dv_tool_function.read_json("joined_vc")
+    print(f"joined_vc: \n"
+          f"{joined_vc}")
+    for i, j in joined_vc.items():
+        # join the vc
+        try:
+            bot.get_channel(int(j)).connect()
+        except:
+            del joined_vc[i]
+            print(f"Failed to connect to {j} in {i}.\n")
+        else:
+            print(f"Successfully connected to {j} in {i}.\n")
+
 
 @bot.event
 async def on_guild_join(guild):
@@ -354,6 +367,10 @@ async def join(ctx):
             await ctx.message.add_reaction("❌")
         else:
             await ctx.message.add_reaction("✅")
+            # write channel id to joined_vc dict
+            joined_vc = dv_tool_function.read_json("joined_vc")
+            joined_vc[ctx.guild.id] = user_voice_channel.id
+            dv_tool_function.write_json(joined_vc, "joined_vc")
 
 
 @bot.command(Name="leave")
@@ -364,6 +381,10 @@ async def leave(ctx):
         pass
     else:
         await ctx.message.add_reaction("🖐")
+        # delete channel id from joined_vc dict
+    joined_vc = dv_tool_function.read_json("joined_vc")
+    del joined_vc[ctx.guild.id]
+    dv_tool_function.write_json(joined_vc, "joined_vc")
 
 
 @bot.command(Name="setchannel")
@@ -415,6 +436,11 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             is_connected = False
         else:
             is_connected = True
+
+        if not is_connected:
+            joined_vc = dv_tool_function.read_json("joined_vc")
+            del joined_vc[guild_id]
+            dv_tool_function.write_json(joined_vc, "joined_vc")
 
         channelissetup = dv_tool_function.check_dict_data(db, "channel")
         langissetup = dv_tool_function.check_dict_data(db, "lang")
@@ -710,6 +736,8 @@ async def wrong_msg(ctx, msg: str):
 @commands.guild_only()
 # @commands.bot_has_permissions(connect=True, speak=True)
 async def move(ctx):
+    joined_vc = dv_tool_function.read_json("joined_vc")
+    del joined_vc[ctx.guild.id]
     # get user voice channel
     try:
         user_voice_channel = ctx.author.voice.channel
@@ -728,6 +756,10 @@ async def move(ctx):
             pass
         else:
             await ctx.message.add_reaction("✅")
+        # get joined_vc
+        if user_voice_channel is not None:
+            joined_vc[ctx.guild.id] = user_voice_channel.id
+    dv_tool_function.write_json("joined_vc", joined_vc)
 
 
 @bot.command(Name="say_lang")
@@ -750,6 +782,11 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             is_connected = False
         else:
             is_connected = True
+
+        if not is_connected:
+            joined_vc = dv_tool_function.read_json("joined_vc")
+            del joined_vc[guild_id]
+            dv_tool_function.write_json("joined_vc", joined_vc)
 
         lang_code_list = dv_tool_function.new_read_json("languages.json")[
             "Support_Language"
