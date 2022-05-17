@@ -5,6 +5,7 @@ import os
 # import sys
 import queue
 import shutil
+import signal
 import subprocess
 import traceback
 from datetime import datetime
@@ -63,6 +64,8 @@ for filename in os.listdir(folder):
             shutil.rmtree(file_path)
     except Exception as e:
         print(f"Failed to delete {file_path}. Reason: {e}")
+
+
 # load command
 # help_zh_tw = load_command.read_description("help", "zh-tw")
 
@@ -618,6 +621,16 @@ async def ping(ctx):
     await ctx.reply(f"Pong! {round(bot.latency * 1000)}ms")
 
 
+@bot.command(Name="reboot")
+@commands.is_owner()
+async def reboot(ctx):
+    sender = int(ctx.message.author.id)
+    owner = int(config["owner"])
+    if sender == owner:
+        await ctx.reply("Rebooting...")
+        await bot.close()
+
+
 @bot.command(Name="shutdown")
 @commands.is_owner()
 async def shutdown(ctx):
@@ -625,7 +638,8 @@ async def shutdown(ctx):
     owner = int(config["owner"])
     if sender == owner:
         await ctx.reply("Shutting down...")
-        await bot.close()
+        # send SIGTERM to the bot process
+        os.kill(os.getpid(), signal.SIGTERM)
 
 
 @bot.command(Name="clear")
