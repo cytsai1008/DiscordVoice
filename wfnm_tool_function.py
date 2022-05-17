@@ -11,7 +11,7 @@ def redis_client() -> redis.Redis:
     """Returns redis client"""
     return redis.Redis(
         host=os.environ["REDIS_WFNM_URL"],
-        port=16704,
+        port=16062,
         username=os.environ["REDIS_USER"],
         password=os.environ["REDIS_WFNM_PASSWD"],
         decode_responses=True,
