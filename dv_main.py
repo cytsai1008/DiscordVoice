@@ -141,10 +141,11 @@ async def on_ready():
     for i, j in joined_vc.items():
         # join the vc
         try:
-            bot.get_channel(int(j)).connect()
+            await bot.get_channel(int(j)).connect()
         except:
             del joined_vc[i]
             print(f"Failed to connect to {j} in {i}.\n")
+            print(f"Reason: {traceback.format_exc()}")
         else:
             print(f"Successfully connected to {j} in {i}.\n")
 
