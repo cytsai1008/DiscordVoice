@@ -1,0 +1,5 @@
+請輸入
+`nm!choose breakfast`
+`nm!choose lunch`
+`nm!choose afternoon_tea`
+`nm!choose dinner`

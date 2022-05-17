@@ -1,0 +1,5 @@
+請輸入
+`nm!add breakfast <食物>`
+`nm!add lunch <食物>`
+`nm!add afternoon_tea <食物>`
+`nm!add dinner <食物>`

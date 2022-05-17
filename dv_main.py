@@ -29,7 +29,7 @@ if not os.path.exists("Log"):
     os.mkdir("Log")
 if not os.path.exists("tts_temp"):
     os.mkdir("tts_temp")
-handler = logging.FileHandler(filename="Log/discord.log", encoding="utf-8", mode="w")
+handler = logging.FileHandler(filename="Log/discord_dv.log", encoding="utf-8", mode="w")
 handler.setFormatter(
     logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
 )
