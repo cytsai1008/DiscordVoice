@@ -370,7 +370,7 @@ async def join(ctx):
             # write channel id to joined_vc dict
             joined_vc = dv_tool_function.read_json("joined_vc")
             joined_vc[ctx.guild.id] = user_voice_channel.id
-            dv_tool_function.write_json(joined_vc, "joined_vc")
+            dv_tool_function.write_json("joined_vc", joined_vc)
 
 
 @bot.command(Name="leave")
@@ -384,7 +384,7 @@ async def leave(ctx):
         # delete channel id from joined_vc dict
     joined_vc = dv_tool_function.read_json("joined_vc")
     del joined_vc[ctx.guild.id]
-    dv_tool_function.write_json(joined_vc, "joined_vc")
+    dv_tool_function.write_json("joined_vc", joined_vc)
 
 
 @bot.command(Name="setchannel")
@@ -440,7 +440,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
         if not is_connected:
             joined_vc = dv_tool_function.read_json("joined_vc")
             del joined_vc[guild_id]
-            dv_tool_function.write_json(joined_vc, "joined_vc")
+            dv_tool_function.write_json("joined_vc", joined_vc)
 
         channelissetup = dv_tool_function.check_dict_data(db, "channel")
         langissetup = dv_tool_function.check_dict_data(db, "lang")
