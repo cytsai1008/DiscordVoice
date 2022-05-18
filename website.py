@@ -7,7 +7,7 @@ app: flask.Flask = flask.Flask("")
 
 @app.route("/")
 def home():
-    return "hello, UpTimeRobot!"
+    return flask.render_template("index.html")
 
 
 def run():

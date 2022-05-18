@@ -1,0 +1,135 @@
+<html dir="ltr" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta
+            content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+            name="viewport"
+    />
+    <title>CYTsai's Discord Bots</title>
+    <style>
+        body {
+            color: #eee;
+            background-color: #2a2a2a;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        a {
+            color: #0099ff;
+        }
+
+        a:hover {
+            color: #037cce;
+        }
+
+        .logo {
+            display: inline-block;
+            font-weight: bold;
+            font-size: 2em;
+            margin: 0;
+        }
+
+        .title {
+            border-bottom: 1px solid #4a4a4a;
+            padding-bottom: 0.25em;
+        }
+
+    </style>
+    <script>
+        window.$discordMessage = {
+            profiles: {
+                DV: {
+                    author: "Google小姐幫你說",
+                    avatar: "https://cdn.discordapp.com/avatars/960004225713201172/b181358023c46d7613ff4214610601dc.webp",
+                    roleColor: "#ffffff",
+                    bot: true
+                },
+                WFNM: {
+                    author: "下餐吃什麼",
+                    avatar: "https://cdn.discordapp.com/avatars/929275906294448169/1a8a8363f91e0d1439f4fc8bffb21fc4.webp",
+                    roleColor: "#ffffff",
+                    bot: true
+                },
+                CYTsai: {
+                    author: "CYTsai",
+                    avatar: "https://github.com/cytsai1008.png?size=200",
+                    roleColor: "#37cee6",
+                }
+            }
+        };
+
+    </script>
+    <script
+            src="https://unpkg.com/@skyra/discord-components-core"
+            type="module"
+    ></script>
+</head>
+<body>
+<div>
+    <div>
+        <h1 class="logo">CYTsai's Discord Bots</h1>
+    </div>
+    <main>
+        <p>I don't know how to design the website :(</p>
+        <discord-messages>
+            <discord-message profile="DV">
+                <discord-attachments slot="attachments">
+                    <a href="https://discord.com/oauth2/authorize?client_id=960004225713201172&scope=bot+applications.commands&permissions=139690626112">https://discord.com/oauth2/authorize?client_id=960004225713201172&scope=bot+applications.commands&permissions=139690626112</a>
+                    <discord-invite
+                            icon="https://cdn.discordapp.com/avatars/960004225713201172/b181358023c46d7613ff4214610601dc.webp"
+                            members="99999"
+                            name="Google小姐幫你說"
+                            online="99999"
+                            url="https://discord.com/oauth2/authorize?client_id=960004225713201172&scope=bot+applications.commands&permissions=139690626112"
+                    ></discord-invite>
+                </discord-attachments>
+            </discord-message>
+            <discord-message profile="WFNM">
+                <discord-attachments slot="attachments">
+                    <a href="https://discord.com/oauth2/authorize?client_id=929275906294448169&permissions=414464724032&scope=bot">https://discord.com/oauth2/authorize?client_id=929275906294448169&permissions=414464724032&scope=bot</a>
+                    <discord-invite
+                            icon="https://cdn.discordapp.com/avatars/929275906294448169/1a8a8363f91e0d1439f4fc8bffb21fc4.webp"
+                            members="99999"
+                            name="下餐吃什麼"
+                            online="99999"
+                            url="https://discord.com/oauth2/authorize?client_id=929275906294448169&permissions=414464724032&scope=bot"
+                    ></discord-invite>
+                </discord-attachments>
+            </discord-message>
+            <discord-message profile="CYTsai">
+                $help
+            </discord-message>
+            <discord-message profile="CYTsai">
+                nm!help
+            </discord-message>
+            <discord-message profile="DV">
+                <discord-reply profile="CYTsai" slot="reply">$help</discord-reply>
+                Use <code>$help</code> to see the help message.<br/>
+                Use <code>$setchannel</code> to set a channel. (ex. <code>$setchannel #general</code>)<br/>
+                Use <code>$setlang</code> to set a language. (ex. <code>$setlang en-us</code>)<br/>
+                Use <code>$say</code> to speak in voice channel. (ex. <code>$say ABCD</code>)<br/>
+                Use <code>$say_lang</code> to speak in voice channel with another language. (ex. <code>$say_lang en-us
+                ABCD</code>)<br/>
+                Use <code>$stop</code> to stop speaking.<br/>
+                Use <code>$join</code> to let me join to a voice channel.<br/>
+                Use <code>$move</code> to let me move to another voice channel.<br/>
+                Use <code>$leave</code> to let me leave the voice channel.<br/>
+                Use <code>$ping</code> to check my latency.<br/>
+                Use <code>$invite</code> to get the bot's invite link.<br/>
+            </discord-message>
+            <discord-message profile="WFNM">
+                <discord-reply profile="CYTsai" slot="reply">nm!help</discord-reply>
+                <code>nm!help</code> : 顯示此清單<br/>
+                <code>nm!ping</code> : 檢測ping值<br/>
+                <code>nm!add</code> : 新增食物<br/>
+                <code>nm!show</code> : 顯示食物清單<br/>
+                <code>nm!lists</code> : 顯示食物清單<br/>
+                <code>nm!remove</code> : 移除食物<br/>
+                <code>nm!choose</code> : 隨機選擇食物<br/>
+                <code>nm!time</code> : 設定時區(請以±12小時計算)<br/>
+            </discord-message>
+
+        </discord-messages>
+    </main>
+</div>
+</body>
+</html>
