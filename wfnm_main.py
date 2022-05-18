@@ -447,7 +447,7 @@ async def choose(ctx, *args):  # sourcery no-metrics
     except:
         current_utc = datetime.utcnow()
         current_utc = current_utc.hour
-        if os.path.exists(f"{server_id}"):
+        if tool_function.check_file(f"{server_id}"):
 
             try:
                 data = tool_function.read_json(f"{server_id}")
