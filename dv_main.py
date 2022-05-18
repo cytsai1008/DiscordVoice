@@ -133,8 +133,7 @@ async def on_ready():
         print(guild.name + "\n")
 
     joined_vc = dv_tool_function.read_json("joined_vc")
-    print(f"joined_vc: \n"
-          f"{joined_vc}")
+    print(f"joined_vc: \n" f"{joined_vc}")
     for i, j in joined_vc.items():
         # join the vc
         try:
@@ -515,7 +514,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         )
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
-                        if dv_tool_function.check_dict_data(db, "queue") and db["queue"]:
+                        if (
+                                dv_tool_function.check_dict_data(db, "queue")
+                                and db["queue"]
+                        ):
                             globals()[list_name].put(content)
                             # add reaction
                             await ctx.message.add_reaction("⏯")
@@ -850,7 +852,10 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         )
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
-                        if dv_tool_function.check_dict_data(db, "queue") and db["queue"]:
+                        if (
+                                dv_tool_function.check_dict_data(db, "queue")
+                                and db["queue"]
+                        ):
                             globals()[list_name].put(content)
                             # add reaction
                             await ctx.message.add_reaction("⏯")

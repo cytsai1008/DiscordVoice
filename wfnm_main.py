@@ -18,7 +18,9 @@ logger = logging.getLogger("discord")
 logger.setLevel(logging.DEBUG)
 if not os.path.exists("Log"):
     os.mkdir("Log")
-handler = logging.FileHandler(filename="Log/discord_wfnm.log", encoding="utf-8", mode="w")
+handler = logging.FileHandler(
+    filename="Log/discord_wfnm.log", encoding="utf-8", mode="w"
+)
 handler.setFormatter(
     logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
 )
@@ -32,7 +34,9 @@ token = {
     "prefix": os.getenv("DISCORD_WFNM_PREFIX"),
 }
 
-bot = commands.Bot(command_prefix=token["prefix"], help_command=None, case_insensitive=True)
+bot = commands.Bot(
+    command_prefix=token["prefix"], help_command=None, case_insensitive=True
+)
 
 help_zh_tw = load_command.read_description("help", "zh-tw")
 add_zh_tw = load_command.read_description("add", "zh-tw")
@@ -254,10 +258,14 @@ async def remove(ctx, *args):
                     f"0 food deleted from {args[0]} ({wrong_data} not found)"
                 )
             elif len(del_key) >= 2:
-                await ctx.send(f"{len(del_key)} foods deleted from {args[0]} ({wrong_data} not found)")
+                await ctx.send(
+                    f"{len(del_key)} foods deleted from {args[0]} ({wrong_data} not found)"
+                )
 
             elif len(del_key) == 1:
-                await ctx.send(f"{len(del_key)} food deleted from {args[0]} ({wrong_data} not found)")
+                await ctx.send(
+                    f"{len(del_key)} food deleted from {args[0]} ({wrong_data} not found)"
+                )
 
             tool_function.write_json(f"{server_id}", data)
             # Save data to json
