@@ -380,7 +380,10 @@ async def leave(ctx):
         await ctx.message.add_reaction("🖐")
         # delete channel id from joined_vc dict
     joined_vc = dv_tool_function.read_json("joined_vc")
-    del joined_vc[str(ctx.guild.id)]
+    try:
+        del joined_vc[str(ctx.guild.id)]
+    except KeyError:
+        pass
     dv_tool_function.write_json("joined_vc", joined_vc)
 
 
@@ -436,7 +439,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
 
         if not is_connected:
             joined_vc = dv_tool_function.read_json("joined_vc")
-            del joined_vc[str(guild_id)]
+            try:
+                del joined_vc[str(guild_id)]
+            except KeyError:
+                pass
             dv_tool_function.write_json("joined_vc", joined_vc)
 
         channelissetup = dv_tool_function.check_dict_data(db, "channel")
@@ -737,7 +743,10 @@ async def wrong_msg(ctx, msg: str):
 # @commands.bot_has_permissions(connect=True, speak=True)
 async def move(ctx):
     joined_vc = dv_tool_function.read_json("joined_vc")
-    del joined_vc[str(ctx.guild.id)]
+    try:
+        del joined_vc[str(ctx.guild.id)]
+    except KeyError:
+        pass
     # get user voice channel
     try:
         user_voice_channel = ctx.author.voice.channel
@@ -785,7 +794,10 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 
         if not is_connected:
             joined_vc = dv_tool_function.read_json("joined_vc")
-            del joined_vc[str(guild_id)]
+            try:
+                del joined_vc[str(guild_id)]
+            except KeyError:
+                pass
             dv_tool_function.write_json("joined_vc", joined_vc)
 
         lang_code_list = dv_tool_function.new_read_json("languages.json")[
