@@ -444,7 +444,7 @@ async def choose(ctx, *args):  # sourcery no-metrics
             tool_function.write_json(f"{server_id}", {})
             await ctx.send(f"No food in {args[0]}")
             # print("Warning 01")
-    except IndexError:
+    except:
         current_utc = datetime.utcnow()
         current_utc = current_utc.hour
         if os.path.exists(f"{server_id}"):

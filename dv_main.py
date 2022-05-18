@@ -1,5 +1,4 @@
 import asyncio
-import json
 import logging
 import os
 # import sys
@@ -41,8 +40,6 @@ config = {
     "prefix": f"{os.getenv('DISCORD_DV_PREFIX')}",
     "owner": int(os.getenv("DISCORD_OWNER")),
 }
-
-config = json.loads(json.dumps(config))
 
 bot = commands.Bot(
     command_prefix=config["prefix"],
