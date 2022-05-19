@@ -1,5 +1,0 @@
-請輸入
-`nm!remove breakfast <食物>`
-`nm!remove lunch <食物>`
-`nm!remove afternoon_tea <食物>`
-`nm!remove dinner <食物>`
