@@ -621,6 +621,7 @@ async def setlang(ctx, lang: str):
     guild_id = ctx.guild.id
     support_lang = dv_tool_function.new_read_json("languages.json")
     lang = lang.lower()
+    lang = lang.replace("_", "-")
     if lang in support_lang["Support_Language"]:
         if dv_tool_function.check_file(f"{guild_id}"):
             # read db file
@@ -805,6 +806,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         ]
 
         lang = lang.lower()
+        lang = lang.replace("_", "-")
 
         lang_code_is_right = lang in lang_code_list
         channelissetup = dv_tool_function.check_dict_data(db, "channel")
