@@ -3,6 +3,7 @@ import logging
 import os
 # import sys
 import queue
+import re
 import shutil
 import signal
 import subprocess
@@ -477,6 +478,21 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             content = await commands.clean_content(
                 fix_channel_mentions=True, use_nicknames=True
             ).convert(ctx, content)
+
+            # Animate Emoji Replace
+            if re.findall('<a:[^:]+:\d+>', content):
+                emoji_id = re.findall('<a:[^:]+:\d+>', content)
+                emoji_text = re.findall('<a:([^:]+):\d+>', content)
+                for i in range(len(emoji_id)):
+                    content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
+
+            # Standard Emoji Replace
+            if re.findall('<:[^:]+:\d+>', content):
+                emoji_id = re.findall('<:[^:]+:\d+>', content)
+                emoji_text = re.findall('<:([^:]+):\d+>', content)
+                for i in range(len(emoji_id)):
+                    content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
+
             say_this = ctx.author.id == config["owner"] or len(content) < 30
             try:
                 username = ctx.author.display_name
