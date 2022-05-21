@@ -2,7 +2,6 @@ import logging
 import os
 import random
 import signal
-
 # import subprocess
 from datetime import datetime
 
@@ -17,10 +16,10 @@ import wfnm_tool_function as tool_function
 
 logger = logging.getLogger("discord")
 logger.setLevel(logging.DEBUG)
-if not os.path.exists("Log"):
-    os.mkdir("Log")
+if not os.path.exists("wfnm_log"):
+    os.mkdir("wfnm_log")
 handler = logging.FileHandler(
-    filename="Log/discord_wfnm.log", encoding="utf-8", mode="w"
+    filename="wfnm_log/discord_wfnm.log", encoding="utf-8", mode="w"
 )
 handler.setFormatter(
     logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")

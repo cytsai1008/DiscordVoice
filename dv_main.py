@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-
 # import sys
 import queue
 import re
@@ -26,11 +25,11 @@ import dv_tool_function
 # logging
 logger = logging.getLogger("discord")
 logger.setLevel(logging.DEBUG)
-if not os.path.exists("Log"):
-    os.mkdir("Log")
+if not os.path.exists("dv_log"):
+    os.mkdir("dv_log")
 if not os.path.exists("tts_temp"):
     os.mkdir("tts_temp")
-handler = logging.FileHandler(filename="Log/discord_dv.log", encoding="utf-8", mode="w")
+handler = logging.FileHandler(filename="dv_log/discord_dv.log", encoding="utf-8", mode="w")
 handler.setFormatter(
     logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
 )
