@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+
 # import sys
 import queue
 import re
@@ -197,7 +198,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         )
         await ctx.message.add_reaction("⏳")
     elif command == "setchannel" and isinstance(
-            error, discord.ext.commands.errors.ChannelNotFound
+        error, discord.ext.commands.errors.ChannelNotFound
     ):
         pass
     elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
@@ -451,10 +452,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
         langissetup = dv_tool_function.check_dict_data(db, "lang")
 
         if (
-                is_connected
-                and channelissetup
-                and langissetup
-                and channel_id == db["channel"]
+            is_connected
+            and channelissetup
+            and langissetup
+            and channel_id == db["channel"]
         ):
 
             # use cld to detect language
@@ -481,16 +482,16 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             ).convert(ctx, content)
 
             # Animate Emoji Replace
-            if re.findall('<a:[^:]+:\d+>', content):
-                emoji_id = re.findall('<a:[^:]+:\d+>', content)
-                emoji_text = re.findall('<a:([^:]+):\d+>', content)
+            if re.findall("<a:[^:]+:\d+>", content):
+                emoji_id = re.findall("<a:[^:]+:\d+>", content)
+                emoji_text = re.findall("<a:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
                     content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
 
             # Standard Emoji Replace
-            if re.findall('<:[^:]+:\d+>', content):
-                emoji_id = re.findall('<:[^:]+:\d+>', content)
-                emoji_text = re.findall('<:([^:]+):\d+>', content)
+            if re.findall("<:[^:]+:\d+>", content):
+                emoji_id = re.findall("<:[^:]+:\d+>", content)
+                emoji_text = re.findall("<:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
                     content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
 
@@ -538,8 +539,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
                         if (
-                                dv_tool_function.check_dict_data(db, "queue")
-                                and db["queue"]
+                            dv_tool_function.check_dict_data(db, "queue")
+                            and db["queue"]
                         ):
                             globals()[list_name].put(content)
                             # add reaction
@@ -591,12 +592,12 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 await ctx.reply("Too long to say.")
 
         elif (
-                channelissetup
-                and channel_id != db["channel"]
-                and (
-                        not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                        or db["not_this_channel_msg"] != "off"
-                )
+            channelissetup
+            and channel_id != db["channel"]
+            and (
+                not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+                or db["not_this_channel_msg"] != "off"
+            )
         ):
             channel_msg = f"Please run this command in <#{db['channel']}>.\n"
             await ctx.reply(
@@ -608,8 +609,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             await ctx.message.add_reaction("🤔")
 
         elif (
-                dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                and db["not_this_channel_msg"] == "off"
+            dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+            and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
@@ -829,10 +830,10 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         channelissetup = dv_tool_function.check_dict_data(db, "channel")
 
         if (
-                is_connected
-                and channelissetup
-                and lang_code_is_right
-                and channel_id == db["channel"]
+            is_connected
+            and channelissetup
+            and lang_code_is_right
+            and channel_id == db["channel"]
         ):
 
             # export content to mp3 by google tts api
@@ -884,8 +885,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
                         if (
-                                dv_tool_function.check_dict_data(db, "queue")
-                                and db["queue"]
+                            dv_tool_function.check_dict_data(db, "queue")
+                            and db["queue"]
                         ):
                             globals()[list_name].put(content)
                             # add reaction
@@ -937,12 +938,12 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 await ctx.reply("Too long to say.")
 
         elif (
-                channelissetup
-                and channel_id != db["channel"]
-                and (
-                        not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                        or db["not_this_channel_msg"] != "off"
-                )
+            channelissetup
+            and channel_id != db["channel"]
+            and (
+                not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+                or db["not_this_channel_msg"] != "off"
+            )
         ):
             channel_msg = f"Please run this command in <#{db['channel']}>.\n"
             await ctx.reply(
@@ -954,8 +955,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             await ctx.message.add_reaction("🤔")
 
         elif (
-                dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                and db["not_this_channel_msg"] == "off"
+            dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+            and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
