@@ -361,7 +361,7 @@ async def join(ctx):
             bot_voice_channel = ctx.guild.voice_client.channel
             await ctx.reply(
                 f"I'm already in <#{bot_voice_channel.id}>.\n"
-                f"To move, please use `{config['prefix']}leave` first."
+                f"To move, please use `{config['prefix']}move`."
             )
             await ctx.message.add_reaction("❌")
         else:
