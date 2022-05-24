@@ -476,6 +476,15 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             """
             # export content to mp3 by google tts api
             # get username
+
+            """
+            Discord User ID RegExp
+            <@![0-9]{18}>
+            <@[0-9]{18}>
+            Role ID
+            <@&[0-9]{18}>
+            """
+
             content = await commands.clean_content(
                 fix_channel_mentions=True, use_nicknames=True
             ).convert(ctx, content)
@@ -602,7 +611,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             await ctx.reply(
                 "This channel is not made for me to speaking.\n"
                 f"{channel_msg}"
-                f"To change channel, use {config['prefix']}channel <#{channel_id}>.\n"
+                f"To change channel, use {config['prefix']}setchannel <#{channel_id}>.\n"
                 f"To disable this message, use `{config['prefix']}wrong_msg off`."
             )
             await ctx.message.add_reaction("🤔")
@@ -948,7 +957,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             await ctx.reply(
                 "This channel is not made for me to speaking.\n"
                 f"{channel_msg}"
-                f"To change channel, use {config['prefix']}channel <#{channel_id}>.\n"
+                f"To change channel, use {config['prefix']}setchannel <#{channel_id}>.\n"
                 f"To disable this message, use `{config['prefix']}wrong_msg off`."
             )
             await ctx.message.add_reaction("🤔")
