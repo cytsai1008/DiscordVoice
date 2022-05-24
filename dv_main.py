@@ -197,7 +197,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         )
         await ctx.message.add_reaction("⏳")
     elif command == "setchannel" and isinstance(
-        error, discord.ext.commands.errors.ChannelNotFound
+            error, discord.ext.commands.errors.ChannelNotFound
     ):
         pass
     elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
@@ -451,10 +451,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
         langissetup = dv_tool_function.check_dict_data(db, "lang")
 
         if (
-            is_connected
-            and channelissetup
-            and langissetup
-            and channel_id == db["channel"]
+                is_connected
+                and channelissetup
+                and langissetup
+                and channel_id == db["channel"]
         ):
 
             # use cld to detect language
@@ -547,8 +547,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
                         if (
-                            dv_tool_function.check_dict_data(db, "queue")
-                            and db["queue"]
+                                dv_tool_function.check_dict_data(db, "queue")
+                                and db["queue"]
                         ):
                             globals()[list_name].put(content)
                             # add reaction
@@ -560,32 +560,6 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                                 "Sorry, queue function is under development and current not supported."
                             )
 
-                elif ctx.author.id == config["owner"]:
-                    print("init google tts api")
-                    # tts_func.process_voice(content, db["lang"])
-                    print("play mp3")
-                    subprocess.call(
-                        [
-                            "python",
-                            "tts_alone.py",
-                            "--content",
-                            content,
-                            "--lang",
-                            db["lang"],
-                            "--filename",
-                            f"{guild_id}.mp3",
-                        ]
-                    )
-
-                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
-                    # stop current audio
-                    ctx.voice_client.stop()
-                    await asyncio.sleep(0.5)
-                    ctx.voice_client.play(
-                        voice_file,
-                        after=playnext(ctx, db["lang"], guild_id, globals()[list_name]),
-                    )
-                    await ctx.message.add_reaction("⁉")
                 elif dv_tool_function.check_dict_data(db, "queue") and db["queue"]:
                     globals()[list_name].put(content)
                     # add reaction
@@ -600,12 +574,12 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 await ctx.reply("Too long to say.")
 
         elif (
-            channelissetup
-            and channel_id != db["channel"]
-            and (
-                not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                or db["not_this_channel_msg"] != "off"
-            )
+                channelissetup
+                and channel_id != db["channel"]
+                and (
+                        not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+                        or db["not_this_channel_msg"] != "off"
+                )
         ):
             channel_msg = f"Please run this command in <#{db['channel']}>.\n"
             await ctx.reply(
@@ -617,8 +591,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             await ctx.message.add_reaction("🤔")
 
         elif (
-            dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-            and db["not_this_channel_msg"] == "off"
+                dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+                and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
@@ -838,10 +812,10 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         channelissetup = dv_tool_function.check_dict_data(db, "channel")
 
         if (
-            is_connected
-            and channelissetup
-            and lang_code_is_right
-            and channel_id == db["channel"]
+                is_connected
+                and channelissetup
+                and lang_code_is_right
+                and channel_id == db["channel"]
         ):
 
             # export content to mp3 by google tts api
@@ -893,8 +867,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
                         if (
-                            dv_tool_function.check_dict_data(db, "queue")
-                            and db["queue"]
+                                dv_tool_function.check_dict_data(db, "queue")
+                                and db["queue"]
                         ):
                             globals()[list_name].put(content)
                             # add reaction
@@ -905,33 +879,6 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                             await ctx.reply(
                                 "Sorry, queue function is under development and current not supported."
                             )
-
-                elif ctx.author.id == config["owner"]:
-                    print("init google tts api")
-                    # tts_func.process_voice(content, db["lang"])
-                    print("play mp3")
-                    subprocess.call(
-                        [
-                            "python",
-                            "tts_alone.py",
-                            "--content",
-                            content,
-                            "--lang",
-                            lang,
-                            "--filename",
-                            f"{guild_id}.mp3",
-                        ]
-                    )
-
-                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
-                    # stop current audio
-                    ctx.voice_client.stop()
-                    await asyncio.sleep(0.5)
-                    ctx.voice_client.play(
-                        voice_file,
-                        after=playnext(ctx, db["lang"], guild_id, globals()[list_name]),
-                    )
-                    await ctx.message.add_reaction("⁉")
                 elif dv_tool_function.check_dict_data(db, "queue") and db["queue"]:
                     globals()[list_name].put(content)
                     # add reaction
@@ -946,12 +893,12 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 await ctx.reply("Too long to say.")
 
         elif (
-            channelissetup
-            and channel_id != db["channel"]
-            and (
-                not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                or db["not_this_channel_msg"] != "off"
-            )
+                channelissetup
+                and channel_id != db["channel"]
+                and (
+                        not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+                        or db["not_this_channel_msg"] != "off"
+                )
         ):
             channel_msg = f"Please run this command in <#{db['channel']}>.\n"
             await ctx.reply(
@@ -963,8 +910,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             await ctx.message.add_reaction("🤔")
 
         elif (
-            dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-            and db["not_this_channel_msg"] == "off"
+                dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+                and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
@@ -987,6 +934,222 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             "Setting file not exist.\n"
             f"Please set channel by `{config['prefix']}setchannel`.\n"
             f"Please set language by `{config['prefix']}setlang`. (This command does not required in `{config['prefix']}say_lang`)\n"
+        )
+
+
+@bot.command(name="force_say")
+@commands.guild_only()
+@commands.is_owner()
+async def force_say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
+    # get message channel id
+    channel_id = ctx.channel.id
+    # get guild id
+    guild_id = ctx.guild.id
+    if dv_tool_function.check_file(f"{guild_id}"):
+        # read db file
+        db = dv_tool_function.read_json(f"{guild_id}")
+        # check channel id
+        # check if is in voice channel
+        try:
+            ctx.voice_client.is_connected()
+        except AttributeError:
+            is_connected = False
+        else:
+            is_connected = True
+
+        if not is_connected:
+            joined_vc = dv_tool_function.read_json("joined_vc")
+            try:
+                del joined_vc[str(guild_id)]
+            except KeyError:
+                pass
+            dv_tool_function.write_json("joined_vc", joined_vc)
+
+        channelissetup = dv_tool_function.check_dict_data(db, "channel")
+        langissetup = dv_tool_function.check_dict_data(db, "lang")
+
+        if (
+                is_connected
+                and channelissetup
+                and langissetup
+                and channel_id == db["channel"]
+        ):
+
+            # use cld to detect language
+            # export content to mp3 by google tts api
+            # get username
+
+            """
+            Discord User ID RegExp
+            <@![0-9]{18}>
+            <@[0-9]{18}>
+            Role ID
+            <@&[0-9]{18}>
+            """
+
+            content = await commands.clean_content(
+                fix_channel_mentions=True, use_nicknames=True
+            ).convert(ctx, content)
+
+            # Animate Emoji Replace
+            if re.findall("<a:[^:]+:\d+>", content):
+                emoji_id = re.findall("<a:[^:]+:\d+>", content)
+                emoji_text = re.findall("<a:([^:]+):\d+>", content)
+                for i in range(len(emoji_id)):
+                    content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
+
+            # Standard Emoji Replace
+            if re.findall("<:[^:]+:\d+>", content):
+                emoji_id = re.findall("<:[^:]+:\d+>", content)
+                emoji_text = re.findall("<:([^:]+):\d+>", content)
+                for i in range(len(emoji_id)):
+                    content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
+
+            say_this = ctx.author.id == config["owner"] or len(content) < 30
+            try:
+                username = ctx.author.display_name
+            except AttributeError:
+                username = ctx.author.name
+            # get username length
+            if len(username) > 20:
+                username = "someone"
+            if ctx.author.voice is not None:
+                content = f"{username} said {content}"
+            else:
+                content = f"{username} from outside said {content}"
+            if say_this:
+                list_name = f"list_{str(guild_id)}"
+                if list_name not in globals():
+                    globals()[list_name] = queue.Queue(maxsize=10)
+
+                if not ctx.voice_client.is_playing():
+                    print("init google tts api")
+                    # tts_func.process_voice(content, db["lang"])
+                    print("play mp3")
+                    subprocess.call(
+                        [
+                            "python",
+                            "tts_alone.py",
+                            "--content",
+                            content,
+                            "--lang",
+                            db["lang"],
+                            "--filename",
+                            f"{guild_id}.mp3",
+                        ]
+                    )
+                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                    try:
+                        ctx.voice_client.play(
+                            voice_file,
+                            after=playnext(
+                                ctx, db["lang"], guild_id, globals()[list_name]
+                            ),
+                        )
+                        await ctx.message.add_reaction("🔊")
+                    except discord.errors.ClientException:
+                        if (
+                                dv_tool_function.check_dict_data(db, "queue")
+                                and db["queue"]
+                        ):
+                            globals()[list_name].put(content)
+                            # add reaction
+                            await ctx.message.add_reaction("⏯")
+                            asyncio.ensure_future(check_is_not_playing(ctx))
+                            playnext(ctx, db["lang"], guild_id, globals()[list_name])
+                        else:
+                            print("init google tts api")
+                            # tts_func.process_voice(content, db["lang"])
+                            print("play mp3")
+                            subprocess.call(
+                                [
+                                    "python",
+                                    "tts_alone.py",
+                                    "--content",
+                                    content,
+                                    "--lang",
+                                    db["lang"],
+                                    "--filename",
+                                    f"{guild_id}.mp3",
+                                ]
+                            )
+
+                            voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                            # stop current audio
+                            ctx.voice_client.stop()
+                            await asyncio.sleep(0.5)
+                            ctx.voice_client.play(
+                                voice_file,
+                                after=playnext(ctx, db["lang"], guild_id, globals()[list_name]),
+                            )
+                            await ctx.message.add_reaction("⁉")
+                else:
+                    print("init google tts api")
+                    # tts_func.process_voice(content, db["lang"])
+                    print("play mp3")
+                    subprocess.call(
+                        [
+                            "python",
+                            "tts_alone.py",
+                            "--content",
+                            content,
+                            "--lang",
+                            db["lang"],
+                            "--filename",
+                            f"{guild_id}.mp3",
+                        ]
+                    )
+
+                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                    # stop current audio
+                    ctx.voice_client.stop()
+                    await asyncio.sleep(0.5)
+                    ctx.voice_client.play(
+                        voice_file,
+                        after=playnext(ctx, db["lang"], guild_id, globals()[list_name]),
+                    )
+                    await ctx.message.add_reaction("⁉")
+            else:
+                await ctx.reply("Too long to say.")
+
+        elif (
+                channelissetup
+                and channel_id != db["channel"]
+                and (
+                        not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+                        or db["not_this_channel_msg"] != "off"
+                )
+        ):
+            channel_msg = f"Please run this command in <#{db['channel']}>.\n"
+            await ctx.reply(
+                "This channel is not made for me to speaking.\n"
+                f"{channel_msg}"
+                f"To change channel, use {config['prefix']}setchannel <#{channel_id}>.\n"
+                f"To disable this message, use `{config['prefix']}wrong_msg off`."
+            )
+            await ctx.message.add_reaction("🤔")
+
+        elif (
+                dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+                and db["not_this_channel_msg"] == "off"
+        ):
+            return
+            # reply to sender
+        else:
+            errormsg = ""
+            if not is_connected:
+                errormsg += f"Please join voice channel by `{config['prefix']}join`.\n"
+            if not channelissetup:
+                errormsg += f"Please set channel by `{config['prefix']}setchannel`.\n"
+            if not langissetup:
+                errormsg += f"Please set language by `{config['prefix']}setlang`.\n"
+            await ctx.reply(errormsg)
+            await ctx.message.add_reaction("❌")
+    else:
+        await ctx.send(
+            "Setting file not exist.\n"
+            f"Please set channel by `{config['prefix']}setchannel`.\n"
+            f"Please set language by `{config['prefix']}setlang`.\n"
         )
 
 
