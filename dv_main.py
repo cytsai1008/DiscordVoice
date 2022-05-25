@@ -124,11 +124,7 @@ async def check_is_not_playing(ctx):
 async def on_ready():
     print("目前登入身份：", bot.user)
     game = discord.Game(f"{config['prefix']}help")
-    # discord.Status.<狀態>，可以是online,offline,idle,dnd,invisible
-    await bot.change_presence(status=discord.Status.online, activity=game)
-    owner = await bot.fetch_user(int(config["owner"]))
-    await owner.send("bot online.")
-    # get all guilds
+    # discord.Status.<狀態>，可以是online,offline,idle,dnd,invisible    # get all guilds
     print("目前登入的伺服器：")
     for guild in bot.guilds:
         print(guild.name + "\n")
@@ -145,6 +141,9 @@ async def on_ready():
             print(f"Reason: {traceback.format_exc()}")
         else:
             print(f"Successfully connected to {j} in {i}.\n")
+    await bot.change_presence(status=discord.Status.online, activity=game)
+    owner = await bot.fetch_user(int(config["owner"]))
+    await owner.send("bot online.")
 
 
 @bot.event
