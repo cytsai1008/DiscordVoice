@@ -2,7 +2,7 @@
 `nm!ping` : 檢測ping值
 `nm!add` : 新增食物
 `nm!show` : 顯示食物清單
-`nm!lists` : 顯示食物清單
+`nm!lists` or `nm!list` : 顯示食物清單
 `nm!remove` : 移除食物
-`nm!choose` : 隨機選擇食物
+`nm!choose` or `nm!random` : 隨機選擇食物
 `nm!time` : 設定時區(請以±12小時計算)

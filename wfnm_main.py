@@ -82,45 +82,13 @@ async def on_guild_join(guild):
         )
 
 
-"""
 @bot.event
-async def change_presence():
-    while True:
-        rand_stat = random.choice(
-            ['nm!help', 'nm!ping', 'nm!show', 'nm!choose', 'https://github.com/cytsai1008/What-For-Next-Meal',
-             'nm!lists', 'nm!add', 'nm!remove', 'nm!random'])
-        rand_game = discord.Game(rand_stat)
-        print(type(rand_game))
-        await bot.change_presence(status=discord.Status.online, activity=rand_game)
-        await asyncio.sleep(10)
-"""
-
-"""
-@client.event
-
-async def status():
-    game1 = discord.Game('吃拉麵')
-    game2 = discord.Game('吃咖哩')
-    game3 = discord.Game('吃壽司')
-    game4 = discord.Game('吃火鍋')
-    game5 = discord.Game('吃麵包')
-
-    async def game_status():
-        await client.change_presence(activity=game1)
-        await asyncio.sleep(5)
-        await client.change_presence(activity=game2)
-        await asyncio.sleep(5)
-        await client.change_presence(activity=game3)
-        await asyncio.sleep(5)
-        await client.change_presence(activity=game4)
-        await asyncio.sleep(5)
-        await client.change_presence(activity=game5)
-        await asyncio.sleep(5)
-
-    await game_status()
-
-    await status()
-"""
+async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass-elif
+    # sourcery skip: remove-pass-elif
+    command = ctx.invoked_with.lower()
+    if isinstance(error, discord.ext.commands.errors.CommandNotFound):
+        await ctx.reply("Command not found.")
+        await ctx.message.add_reaction("❌")
 
 
 @bot.command(Name="help")
@@ -352,7 +320,7 @@ async def show(ctx, *args):  # sourcery no-metrics
         # print("Error 03")
 
 
-@bot.command(Name="lists")
+@bot.command(Name="lists", aliases=["list"])
 async def lists(ctx, *args):  # sourcery no-metrics
     server_id = tool_function.id_check(ctx.message)
     print(server_id)
@@ -426,7 +394,7 @@ async def lists(ctx, *args):  # sourcery no-metrics
         # print("Error 03")
 
 
-@bot.command(Name="choose")
+@bot.command(Name="choose", aliases=["random"])
 async def choose(ctx, *args):  # sourcery no-metrics
     server_id = tool_function.id_check(ctx.message)
     print(server_id)
