@@ -1,11 +1,10 @@
-def process_voice(content: str, lang_code: str):
+async def process_voice(content: str, lang_code: str, filename: str) -> None:
     """Synthesizes speech from the input string of text or ssml.
     Make sure to be working in a virtual environment.
 
     Note: ssml must be well-formed according to:
         https://www.w3.org/TR/speech-synthesis/
     """
-    import os
     from google.cloud import texttospeech
 
     # Instantiates a client
@@ -33,7 +32,7 @@ def process_voice(content: str, lang_code: str):
     )
 
     # The response's audio_content is binary.
-    with open(f"{os.environ['TEMP']}/output.mp3", "wb") as out:
+    with open(f"tts_temp/{filename}", "wb") as out:
         # Write the response to the output file.
         out.write(response.audio_content)
-        print('Audio content written to file "output.mp3"')
+        print(f'Audio content written to file "{filename}"')

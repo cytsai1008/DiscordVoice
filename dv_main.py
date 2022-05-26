@@ -15,12 +15,10 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 import dv_tool_function
+import tts_func
 
 # from io import BytesIO
-
 # from google.cloud import texttospeech
-
-# import tts_func
 
 # logging
 logger = logging.getLogger("discord")
@@ -29,7 +27,9 @@ if not os.path.exists("dv_log"):
     os.mkdir("dv_log")
 if not os.path.exists("tts_temp"):
     os.mkdir("tts_temp")
-handler = logging.FileHandler(filename="dv_log/discord_dv.log", encoding="utf-8", mode="w")
+handler = logging.FileHandler(
+    filename="dv_log/discord_dv.log", encoding="utf-8", mode="w"
+)
 handler.setFormatter(
     logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
 )
@@ -83,18 +83,7 @@ def remove_file(file_name):
 def convert_tts(content: str, lang_code: str, file_name: str):
     print("init google tts api")
     print("play mp3")
-    subprocess.call(
-        [
-            "python",
-            "tts_alone.py",
-            "--content",
-            content,
-            "--lang",
-            lang_code,
-            "--filename",
-            f"{file_name}.mp3",
-        ]
-    )
+    asyncio.run(tts_func.process_voice(content, lang_code, f"{file_name}.mp3"))
 
 
 def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
@@ -523,18 +512,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     print("init google tts api")
                     # tts_func.process_voice(content, db["lang"])
                     print("play mp3")
-                    subprocess.call(
-                        [
-                            "python",
-                            "tts_alone.py",
-                            "--content",
-                            content,
-                            "--lang",
-                            db["lang"],
-                            "--filename",
-                            f"{guild_id}.mp3",
-                        ]
-                    )
+                    await tts_func.process_voice(content, db["lang"], f"{guild_id}.mp3")
                     voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                     try:
                         ctx.voice_client.play(
@@ -843,18 +821,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                     print("init google tts api")
                     # tts_func.process_voice(content, db["lang"])
                     print("play mp3")
-                    subprocess.call(
-                        [
-                            "python",
-                            "tts_alone.py",
-                            "--content",
-                            content,
-                            "--lang",
-                            lang,
-                            "--filename",
-                            f"{guild_id}.mp3",
-                        ]
-                    )
+                    await tts_func.process_voice(content, lang, f"{guild_id}.mp3")
                     voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                     try:
                         ctx.voice_client.play(
@@ -939,7 +906,9 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 @bot.command(name="force_say")
 @commands.guild_only()
 @commands.is_owner()
-async def force_say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
+async def force_say(
+        ctx, *, content: str
+):  # sourcery no-metrics skip: for-index-replacement
     # get message channel id
     channel_id = ctx.channel.id
     # get guild id
@@ -1025,18 +994,7 @@ async def force_say(ctx, *, content: str):  # sourcery no-metrics skip: for-inde
                     print("init google tts api")
                     # tts_func.process_voice(content, db["lang"])
                     print("play mp3")
-                    subprocess.call(
-                        [
-                            "python",
-                            "tts_alone.py",
-                            "--content",
-                            content,
-                            "--lang",
-                            db["lang"],
-                            "--filename",
-                            f"{guild_id}.mp3",
-                        ]
-                    )
+                    await tts_func.process_voice(content, db["lang"], f"{guild_id}.mp3")
                     voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                     try:
                         ctx.voice_client.play(
@@ -1060,44 +1018,28 @@ async def force_say(ctx, *, content: str):  # sourcery no-metrics skip: for-inde
                             print("init google tts api")
                             # tts_func.process_voice(content, db["lang"])
                             print("play mp3")
-                            subprocess.call(
-                                [
-                                    "python",
-                                    "tts_alone.py",
-                                    "--content",
-                                    content,
-                                    "--lang",
-                                    db["lang"],
-                                    "--filename",
-                                    f"{guild_id}.mp3",
-                                ]
+                            await tts_func.process_voice(
+                                content, db["lang"], f"{guild_id}.mp3"
                             )
 
-                            voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                            voice_file = discord.FFmpegPCMAudio(
+                                f"tts_temp/{guild_id}.mp3"
+                            )
                             # stop current audio
                             ctx.voice_client.stop()
                             await asyncio.sleep(0.5)
                             ctx.voice_client.play(
                                 voice_file,
-                                after=playnext(ctx, db["lang"], guild_id, globals()[list_name]),
+                                after=playnext(
+                                    ctx, db["lang"], guild_id, globals()[list_name]
+                                ),
                             )
                             await ctx.message.add_reaction("⁉")
                 else:
                     print("init google tts api")
                     # tts_func.process_voice(content, db["lang"])
                     print("play mp3")
-                    subprocess.call(
-                        [
-                            "python",
-                            "tts_alone.py",
-                            "--content",
-                            content,
-                            "--lang",
-                            db["lang"],
-                            "--filename",
-                            f"{guild_id}.mp3",
-                        ]
-                    )
+                    await tts_func.process_voice(content, db["lang"], f"{guild_id}.mp3")
 
                     voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                     # stop current audio

@@ -13,14 +13,13 @@ str(lang_code)
 str(filename)
 
 
-def process_voice(content: str, lang_code: str):
+def process_voice(content: str, lang_code: str, filename: str) -> None:
     """Synthesizes speech from the input string of text or ssml.
     Make sure to be working in a virtual environment.
 
     Note: ssml must be well-formed according to:
         https://www.w3.org/TR/speech-synthesis/
     """
-    import os
     from google.cloud import texttospeech
 
     # Instantiates a client
@@ -54,4 +53,4 @@ def process_voice(content: str, lang_code: str):
         print(f'Audio content written to file "{filename}"')
 
 
-process_voice(content, lang_code)
+process_voice(content, lang_code, filename)
