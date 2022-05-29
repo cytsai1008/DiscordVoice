@@ -131,7 +131,7 @@ async def on_ready():
             else:
                 print(f"Successfully connected to {j} in {i}.\n")
         for i, j in joined_vc.items():
-            channel_list += f"{await bot.get_guild(i).name} : {await bot.get_channel(j).name}\n"
+            channel_list += f"{i}: {j}\n"
     await bot.change_presence(status=discord.Status.online, activity=game)
     owner = await bot.fetch_user(int(config["owner"]))
     await owner.send("bot online.\n"
