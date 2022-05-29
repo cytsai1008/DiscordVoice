@@ -117,22 +117,28 @@ async def on_ready():
     print("目前登入的伺服器：")
     for guild in bot.guilds:
         print(guild.name + "\n")
-
-    joined_vc = dv_tool_function.read_json("joined_vc")
-    print(f"joined_vc: \n" f"{joined_vc}")
-    for i, j in joined_vc.items():
-        # join the vc
-        try:
-            await bot.get_channel(int(j)).connect()
-        except:
-            del joined_vc[str(i)]
-            print(f"Failed to connect to {j} in {i}.\n")
-            print(f"Reason: {traceback.format_exc()}")
-        else:
-            print(f"Successfully connected to {j} in {i}.\n")
+    channel_list = ""
+    if dv_tool_function.check_file("joined_vc"):
+        joined_vc = dv_tool_function.read_json("joined_vc")
+        print(f"joined_vc: \n" f"{joined_vc}")
+        for i, j in joined_vc.items():
+            # join the vc
+            try:
+                await bot.get_channel(int(j)).connect()
+            except:
+                del joined_vc[str(i)]
+                print(f"Failed to connect to {j} in {i}.\n")
+                print(f"Reason: {traceback.format_exc()}")
+            else:
+                print(f"Successfully connected to {j} in {i}.\n")
+        for i, j in joined_vc.items():
+            channel_list += f"{await bot.get_guild(i).name} : {await bot.get_channel(j).name}\n"
     await bot.change_presence(status=discord.Status.online, activity=game)
     owner = await bot.fetch_user(int(config["owner"]))
-    await owner.send("bot online.")
+    await owner.send("bot online.\n"
+                     "Connect to:\n"
+                     f"{channel_list}"
+                     )
 
 
 @bot.event
