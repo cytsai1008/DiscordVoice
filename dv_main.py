@@ -8,7 +8,6 @@ import shutil
 import signal
 import subprocess
 import traceback
-from datetime import datetime
 
 import discord
 from discord.ext import commands
@@ -262,6 +261,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         )
 
 
+"""
 @bot.event
 async def on_error(event, *args, **kwargs):
     with open("error.log", "a") as f:
@@ -278,6 +278,7 @@ async def on_error(event, *args, **kwargs):
         f"Error kwargs on: {kwargs}\n"
         f"Error type: {type(event)}"
     )
+"""
 
 
 @bot.command(Name="help")
