@@ -136,7 +136,7 @@ async def on_ready():
             dv_tool_function.write_json("joined_vc", joined_vc)
         for i, j in joined_vc.items():
             channel_list += f"{i}: {j}\n"
-        if len(remove_vc) > 0:
+        if remove_vc:
             new_line = "\n"
             channel_list += f"Fail to connect to the following channels:\n" \
                             f"{new_line.join(remove_vc)}\n"
