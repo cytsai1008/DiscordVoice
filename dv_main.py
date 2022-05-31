@@ -118,6 +118,7 @@ async def on_ready():
         print(guild.name + "\n")
     channel_list = ""
     if dv_tool_function.check_file("joined_vc"):
+        remove_vc = []
         joined_vc = dv_tool_function.read_json("joined_vc")
         print(f"joined_vc: \n" f"{joined_vc}")
         for i, j in joined_vc.items():
@@ -125,13 +126,19 @@ async def on_ready():
             try:
                 await bot.get_channel(int(j)).connect()
             except:
-                del joined_vc[str(i)]
+                remove_vc.append(str(i))
                 print(f"Failed to connect to {j} in {i}.\n")
-                print(f"Reason: {traceback.format_exc()}")
+                print(f"Reason: \n{traceback.format_exc()}")
             else:
                 print(f"Successfully connected to {j} in {i}.\n")
+        for i in remove_vc:
+            del joined_vc[i]
+            dv_tool_function.write_json("joined_vc", joined_vc)
         for i, j in joined_vc.items():
             channel_list += f"{i}: {j}\n"
+        if len(remove_vc) > 0:
+            channel_list += f"Fail to connect to the following channels:\n" \
+                            f"{remove_vc}\n"
     await bot.change_presence(status=discord.Status.online, activity=game)
     owner = await bot.fetch_user(int(config["owner"]))
     await owner.send("bot online.\n"
