@@ -137,8 +137,9 @@ async def on_ready():
         for i, j in joined_vc.items():
             channel_list += f"{i}: {j}\n"
         if len(remove_vc) > 0:
+            new_line = "\n"
             channel_list += f"Fail to connect to the following channels:\n" \
-                            f"{remove_vc}\n"
+                            f"{new_line.join(remove_vc)}\n"
     await bot.change_presence(status=discord.Status.online, activity=game)
     owner = await bot.fetch_user(int(config["owner"]))
     await owner.send("bot online.\n"
