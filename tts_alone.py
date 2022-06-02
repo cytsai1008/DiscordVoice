@@ -16,6 +16,7 @@ str(filename)
 
 dotenv.load_dotenv()
 
+
 def process_voice(content: str, lang_code: str, filename: str) -> None:
     """Synthesizes speech from the input string of text or ssml.
     Make sure to be working in a virtual environment.

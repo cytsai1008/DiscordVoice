@@ -12,12 +12,19 @@ import traceback
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from scout_apm.api import Config as scout_config
 
 import dv_tool_function
 import tts_func
 
 # from io import BytesIO
 # from google.cloud import texttospeech
+
+scout_config.set(
+    key=os.environ["SCOUT_KEY"],
+    name="DV",
+    monitor=True,
+)
 
 # logging
 logger = logging.getLogger("discord")
@@ -138,14 +145,13 @@ async def on_ready():
             channel_list += f"{i}: {j}\n"
         if remove_vc:
             new_line = "\n"
-            channel_list += f"Fail to connect to the following channels:\n" \
-                            f"{new_line.join(remove_vc)}\n"
+            channel_list += (
+                f"Fail to connect to the following channels:\n"
+                f"{new_line.join(remove_vc)}\n"
+            )
     await bot.change_presence(status=discord.Status.online, activity=game)
     owner = await bot.fetch_user(int(config["owner"]))
-    await owner.send("bot online.\n"
-                     "Connect to:\n"
-                     f"{channel_list}"
-                     )
+    await owner.send("bot online.\n" "Connect to:\n" f"{channel_list}")
 
 
 @bot.event

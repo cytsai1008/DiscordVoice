@@ -8,11 +8,18 @@ from datetime import datetime
 import discord
 import dotenv
 from discord.ext import commands
+from scout_apm.api import Config as scout_config
 
 import load_command
 import wfnm_tool_function as tool_function
 
 # import time
+
+scout_config.set(
+    key=os.environ["SCOUT_KEY"],
+    name="WFNM",
+    monitor=True,
+)
 
 logger = logging.getLogger("discord")
 logger.setLevel(logging.DEBUG)

@@ -9,7 +9,7 @@ app: flask.Flask = flask.Flask("")
 ScoutApm(app)
 
 # Scout settings
-app.config["SCOUT_NAME"] = "CYTsai's Discord Bot 1"
+app.config["SCOUT_NAME"] = "CYTsai's Discord Bot 1 Website"
 # If you'd like to utilize Error Monitoring:
 app.config["SCOUT_ERRORS_ENABLED"] = True
 
