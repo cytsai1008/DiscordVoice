@@ -12,19 +12,12 @@ import traceback
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from scout_apm.api import Config as scout_config
 
 import dv_tool_function
 import tts_func
 
 # from io import BytesIO
 # from google.cloud import texttospeech
-
-scout_config.set(
-    key=os.environ["SCOUT_KEY"],
-    name="DV",
-    monitor=True,
-)
 
 # logging
 logger = logging.getLogger("discord")
