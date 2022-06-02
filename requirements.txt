@@ -6,3 +6,4 @@ google-cloud-texttospeech
 redis
 flask
 gunicorn
+scout-apm

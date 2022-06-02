@@ -1,5 +1,7 @@
 import argparse
 
+import dotenv
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--content", required=True)
 parser.add_argument("--lang", required=True)
@@ -12,6 +14,7 @@ str(content)
 str(lang_code)
 str(filename)
 
+dotenv.load_dotenv()
 
 def process_voice(content: str, lang_code: str, filename: str) -> None:
     """Synthesizes speech from the input string of text or ssml.

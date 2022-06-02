@@ -1,8 +1,17 @@
 from threading import Thread
 
 import flask
+from scout_apm.flask import ScoutApm
 
 app: flask.Flask = flask.Flask("")
+
+# Attach ScoutApm to the Flask App
+ScoutApm(app)
+
+# Scout settings
+app.config["SCOUT_NAME"] = "CYTsai's Discord Bot 1"
+# If you'd like to utilize Error Monitoring:
+app.config["SCOUT_ERRORS_ENABLED"] = True
 
 
 @app.route("/")
