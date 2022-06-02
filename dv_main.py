@@ -160,6 +160,14 @@ async def on_guild_join(guild):
             f"To leave a voice channel, please use `{config['prefix']}leave`.\n"
             f"For more information, please type `{config['prefix']}help`."
         )
+    # get guild name
+    guild_name = guild.name
+    guild_id = guild.id
+    # send to owner dm
+    owner = await bot.fetch_user(int(config["owner"]))
+    await owner.send(
+        f"New server joined!\n" f"Guild Name: {guild_name}\n" f"Guild ID: {guild_id}\n"
+    )
 
 
 @bot.event
