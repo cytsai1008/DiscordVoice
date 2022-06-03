@@ -36,3 +36,27 @@ async def process_voice(content: str, lang_code: str, filename: str) -> None:
         # Write the response to the output file.
         out.write(response.audio_content)
         print(f'Audio content written to file "{filename}"')
+
+
+async def azure_tts_converter(content: str, lang_code: str, filename: str) -> None:
+    import os
+    import azure.cognitiveservices.speech as speechsdk
+
+    subscription_key = os.getenv("AZURE_TTS_KEY")
+
+    speech_config = speechsdk.SpeechConfig(
+        subscription=subscription_key, region="eastus"
+    )
+    audio_config = speechsdk.audio.AudioOutputConfig(filename=f"./tts_temp/{filename}")
+
+    # The language of the voice that speaks.
+    speech_config.speech_synthesis_language = lang_code
+
+    speech_synthesizer = speechsdk.SpeechSynthesizer(
+        speech_config=speech_config, audio_config=audio_config
+    )
+
+    # Get text from the console and synthesize to the default speaker.
+
+    speech_synthesizer.speak_text_async(content)
+    print(f'Audio content written to file "{filename}"')

@@ -1,6 +1,8 @@
-import google.cloud.texttospeech as tts
-import dotenv
 import json
+import os
+
+import dotenv
+import google.cloud.texttospeech as tts
 
 dotenv.load_dotenv()
 
@@ -28,6 +30,41 @@ def list_languages():
         json.dump(json_lang, f)
 
 
+def list_azure_languages():
+    # Request module must be installed.
+    # Run pip install requests if necessary.
+    import requests
+
+    subscription_key = os.getenv("AZURE_TTS_KEY")
+
+    def get_token(subscription_key):
+        fetch_token_url = (
+            "https://eastus.tts.speech.microsoft.com/cognitiveservices/voices/list"
+        )
+        headers = {"Ocp-Apim-Subscription-Key": subscription_key}
+        response = requests.get(fetch_token_url, headers=headers)
+        return response.json()
+
+    azure_lang = get_token(subscription_key)
+    with open("azure_raw.json", "w") as f:
+        json.dump(azure_lang, f, indent=2, ensure_ascii=False)
+    azure_langs = []
+
+    for i in range(len(azure_lang)):
+        if azure_lang[i]["Locale"] not in azure_langs:
+            azure_langs.append(azure_lang[i]["Locale"])
+
+    azure_langs = [x.lower() for x in azure_langs]
+    azure_langs = sorted(azure_langs)
+
+    azure_langs = {"Support_Language": azure_langs}
+    with open("azure_languages.json", "w") as f:
+        json.dump(azure_langs, f)
+
+
 if __name__ == "__main__":
+    print("Updating azure_languages.json...")
+    list_azure_languages()
     print("Updating languages.json...")
     list_languages()
+    # Why it returns 0xC0000005 error?

@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import logging
 import os
 # import sys
@@ -135,7 +136,7 @@ async def on_ready():
             del joined_vc[i]
             dv_tool_function.write_json("joined_vc", joined_vc)
         for i, j in joined_vc.items():
-            channel_list += f"{i}: {j}\n"
+            channel_list += f"{i}: {j}\n\n"
         if remove_vc:
             new_line = "\n"
             channel_list += (
@@ -392,10 +393,8 @@ async def leave(ctx):
         await ctx.message.add_reaction("🖐")
         # delete channel id from joined_vc dict
     joined_vc = dv_tool_function.read_json("joined_vc")
-    try:
+    with contextlib.suppress(KeyError):
         del joined_vc[str(ctx.guild.id)]
-    except KeyError:
-        pass
     dv_tool_function.write_json("joined_vc", joined_vc)
 
 
@@ -430,7 +429,6 @@ async def setchannel_error(ctx, error):
 @bot.command(Name="say")
 @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
-# @commands.bot_has_permissions(connect=True, speak=True)
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # get message channel id
 
@@ -451,10 +449,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
 
         if not is_connected:
             joined_vc = dv_tool_function.read_json("joined_vc")
-            try:
+            with contextlib.suppress(KeyError):
                 del joined_vc[str(guild_id)]
-            except KeyError:
-                pass
             dv_tool_function.write_json("joined_vc", joined_vc)
 
         channelissetup = dv_tool_function.check_dict_data(db, "channel")
@@ -740,26 +736,20 @@ async def wrong_msg(ctx, msg: str):
 
 @bot.command(Name="move")
 @commands.guild_only()
-# @commands.bot_has_permissions(connect=True, speak=True)
 async def move(ctx):
     joined_vc = dv_tool_function.read_json("joined_vc")
-    try:
+    with contextlib.suppress(KeyError):
         del joined_vc[str(ctx.guild.id)]
-    except KeyError:
-        pass
     # get user voice channel
     try:
         user_voice_channel = ctx.author.voice.channel
     except AttributeError:
         await ctx.reply("Please join a voice channel first.")
         await ctx.message.add_reaction("❌")
-    # join
     else:
         try:
-            try:
+            with contextlib.suppress(AttributeError):
                 await ctx.voice_client.disconnect()
-            except AttributeError:
-                pass
             await user_voice_channel.connect()
         except discord.errors.ClientException:
             pass
@@ -794,10 +784,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 
         if not is_connected:
             joined_vc = dv_tool_function.read_json("joined_vc")
-            try:
+            with contextlib.suppress(KeyError):
                 del joined_vc[str(guild_id)]
-            except KeyError:
-                pass
             dv_tool_function.write_json("joined_vc", joined_vc)
 
         lang_code_list = dv_tool_function.new_read_json("languages.json")[
@@ -949,10 +937,8 @@ async def force_say(
 
         if not is_connected:
             joined_vc = dv_tool_function.read_json("joined_vc")
-            try:
+            with contextlib.suppress(KeyError):
                 del joined_vc[str(guild_id)]
-            except KeyError:
-                pass
             dv_tool_function.write_json("joined_vc", joined_vc)
 
         channelissetup = dv_tool_function.check_dict_data(db, "channel")

@@ -4,6 +4,7 @@ import random
 import signal
 # import subprocess
 from datetime import datetime
+from datetime import timezone
 
 import discord
 import dotenv
@@ -421,7 +422,7 @@ async def choose(ctx, *args):  # sourcery no-metrics
             await ctx.send(f"No food in {args[0]}")
             # print("Warning 01")
     except IndexError:
-        current_utc = datetime.utcnow()
+        current_utc = datetime.now(timezone.utc)
         current_utc = current_utc.hour
         if tool_function.check_file(f"{server_id}"):
 
