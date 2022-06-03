@@ -79,7 +79,7 @@ def check_platform(
         lang: str,
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""
-    if lang in new_read_json("languages.json.json")["Support_Language"] and lang not in \
+    if lang in new_read_json("languages.json")["Support_Language"] and lang not in \
             new_read_json("azure_languages.json")["Support_Language"]:
         return "Google"
     if lang in new_read_json("azure_languages.json")["Support_Language"] and lang not in \
