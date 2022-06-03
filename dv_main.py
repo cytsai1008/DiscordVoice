@@ -88,12 +88,9 @@ def convert_tts(content: str, lang_code: str, file_name: str):
 
 def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
     if list_id.empty():
-        try:
+        with contextlib.suppress(Exception):
             if os.path.exists(f"tts_temp/{guild_id}.mp3"):
                 os.remove("tts_temp/{guild_id}.mp3")
-        except:
-            pass
-
     elif ctx.voice_client is not None and not ctx.voice_client.is_playing():
         convert_tts(list_id.get(), lang_id, guild_id)
         song = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
@@ -109,7 +106,6 @@ async def check_is_not_playing(ctx):
 
 
 @bot.event
-# 當機器人完成啟動時
 async def on_ready():
     print("目前登入身份：", bot.user)
     game = discord.Game(f"{config['prefix']}help")
@@ -126,7 +122,7 @@ async def on_ready():
             # join the vc
             try:
                 await bot.get_channel(int(j)).connect()
-            except:
+            except Exception:
                 remove_vc.append(str(i))
                 print(f"Failed to connect to {j} in {i}.\n")
                 print(f"Reason: \n{traceback.format_exc()}")
@@ -173,7 +169,7 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass-elif
-    # sourcery skip: remove-pass-elif
+    # sourcery skip: low-code-quality, remove-pass-elif
     command = ctx.invoked_with.lower()
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
         await ctx.reply("Command not found.")
@@ -218,8 +214,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     elif isinstance(error, discord.ext.commands.errors.NotOwner):
         pass
     else:
-        NotAbleReply = ""
-        NotAbleSend = ""
+        not_able_reply = ""
+        not_able_send = ""
         try:
             server_name = ctx.guild.name
         except AttributeError:
@@ -241,8 +237,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 f"Error Type: {type(error)}\n"
                 "```"
             )
-        except:
-            NotAbleReply = traceback.format_exc()
+        except Exception:
+            not_able_reply = traceback.format_exc()
             owner_name = await bot.get_user(int(config["owner_id"])).name
             owner_full_id = (
                 f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
@@ -255,8 +251,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                     f"Error Type: {type(error)}\n"
                     "```"
                 )
-            except:
-                NotAbleSend = traceback.format_exc()
+            except Exception:
+                not_able_send = traceback.format_exc()
         owner = await bot.fetch_user(int(config["owner"]))
         owner_name = await bot.get_user(config["owner_id"]).name
         owner_full_id = (
@@ -268,8 +264,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             f"Command: {command_name}\n"
             f"Error: {error}\n"
             f"Error Type: {type(error)}\n"
-            f"Unable to reply: {NotAbleReply}\n"
-            f"Unable to send: {NotAbleSend}\n"
+            f"Unable to reply: {not_able_reply}\n"
+            f"Unable to send: {not_able_send}\n"
             f"Server Name: {server_name}\n"
             f"Server ID: {server_id}\n"
             f"Sender: {sender_name}#{ctx.author.discriminator}\n"
@@ -301,7 +297,7 @@ async def on_error(event, *args, **kwargs):
 async def help(ctx):
     try:
         _ = ctx.guild.id
-    except:
+    except Exception:
         guild_msg = False
     else:
         guild_msg = True
@@ -1105,3 +1101,12 @@ async def force_say(
 subprocess.call(["python", "gcp-token-generator.py"])
 subprocess.call(["python", "get_lang_code.py"])
 bot.run(os.environ["DISCORD_DV_TOKEN"])
+
+"""
+Note:
+
+`os.getenv()` does not raise an exception, but returns None
+`os.environ.get()` similarly returns None
+`os.environ[]` raises an exception if the environmental variable does not exist
+
+"""

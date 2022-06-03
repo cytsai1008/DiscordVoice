@@ -212,7 +212,7 @@ async def remove(ctx, *args):
             # print(f"data is {data}")
             try:
                 del_key = tool_function.check_duplicate_data(data[args[0]], del_list)
-            except:
+            except Exception:
                 del_key = []
             # Cleanup duplicate meal_list
             print(f"del_list is {del_list}")
@@ -249,6 +249,7 @@ async def remove(ctx, *args):
 
 @bot.command(Name="show")
 async def show(ctx, *args):  # sourcery no-metrics
+    # sourcery skip: low-code-quality
     server_id = tool_function.id_check(ctx.message)
     print(server_id)
     try:
