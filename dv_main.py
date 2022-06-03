@@ -1268,9 +1268,8 @@ async def force_say(
 
 @bot.command(name="setvoice")
 async def setvoice(ctx, platform: str):
-    platform.capitalize()
     supported_platform = {"Google", "Azure"}
-    if platform not in supported_platform and platform.lower() != "reset":
+    if platform.capitalize() not in supported_platform and platform.lower() != "reset":
         await ctx.reply(
             "Not supported platform.\n"
             "Currently supported platform: \n"
@@ -1295,7 +1294,7 @@ async def setvoice(ctx, platform: str):
             dv_tool_function.del_json(guild_id)
         await ctx.reply("Reset platform.")
         return
-    platform.capitalize()
+    platform = platform.capitalize()
     if dv_tool_function.check_file(guild_id):
         data = dv_tool_function.read_json(guild_id)
         data["platform"] = platform
