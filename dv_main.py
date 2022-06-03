@@ -501,14 +501,14 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 emoji_id = re.findall("<a:[^:]+:\d+>", content)
                 emoji_text = re.findall("<a:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
-                    content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
+                    content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
 
             # Standard Emoji Replace
             if re.findall("<:[^:]+:\d+>", content):
                 emoji_id = re.findall("<:[^:]+:\d+>", content)
                 emoji_text = re.findall("<:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
-                    content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
+                    content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
 
             say_this = ctx.author.id == config["owner"] or len(content) < 30
             try:
@@ -1106,9 +1106,16 @@ async def force_say(
 
 if os.getenv("TEST_ENV"):
     print("Running on test environment")
+    test_env = True
+else:
+    print("Running on production environment")
+    test_env = False
 subprocess.call(["python", "gcp-token-generator.py"])
 subprocess.call(["python", "get_lang_code.py"])
-bot.run(os.environ["DISCORD_DV_TOKEN"])
+if test_env:
+    bot.run(os.environ["DISCORD_DV_TEST_TOKEN"])
+else:
+    bot.run(os.environ["DISCORD_DV_TOKEN"])
 
 """
 Note:
