@@ -182,10 +182,13 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             )
         elif command == "setlang":
             support_lang = dv_tool_function.new_read_json("languages.json")
+            azure_lang = dv_tool_function.new_read_json("azure_languages.json")
             await ctx.reply(
                 f"No language providing, please set by `{config['prefix']}setlang some-lang-code`.\n"
-                f"Current supported languages: \n"
-                f"```{', '.join(support_lang['Support_Language'])}```\n"
+                f"Google supported languages: \n"
+                f"```\n{', '.join(support_lang['Support_Language'])}```\n"
+                f"Azure supported languages: \n"
+                f"```\n{', '.join(azure_lang['Support_Language'])}```"
             )
         elif command == "say":
             await ctx.reply("What can I say? :(")
@@ -308,10 +311,13 @@ async def help(ctx):
             lang_msg = f"Use `{config['prefix']}setlang` to set a language. (Current: `{data['lang']}`)\n"
         else:
             support_lang = dv_tool_function.new_read_json("languages.json")
+            azure_lang = dv_tool_function.new_read_json("azure_languages.json")
             lang_msg = (
                 f"Use `{config['prefix']}setlang` to set a language. (ex. `{config['prefix']}setlang en-us`)\n"
-                f"Current supported languages: \n"
-                f"```{', '.join(support_lang['Support_Language'])}```\n"
+                f"Google supported languages: \n"
+                f"```\n{', '.join(support_lang['Support_Language'])}```\n"
+                f"Azure supported languages: \n"
+                f"```\n{', '.join(azure_lang['Support_Language'])}```\n"
             )
 
         if dv_tool_function.check_dict_data(data, "channel"):
@@ -320,10 +326,18 @@ async def help(ctx):
             guild_system_channel = ctx.guild.system_channel
             channel_msg = f"Use `{config['prefix']}setchannel` to set a channel. (ex. {config['prefix']}setchannel <#{guild_system_channel.id}>)\n"
 
+        if dv_tool_function.check_dict_data(data, "platform"):
+            platform_msg = f"Use `{config['prefix']}setvoice` to set a platform. (Current: `{data['platform']}`)\n"
+        else:
+            platform_msg = f"Use `{config['prefix']}setvoice` to set a platform. (ex. `{config['prefix']}setvoice Google`)\n" \
+                           f"Current supported platforms: \n" \
+                           f"```\nGoogle, Azure```\n"
+
         await ctx.reply(
             f"Use `{config['prefix']}help` to see the help message.\n"
             f"{channel_msg}"
             f"{lang_msg}"
+            f"{platform_msg}"
             f"Use `{config['prefix']}say` to speak in voice channel. (ex. `{config['prefix']}say ABCD`)\n"
             f"Use `{config['prefix']}say_lang` to speak in voice channel with another language. (ex. `{config['prefix']}say_lang en-us ABCD`)\n"
             f"Use `{config['prefix']}stop` to stop speaking.\n"
@@ -335,12 +349,18 @@ async def help(ctx):
         )
     else:
         support_lang = dv_tool_function.new_read_json("languages.json")
+        azure_lang = dv_tool_function.new_read_json("azure_languages.json")
         await ctx.reply(
             f"Use `{config['prefix']}help` to see the help message.\n"
             f"Use `{config['prefix']}setchannel` to set a channel. (ex. `{config['prefix']}setchannel #general`)\n"
             f"Use `{config['prefix']}setlang` to set a language. (ex. `{config['prefix']}setlang en-us`)\n"
-            "Current supported languages: \n"
-            f"```{', '.join(support_lang['Support_Language'])}```\n"
+            "Google supported languages: \n"
+            f"```\n{', '.join(support_lang['Support_Language'])}```\n"
+            f"Azure supported languages: \n"
+            f"```\n{', '.join(azure_lang['Support_Language'])}```\n"
+            f"Use `{config['prefix']}setvoice` to set a platform. (ex. `{config['prefix']}setvoice Google`)\n"
+            f"Current supported platforms: \n"
+            f"```\nGoogle, Azure```\n"
             f"Use `{config['prefix']}say` to speak in voice channel. (ex. `{config['prefix']}say ABCD`)\n"
             f"Use `{config['prefix']}say_lang` to speak in voice channel with another language. (ex. `{config['prefix']}say_lang en-us ABCD`)\n"
             f"Use `{config['prefix']}stop` to stop speaking.\n"
@@ -648,9 +668,10 @@ async def setlang(ctx, lang: str):
     # get guild id
     guild_id = ctx.guild.id
     support_lang = dv_tool_function.new_read_json("languages.json")
+    azure_lang = dv_tool_function.new_read_json("azure_languages.json")
     lang = lang.lower()
     lang = lang.replace("_", "-")
-    if lang in support_lang["Support_Language"]:
+    if lang in support_lang["Support_Language"] or lang in azure_lang["Support_Language"]:
         if dv_tool_function.check_file(f"{guild_id}"):
             # read db file
             db = dv_tool_function.read_json(f"{guild_id}")
@@ -664,14 +685,18 @@ async def setlang(ctx, lang: str):
         await ctx.message.add_reaction("✅")
     elif lang == "supported-languages":
         await ctx.reply(
-            f"Current supported languages: \n"
-            f"```{', '.join(support_lang['Support_Language'])}```"
+            f"Google supported languages: \n"
+            f"```\n{', '.join(support_lang['Support_Language'])}```"
+            f"Azure supported languages: \n"
+            f"```\n{', '.join(azure_lang['Support_Language'])}```"
         )
     else:
         await ctx.reply(
             f"`{lang}` is not supported.\n"
-            f"Current supported languages: \n"
-            f"```{', '.join(support_lang['Support_Language'])}```"
+            f"Google supported languages: \n"
+            f"```\n{', '.join(support_lang['Support_Language'])}```"
+            f"Azure supported languages: \n"
+            f"```\n{', '.join(azure_lang['Support_Language'])}```"
         )
         await ctx.message.add_reaction("❌")
 
@@ -834,11 +859,14 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         lang_code_list = dv_tool_function.new_read_json("languages.json")[
             "Support_Language"
         ]
+        azure_lang_code_list = dv_tool_function.new_read_json("languages.json")[
+            "Support_Language"
+        ]
 
         lang = lang.lower()
         lang = lang.replace("_", "-")
 
-        lang_code_is_right = lang in lang_code_list
+        lang_code_is_right = lang in lang_code_list or lang in azure_lang_code_list
         channelissetup = dv_tool_function.check_dict_data(db, "channel")
 
         if (
@@ -964,8 +992,10 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             if not lang_code_is_right:
                 errormsg += (
                     f"Not supported language.\n"
-                    f"Current supported languages: \n"
-                    f"```{', '.join(lang_code_list)}```\n"
+                    f"Google supported languages: \n"
+                    f"```\n{', '.join(lang_code_list)}```\n"
+                    f"Azure supported languages: \n"
+                    f"```\n{', '.join(azure_lang_code_list)}```\n"
                 )
             await ctx.reply(errormsg)
             await ctx.message.add_reaction("❌")
@@ -1237,9 +1267,10 @@ async def force_say(
 
 
 @bot.command(name="setvoice")
-async def setvoice(ctx, platform):
+async def setvoice(ctx, platform: str):
+    platform.capitalize()
     supported_platform = {"Google", "Azure"}
-    if platform not in supported_platform and platform != "reset":
+    if platform not in supported_platform and platform.lower() != "reset":
         await ctx.reply(
             "Not supported platform.\n"
             "Currently supported platform: \n"
@@ -1255,6 +1286,7 @@ async def setvoice(ctx, platform):
                 dv_tool_function.read_json(guild_id), "platform"):
             await ctx.reply("Platform is not set.")
             return
+
         data = dv_tool_function.read_json(guild_id)
         del data["platform"]
         if data != {}:
@@ -1263,7 +1295,7 @@ async def setvoice(ctx, platform):
             dv_tool_function.del_json(guild_id)
         await ctx.reply("Reset platform.")
         return
-
+    platform.capitalize()
     if dv_tool_function.check_file(guild_id):
         data = dv_tool_function.read_json(guild_id)
         data["platform"] = platform
