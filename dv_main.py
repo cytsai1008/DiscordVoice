@@ -455,9 +455,9 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
 
     user_id = ctx.author.id
     user_platform_set = bool(
-        dv_tool_function.check_file(f"{user_id}")
+        dv_tool_function.check_file(f"user_{user_id}")
         and dv_tool_function.check_dict_data(
-            dv_tool_function.read_json(f"{user_id}"), "platform"
+            dv_tool_function.read_json(f"user_{user_id}"), "platform"
         )
     )
 
@@ -827,9 +827,9 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 
     user_id = ctx.author.id
     user_platform_set = bool(
-        dv_tool_function.check_file(f"{user_id}")
+        dv_tool_function.check_file(f"user_{user_id}")
         and dv_tool_function.check_dict_data(
-            dv_tool_function.read_json(f"{user_id}"), "platform"
+            dv_tool_function.read_json(f"user_{user_id}"), "platform"
         )
     )
 
@@ -1017,9 +1017,9 @@ async def force_say(
 
     user_id = ctx.author.id
     user_platform_set = bool(
-        dv_tool_function.check_file(f"{user_id}")
+        dv_tool_function.check_file(f"user_{user_id}")
         and dv_tool_function.check_dict_data(
-            dv_tool_function.read_json(f"{user_id}"), "platform"
+            dv_tool_function.read_json(f"user_{user_id}"), "platform"
         )
     )
 

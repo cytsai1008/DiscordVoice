@@ -79,20 +79,20 @@ def check_platform(
 ) -> str:
     user_id = f"user_{str(user_id)}"
     if user_platform_set and read_json(f"{user_id}")["platform"] == "Google":
-        print("Init Google TTS API")
+        print("Init Google TTS API 1")
         return "Google"
 
     elif user_platform_set and read_json(f"{user_id}")["platform"] == "Azure":
-        print("Init Azure TTS API")
+        print("Init Azure TTS API 1")
         return "Azure"
     elif guild_platform_set and read_json(f"{guild_id}")["platform"] == "Google":
-        print("Init Google TTS API")
+        print("Init Google TTS API 2")
         return "Google"
     elif guild_platform_set and read_json(f"{guild_id}")["platform"] == "Azure":
-        print("Init Azure TTS API")
+        print("Init Azure TTS API 2")
         return "Azure"
     elif not user_platform_set and not guild_platform_set:
-        print("Init Google TTS API")
+        print("Init Google TTS API 3")
         return "Google"
     else:
         print(
