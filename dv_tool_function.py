@@ -76,7 +76,15 @@ def check_platform(
         user_id: [str, int],
         guild_platform_set: bool,
         guild_id: [str, int],
+        lang: str,
 ) -> str:
+    """Return the platform of the user or guild (default: Google)"""
+    if lang in new_read_json("languages.json.json")["Support_Language"] and lang not in \
+            new_read_json("azure_languages.json")["Support_Language"]:
+        return "Google"
+    if lang in new_read_json("azure_languages.json")["Support_Language"] and lang not in \
+            new_read_json("languages.json.json")["Support_Language"]:
+        return "Azure"
     user_id = f"user_{str(user_id)}"
     if user_platform_set and read_json(f"{user_id}")["platform"] == "Google":
         print("Init Google TTS API 1")

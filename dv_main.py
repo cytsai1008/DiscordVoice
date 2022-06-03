@@ -304,7 +304,7 @@ async def on_error(event, *args, **kwargs):
 
 
 @bot.command(Name="help")
-async def help(ctx):
+async def help(ctx):  # sourcery skip: low-code-quality
     try:
         _ = ctx.guild.id
     except Exception:
@@ -598,7 +598,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     print("play mp3")
 
                     platform_result = dv_tool_function.check_platform(
-                        user_platform_set, user_id, guild_platform_set, guild_id
+                        user_platform_set, user_id, guild_platform_set, guild_id, db["lang"]
                     )
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
@@ -614,6 +614,15 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         )
                     else:
                         print("Something Wrong")
+                        # send to owner
+                        owner = await bot.fetch_user(int(config["owner"]))
+                        await owner.send(
+                            f"Something went wrong return triggered!\n"
+                            f"Guild ID: {guild_id}\n"
+                            f"User ID: {user_id}\n"
+                            f"User Platform Set: {user_platform_set}\n"
+                            f"Guild Platform Set: {guild_platform_set}\n"
+                        )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
                         await tts_func.process_voice(
@@ -939,7 +948,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                     print("play mp3")
 
                     platform_result = dv_tool_function.check_platform(
-                        user_platform_set, user_id, guild_platform_set, guild_id
+                        user_platform_set, user_id, guild_platform_set, guild_id, lang
                     )
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
@@ -955,6 +964,15 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         )
                     else:
                         print("Something Wrong")
+                        # send to owner
+                        owner = await bot.fetch_user(int(config["owner"]))
+                        await owner.send(
+                            f"Something went wrong return triggered!\n"
+                            f"Guild ID: {guild_id}\n"
+                            f"User ID: {user_id}\n"
+                            f"User Platform Set: {user_platform_set}\n"
+                            f"Guild Platform Set: {guild_platform_set}\n"
+                        )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
                         await tts_func.process_voice(
@@ -1050,6 +1068,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 async def force_say(
         ctx, *, content: str
 ):  # sourcery no-metrics skip: for-index-replacement
+    # sourcery skip: low-code-quality
     # get message channel id
 
     user_id = ctx.author.id
@@ -1144,7 +1163,7 @@ async def force_say(
                     print("play mp3")
 
                     platform_result = dv_tool_function.check_platform(
-                        user_platform_set, user_id, guild_platform_set, guild_id
+                        user_platform_set, user_id, guild_platform_set, guild_id, db["lang"]
                     )
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
@@ -1160,6 +1179,15 @@ async def force_say(
                         )
                     else:
                         print("Something Wrong")
+                        # send to owner
+                        owner = await bot.fetch_user(int(config["owner"]))
+                        await owner.send(
+                            f"Something went wrong return triggered!\n"
+                            f"Guild ID: {guild_id}\n"
+                            f"User ID: {user_id}\n"
+                            f"User Platform Set: {user_platform_set}\n"
+                            f"Guild Platform Set: {guild_platform_set}\n"
+                        )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
                         await tts_func.process_voice(
@@ -1189,7 +1217,7 @@ async def force_say(
                             print("play mp3")
 
                             platform_result = dv_tool_function.check_platform(
-                                user_platform_set, user_id, guild_platform_set, guild_id
+                                user_platform_set, user_id, guild_platform_set, guild_id, db["lang"]
                             )
                             # GCP Cloud Text to Speech Method
                             if platform_result == "Google":
@@ -1205,6 +1233,15 @@ async def force_say(
                                 )
                             else:
                                 print("Something Wrong")
+                                # send to owner
+                                owner = await bot.fetch_user(int(config["owner"]))
+                                await owner.send(
+                                    f"Something went wrong return triggered!\n"
+                                    f"Guild ID: {guild_id}\n"
+                                    f"User ID: {user_id}\n"
+                                    f"User Platform Set: {user_platform_set}\n"
+                                    f"Guild Platform Set: {guild_platform_set}\n"
+                                )
                                 # add bug emoji reaction
                                 await ctx.message.add_reaction("🐛")
                                 await tts_func.process_voice(
@@ -1228,7 +1265,7 @@ async def force_say(
                     print("play mp3")
 
                     platform_result = dv_tool_function.check_platform(
-                        user_platform_set, user_id, guild_platform_set, guild_id
+                        user_platform_set, user_id, guild_platform_set, guild_id, db["lang"]
                     )
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
@@ -1244,6 +1281,15 @@ async def force_say(
                         )
                     else:
                         print("Something Wrong")
+                        # send to owner
+                        owner = await bot.fetch_user(int(config["owner"]))
+                        await owner.send(
+                            f"Something went wrong return triggered!\n"
+                            f"Guild ID: {guild_id}\n"
+                            f"User ID: {user_id}\n"
+                            f"User Platform Set: {user_platform_set}\n"
+                            f"Guild Platform Set: {guild_platform_set}\n"
+                        )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
                         await tts_func.process_voice(
