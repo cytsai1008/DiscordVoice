@@ -114,7 +114,7 @@ async def on_ready():
     for guild in bot.guilds:
         print(guild.name + "\n")
     channel_list = ""
-    if dv_tool_function.check_file("joined_vc"):
+    if dv_tool_function.check_file("joined_vc") and os.getenv("TEST_ENV") != "True":
         remove_vc = []
         joined_vc = dv_tool_function.read_json("joined_vc")
         print(f"joined_vc: \n" f"{joined_vc}")
@@ -150,7 +150,7 @@ async def on_guild_join(guild):
     if general and general.permissions_for(guild.me).send_messages:
         await general.send(
             "Thanks for adding me!\n"
-            f"Please set a channel by `{config['prefix']}setchannel`. (ex. `{config['prefix']}setchannel #general`)\n"
+            f"Please set a channel by `{config['prefix']}setchannel`. (ex. {config['prefix']}setchannel <#{general.id}>)\n"
             f"Please set a language by `{config['prefix']}setlang`. (ex. `{config['prefix']}setlang en-us`)\n"
             f"To speak something, please use `{config['prefix']}say`. (ex. `{config['prefix']}say ABCD`)\n"
             f"To join a voice channel, please use `{config['prefix']}join`.\n"
@@ -176,8 +176,9 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         await ctx.message.add_reaction("❌")
     elif isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
         if command == "setchannel":
+            guild_system_channel = ctx.guild.system_channel
             await ctx.reply(
-                f"No channel providing, please set by `{config['prefix']}setchannel #some-channel`."
+                f"No channel providing, please set by {config['prefix']}setchannel <#{guild_system_channel.id}>"
             )
         elif command == "setlang":
             support_lang = dv_tool_function.new_read_json("languages.json")
@@ -316,7 +317,8 @@ async def help(ctx):
         if dv_tool_function.check_dict_data(data, "channel"):
             channel_msg = f"Use `{config['prefix']}setchannel` to set a channel. (Current: <#{data['channel']}>)\n"
         else:
-            channel_msg = f"Use `{config['prefix']}setchannel` to set a channel. (ex. `{config['prefix']}setchannel #general`)\n"
+            guild_system_channel = ctx.guild.system_channel
+            channel_msg = f"Use `{config['prefix']}setchannel` to set a channel. (ex. {config['prefix']}setchannel <#{guild_system_channel.id}>)\n"
 
         await ctx.reply(
             f"Use `{config['prefix']}help` to see the help message.\n"
@@ -409,15 +411,17 @@ async def setchannel(ctx, channel: discord.TextChannel):
         data = {"channel": channel_id}
 
     dv_tool_function.write_json(f"{guild_id}", data)
-    await ctx.reply(f"channel set to <#{channel.id}>.")
+    await ctx.reply(f"channel set to <#{channel.id}>")
 
 
 @setchannel.error
 async def setchannel_error(ctx, error):
     if isinstance(error, commands.BadArgument):
+        # get guild system channel
+        guild_system_channel = ctx.guild.system_channel
         await ctx.reply(
-            f"Please enter a valid channel. (Must have blue background and is clickable, ex. `{config['prefix']}setchannel "
-            f"#general`)"
+            f"Please enter a valid channel. (Must have blue background and is clickable, ex. {config['prefix']}setchannel "
+            f"<#{guild_system_channel.id}>)"
         )
         await ctx.message.add_reaction("❌")
 
@@ -426,6 +430,7 @@ async def setchannel_error(ctx, error):
 @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
+    # sourcery skip: low-code-quality
     # get message channel id
 
     channel_id = ctx.channel.id
@@ -590,18 +595,19 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
         else:
             errormsg = ""
             if not is_connected:
-                errormsg += f"Please join voice channel by `{config['prefix']}join`.\n"
+                errormsg += f"Please join voice channel by `{config['prefix']}join`\n"
             if not channelissetup:
-                errormsg += f"Please set channel by `{config['prefix']}setchannel`.\n"
+                guild_system_channel = ctx.guild.system_channel
+                errormsg += f"Please set channel by {config['prefix']}setchannel {guild_system_channel.id}\n"
             if not langissetup:
-                errormsg += f"Please set language by `{config['prefix']}setlang`.\n"
+                errormsg += f"Please set language by `{config['prefix']}setlang`\n"
             await ctx.reply(errormsg)
             await ctx.message.add_reaction("❌")
     else:
         await ctx.send(
             "Setting file not exist.\n"
-            f"Please set channel by `{config['prefix']}setchannel`.\n"
-            f"Please set language by `{config['prefix']}setlang`.\n"
+            f"Please set channel by `{config['prefix']}setchannel`\n"
+            f"Please set language by `{config['prefix']}setlang`\n"
         )
 
 
@@ -1098,6 +1104,8 @@ async def force_say(
         )
 
 
+if os.getenv("TEST_ENV"):
+    print("Running on test environment")
 subprocess.call(["python", "gcp-token-generator.py"])
 subprocess.call(["python", "get_lang_code.py"])
 bot.run(os.environ["DISCORD_DV_TOKEN"])
