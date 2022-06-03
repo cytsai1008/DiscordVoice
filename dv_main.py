@@ -199,7 +199,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             )
         elif command == "setvoice":
             await ctx.reply(
-                f"No voice platform providing, please set by `{config['prefix']}setvoice platform-name`\n"
+                f"No voice platform providing, please set by `{config['prefix']}setvoice platform-name` or `{config['prefix']}setvoice reset` to reset.\n"
                 f"Current supported platforms: \n"
                 f"```\nAzure, Google```"
             )
