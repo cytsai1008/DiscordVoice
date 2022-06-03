@@ -77,6 +77,7 @@ def check_platform(
         guild_platform_set: bool,
         guild_id: [str, int],
 ) -> str:
+    user_id = f"user_{str(user_id)}"
     if user_platform_set and read_json(f"{user_id}")["platform"] == "Google":
         print("Init Google TTS API")
         return "Google"
