@@ -197,6 +197,12 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 "What can I say? :(\n"
                 f"`{config['prefix']}say_lang some-lang-code say-something`"
             )
+        elif command == "setvoice":
+            await ctx.reply(
+                f"No voice platform providing, please set by `{config['prefix']}setvoice platform-name`\n"
+                f"Current supported platforms: \n"
+                f"```\nAzure, Google```"
+            )
         else:
             await ctx.reply("Missing required argument.")
         await ctx.message.add_reaction("❓")
