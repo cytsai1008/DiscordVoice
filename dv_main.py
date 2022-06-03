@@ -336,9 +336,11 @@ async def help(ctx):  # sourcery skip: low-code-quality
         if dv_tool_function.check_dict_data(data, "platform"):
             platform_msg = f"Use `{config['prefix']}setvoice` to set a platform. (Current: `{data['platform']}`)\n"
         else:
-            platform_msg = f"Use `{config['prefix']}setvoice` to set a platform. (ex. `{config['prefix']}setvoice Google`)\n" \
-                           f"Current supported platforms: \n" \
-                           f"```\nGoogle, Azure```\n"
+            platform_msg = (
+                f"Use `{config['prefix']}setvoice` to set a platform. (ex. `{config['prefix']}setvoice Google`)\n"
+                f"Current supported platforms: \n"
+                f"```\nGoogle, Azure```\n"
+            )
 
         await ctx.reply(
             f"Use `{config['prefix']}help` to see the help message.\n"
@@ -354,17 +356,22 @@ async def help(ctx):  # sourcery skip: low-code-quality
             f"Use `{config['prefix']}ping` to check my latency.\n"
             f"Use `{config['prefix']}invite` to get the bot's invite link.\n"
         )
-    elif not guild_msg and dv_tool_function.check_file(f"user_{str(ctx.author.id)}"):
+    elif not guild_msg and dv_tool_function.check_dict_data(
+            dv_tool_function.read_json("user_config")[f"user_{int(ctx.author.id)}"],
+            "platform",
+    ):
         support_lang = dv_tool_function.new_read_json("languages.json")
         azure_lang = dv_tool_function.new_read_json("azure_languages.json")
-        data = dv_tool_function.read_json(f"user_{str(ctx.author.id)}")
+        data = dv_tool_function.read_json("user_config")[f"user_{int(ctx.author.id)}"]
 
         if dv_tool_function.check_dict_data(data, "platform"):
             platform_msg = f"Use `{config['prefix']}setvoice` to set a platform. (Current: `{data['platform']}`)\n"
         else:
-            platform_msg = f"Use `{config['prefix']}setvoice` to set a platform. (ex. `{config['prefix']}setvoice Google`)\n" \
-                           f"Current supported platforms: \n" \
-                           f"```\nGoogle, Azure```\n"
+            platform_msg = (
+                f"Use `{config['prefix']}setvoice` to set a platform. (ex. `{config['prefix']}setvoice Google`)\n"
+                f"Current supported platforms: \n"
+                f"```\nGoogle, Azure```\n"
+            )
 
         await ctx.reply(
             f"Use `{config['prefix']}help` to see the help message.\n"
@@ -493,9 +500,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
 
     user_id = ctx.author.id
     user_platform_set = bool(
-        dv_tool_function.check_file(f"user_{user_id}")
-        and dv_tool_function.check_dict_data(
-            dv_tool_function.read_json(f"user_{user_id}"), "platform"
+        dv_tool_function.check_dict_data(
+            dv_tool_function.read_json("user_config")[f"user_{user_id}"], "platform"
         )
     )
 
@@ -599,7 +605,11 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     print("play mp3")
 
                     platform_result = dv_tool_function.check_platform(
-                        user_platform_set, user_id, guild_platform_set, guild_id, db["lang"]
+                        user_platform_set,
+                        user_id,
+                        guild_platform_set,
+                        guild_id,
+                        db["lang"],
                     )
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
@@ -718,7 +728,10 @@ async def setlang(ctx, lang: str):
     azure_lang = dv_tool_function.new_read_json("azure_languages.json")
     lang = lang.lower()
     lang = lang.replace("_", "-")
-    if lang in support_lang["Support_Language"] or lang in azure_lang["Support_Language"]:
+    if (
+            lang in support_lang["Support_Language"]
+            or lang in azure_lang["Support_Language"]
+    ):
         if dv_tool_function.check_file(f"{guild_id}"):
             # read db file
             db = dv_tool_function.read_json(f"{guild_id}")
@@ -874,9 +887,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 
     user_id = ctx.author.id
     user_platform_set = bool(
-        dv_tool_function.check_file(f"user_{user_id}")
-        and dv_tool_function.check_dict_data(
-            dv_tool_function.read_json(f"user_{user_id}"), "platform"
+        dv_tool_function.check_dict_data(
+            dv_tool_function.read_json("user_config")[f"user_{user_id}"], "platform"
         )
     )
 
@@ -954,9 +966,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
                         print("Init Google TTS API")
-                        await tts_func.process_voice(
-                            content, lang, f"{guild_id}.mp3"
-                        )
+                        await tts_func.process_voice(content, lang, f"{guild_id}.mp3")
 
                     elif platform_result == "Azure":
                         print("Init Azure TTS API")
@@ -976,9 +986,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
-                        await tts_func.process_voice(
-                            content, lang, f"{guild_id}.mp3"
-                        )
+                        await tts_func.process_voice(content, lang, f"{guild_id}.mp3")
 
                     voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                     try:
@@ -1074,9 +1082,8 @@ async def force_say(
 
     user_id = ctx.author.id
     user_platform_set = bool(
-        dv_tool_function.check_file(f"user_{user_id}")
-        and dv_tool_function.check_dict_data(
-            dv_tool_function.read_json(f"user_{user_id}"), "platform"
+        dv_tool_function.check_dict_data(
+            dv_tool_function.read_json("user_config")[f"user_{user_id}"], "platform"
         )
     )
 
@@ -1164,7 +1171,11 @@ async def force_say(
                     print("play mp3")
 
                     platform_result = dv_tool_function.check_platform(
-                        user_platform_set, user_id, guild_platform_set, guild_id, db["lang"]
+                        user_platform_set,
+                        user_id,
+                        guild_platform_set,
+                        guild_id,
+                        db["lang"],
                     )
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
@@ -1218,7 +1229,11 @@ async def force_say(
                             print("play mp3")
 
                             platform_result = dv_tool_function.check_platform(
-                                user_platform_set, user_id, guild_platform_set, guild_id, db["lang"]
+                                user_platform_set,
+                                user_id,
+                                guild_platform_set,
+                                guild_id,
+                                db["lang"],
                             )
                             # GCP Cloud Text to Speech Method
                             if platform_result == "Google":
@@ -1266,7 +1281,11 @@ async def force_say(
                     print("play mp3")
 
                     platform_result = dv_tool_function.check_platform(
-                        user_platform_set, user_id, guild_platform_set, guild_id, db["lang"]
+                        user_platform_set,
+                        user_id,
+                        guild_platform_set,
+                        guild_id,
+                        db["lang"],
                     )
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
@@ -1363,30 +1382,48 @@ async def setvoice(ctx, platform: str):
             "or `reset` to reset."
         )
         return
+    is_guild = dv_tool_function.check_id2(ctx)
     guild_id = dv_tool_function.id_check(ctx)
 
     if platform == "reset":
-        if not dv_tool_function.check_file(guild_id) or not dv_tool_function.check_dict_data(
-                dv_tool_function.read_json(guild_id), "platform"):
+        if (
+                not is_guild
+                and not dv_tool_function.check_dict_data(
+            dv_tool_function.read_json("user_config")[guild_id], "platform"
+        )
+                or (
+                not dv_tool_function.check_file(guild_id)
+                or not dv_tool_function.check_dict_data(
+            dv_tool_function.read_json(guild_id), "platform"
+        )
+        )
+        ):
             await ctx.reply("Platform is not set.")
             return
-
-        data = dv_tool_function.read_json(guild_id)
-        del data["platform"]
-        if data != {}:
-            dv_tool_function.write_json(guild_id, data)
+        if is_guild:
+            data = dv_tool_function.read_json(guild_id)
+            del data["platform"]
         else:
-            dv_tool_function.del_json(guild_id)
+            data = dv_tool_function.read_json("user_config")
+            del data[guild_id]["platform"]
+            if data[guild_id] == {}:
+                del data[guild_id]
+        dv_tool_function.write_json(guild_id, data)
         await ctx.reply("Reset platform.")
         return
     platform = platform.capitalize()
-    if dv_tool_function.check_file(guild_id):
+    if dv_tool_function.check_file(guild_id) and is_guild:
         data = dv_tool_function.read_json(guild_id)
         data["platform"] = platform
+    elif not is_guild and dv_tool_function.check_dict_data(
+            dv_tool_function.read_json("user_config"), guild_id
+    ):
+        data = dv_tool_function.read_json("user_config")
+        data[guild_id]["platform"] = platform
     else:
         data = {"platform": platform}
+        dv_tool_function.write_json(guild_id, data)
 
-    dv_tool_function.write_json(guild_id, data)
     await ctx.reply(f"Set platform to {platform}.")
 
 
