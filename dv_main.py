@@ -238,8 +238,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         command_name = ctx.invoked_with
         try:
             # get owner name
-            owner_name = await bot.get_user(int(config["owner_id"])).name
-            owner_full_id = f"{owner_name}#{await bot.get_user(int(config['owner_id'])).discriminator}"
+            owner_name = await bot.get_user(int(config["owner"])).name
+            owner_full_id = f"{owner_name}#{await bot.get_user(int(config['owner'])).discriminator}"
             await ctx.reply(
                 f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
                 "```"
@@ -249,9 +249,9 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             )
         except Exception:
             not_able_reply = traceback.format_exc()
-            owner_name = await bot.get_user(int(config["owner_id"])).name
+            owner_name = await bot.get_user(int(config["owner"])).name
             owner_full_id = (
-                f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
+                f"{owner_name}#{await bot.get_user(config['owner']).discriminator}"
             )
             try:
                 await ctx.send(
@@ -264,9 +264,9 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             except Exception:
                 not_able_send = traceback.format_exc()
         owner = await bot.fetch_user(int(config["owner"]))
-        owner_name = await bot.get_user(config["owner_id"]).name
+        owner_name = await bot.get_user(config["owner"]).name
         owner_full_id = (
-            f"{owner_name}#{await bot.get_user(config['owner_id']).discriminator}"
+            f"{owner_name}#{await bot.get_user(config['owner']).discriminator}"
         )
         await owner.send(
             f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
