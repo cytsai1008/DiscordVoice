@@ -1281,7 +1281,8 @@ async def setvoice(ctx, platform: str):
             "Currently supported platform: \n"
             "```\n"
             f"{', '.join(list(supported_platform))}\n"
-            "```"
+            "```\n"
+            "or `reset` to reset."
         )
         return
     guild_id = dv_tool_function.id_check(ctx)
