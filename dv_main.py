@@ -433,6 +433,14 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
     # sourcery skip: low-code-quality
     # get message channel id
 
+    user_id = ctx.author.id
+    user_platform_set = bool(
+        dv_tool_function.check_file(f"{user_id}")
+        and dv_tool_function.check_dict_data(
+            dv_tool_function.read_json(f"{user_id}"), "platform"
+        )
+    )
+
     channel_id = ctx.channel.id
     # get guild id
     guild_id = ctx.guild.id
@@ -441,6 +449,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
         db = dv_tool_function.read_json(f"{guild_id}")
         # check channel id
         # check if is in voice channel
+
+        guild_platform_set = bool(dv_tool_function.check_dict_data(db, "platform"))
         try:
             ctx.voice_client.is_connected()
         except AttributeError:
@@ -528,10 +538,31 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     globals()[list_name] = queue.Queue(maxsize=10)
 
                 if not ctx.voice_client.is_playing():
-                    print("init google tts api")
-                    # tts_func.process_voice(content, db["lang"])
                     print("play mp3")
-                    await tts_func.process_voice(content, db["lang"], f"{guild_id}.mp3")
+
+                    platform_result = dv_tool_function.check_platform(
+                        user_platform_set, user_id, guild_platform_set, guild_id
+                    )
+                    # GCP Cloud Text to Speech Method
+                    if platform_result == "Google":
+                        print("Init Google TTS API")
+                        await tts_func.process_voice(
+                            content, db["lang"], f"{guild_id}.mp3"
+                        )
+
+                    elif platform_result == "Azure":
+                        print("Init Azure TTS API")
+                        await tts_func.azure_tts_converter(
+                            content, db["lang"], f"{guild_id}.mp3"
+                        )
+                    else:
+                        print("Something Wrong")
+                        # add bug emoji reaction
+                        await ctx.message.add_reaction("🐛")
+                        await tts_func.process_voice(
+                            content, db["lang"], f"{guild_id}.mp3"
+                        )
+
                     voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                     try:
                         ctx.voice_client.play(
@@ -769,6 +800,14 @@ async def move(ctx):
 async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
     # get message channel id
 
+    user_id = ctx.author.id
+    user_platform_set = bool(
+        dv_tool_function.check_file(f"{user_id}")
+        and dv_tool_function.check_dict_data(
+            dv_tool_function.read_json(f"{user_id}"), "platform"
+        )
+    )
+
     channel_id = ctx.channel.id
     # get guild id
     guild_id = ctx.guild.id
@@ -777,6 +816,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         db = dv_tool_function.read_json(f"{guild_id}")
         # check channel id
         # check if is in voice channel
+
+        guild_platform_set = bool(dv_tool_function.check_dict_data(db, "platform"))
         try:
             ctx.voice_client.is_connected()
         except AttributeError:
@@ -830,10 +871,31 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                     globals()[list_name] = queue.Queue(maxsize=10)
 
                 if not ctx.voice_client.is_playing():
-                    print("init google tts api")
-                    # tts_func.process_voice(content, db["lang"])
                     print("play mp3")
-                    await tts_func.process_voice(content, lang, f"{guild_id}.mp3")
+
+                    platform_result = dv_tool_function.check_platform(
+                        user_platform_set, user_id, guild_platform_set, guild_id
+                    )
+                    # GCP Cloud Text to Speech Method
+                    if platform_result == "Google":
+                        print("Init Google TTS API")
+                        await tts_func.process_voice(
+                            content, lang, f"{guild_id}.mp3"
+                        )
+
+                    elif platform_result == "Azure":
+                        print("Init Azure TTS API")
+                        await tts_func.azure_tts_converter(
+                            content, lang, f"{guild_id}.mp3"
+                        )
+                    else:
+                        print("Something Wrong")
+                        # add bug emoji reaction
+                        await ctx.message.add_reaction("🐛")
+                        await tts_func.process_voice(
+                            content, lang, f"{guild_id}.mp3"
+                        )
+
                     voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                     try:
                         ctx.voice_client.play(
@@ -922,6 +984,15 @@ async def force_say(
         ctx, *, content: str
 ):  # sourcery no-metrics skip: for-index-replacement
     # get message channel id
+
+    user_id = ctx.author.id
+    user_platform_set = bool(
+        dv_tool_function.check_file(f"{user_id}")
+        and dv_tool_function.check_dict_data(
+            dv_tool_function.read_json(f"{user_id}"), "platform"
+        )
+    )
+
     channel_id = ctx.channel.id
     # get guild id
     guild_id = ctx.guild.id
@@ -930,6 +1001,8 @@ async def force_say(
         db = dv_tool_function.read_json(f"{guild_id}")
         # check channel id
         # check if is in voice channel
+
+        guild_platform_set = bool(dv_tool_function.check_dict_data(db, "platform"))
         try:
             ctx.voice_client.is_connected()
         except AttributeError:
@@ -1001,10 +1074,31 @@ async def force_say(
                     globals()[list_name] = queue.Queue(maxsize=10)
 
                 if not ctx.voice_client.is_playing():
-                    print("init google tts api")
-                    # tts_func.process_voice(content, db["lang"])
                     print("play mp3")
-                    await tts_func.process_voice(content, db["lang"], f"{guild_id}.mp3")
+
+                    platform_result = dv_tool_function.check_platform(
+                        user_platform_set, user_id, guild_platform_set, guild_id
+                    )
+                    # GCP Cloud Text to Speech Method
+                    if platform_result == "Google":
+                        print("Init Google TTS API")
+                        await tts_func.process_voice(
+                            content, db["lang"], f"{guild_id}.mp3"
+                        )
+
+                    elif platform_result == "Azure":
+                        print("Init Azure TTS API")
+                        await tts_func.azure_tts_converter(
+                            content, db["lang"], f"{guild_id}.mp3"
+                        )
+                    else:
+                        print("Something Wrong")
+                        # add bug emoji reaction
+                        await ctx.message.add_reaction("🐛")
+                        await tts_func.process_voice(
+                            content, db["lang"], f"{guild_id}.mp3"
+                        )
+
                     voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                     try:
                         ctx.voice_client.play(
@@ -1025,12 +1119,30 @@ async def force_say(
                             asyncio.ensure_future(check_is_not_playing(ctx))
                             playnext(ctx, db["lang"], guild_id, globals()[list_name])
                         else:
-                            print("init google tts api")
-                            # tts_func.process_voice(content, db["lang"])
                             print("play mp3")
-                            await tts_func.process_voice(
-                                content, db["lang"], f"{guild_id}.mp3"
+
+                            platform_result = dv_tool_function.check_platform(
+                                user_platform_set, user_id, guild_platform_set, guild_id
                             )
+                            # GCP Cloud Text to Speech Method
+                            if platform_result == "Google":
+                                print("Init Google TTS API")
+                                await tts_func.process_voice(
+                                    content, db["lang"], f"{guild_id}.mp3"
+                                )
+
+                            elif platform_result == "Azure":
+                                print("Init Azure TTS API")
+                                await tts_func.azure_tts_converter(
+                                    content, db["lang"], f"{guild_id}.mp3"
+                                )
+                            else:
+                                print("Something Wrong")
+                                # add bug emoji reaction
+                                await ctx.message.add_reaction("🐛")
+                                await tts_func.process_voice(
+                                    content, db["lang"], f"{guild_id}.mp3"
+                                )
 
                             voice_file = discord.FFmpegPCMAudio(
                                 f"tts_temp/{guild_id}.mp3"
@@ -1046,10 +1158,30 @@ async def force_say(
                             )
                             await ctx.message.add_reaction("⁉")
                 else:
-                    print("init google tts api")
-                    # tts_func.process_voice(content, db["lang"])
                     print("play mp3")
-                    await tts_func.process_voice(content, db["lang"], f"{guild_id}.mp3")
+
+                    platform_result = dv_tool_function.check_platform(
+                        user_platform_set, user_id, guild_platform_set, guild_id
+                    )
+                    # GCP Cloud Text to Speech Method
+                    if platform_result == "Google":
+                        print("Init Google TTS API")
+                        await tts_func.process_voice(
+                            content, db["lang"], f"{guild_id}.mp3"
+                        )
+
+                    elif platform_result == "Azure":
+                        print("Init Azure TTS API")
+                        await tts_func.azure_tts_converter(
+                            content, db["lang"], f"{guild_id}.mp3"
+                        )
+                    else:
+                        print("Something Wrong")
+                        # add bug emoji reaction
+                        await ctx.message.add_reaction("🐛")
+                        await tts_func.process_voice(
+                            content, db["lang"], f"{guild_id}.mp3"
+                        )
 
                     voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
                     # stop current audio
@@ -1102,6 +1234,44 @@ async def force_say(
             f"Please set channel by `{config['prefix']}setchannel`.\n"
             f"Please set language by `{config['prefix']}setlang`.\n"
         )
+
+
+@bot.command(name="setvoice")
+async def setvoice(ctx, platform):
+    supported_platform = {"Google", "Azure"}
+    if platform not in supported_platform and platform != "reset":
+        await ctx.reply(
+            "Not supported platform.\n"
+            "Currently supported platform: \n"
+            "```\n"
+            f"{', '.join(list(supported_platform))}\n"
+            "```"
+        )
+        return
+    guild_id = dv_tool_function.id_check(ctx)
+
+    if platform == "reset":
+        if not dv_tool_function.check_file(guild_id) or not dv_tool_function.check_dict_data(
+                dv_tool_function.read_json(guild_id), "platform"):
+            await ctx.reply("Platform is not set.")
+            return
+        data = dv_tool_function.read_json(guild_id)
+        del data["platform"]
+        if data != {}:
+            dv_tool_function.write_json(guild_id, data)
+        else:
+            dv_tool_function.del_json(guild_id)
+        await ctx.reply("Reset platform.")
+        return
+
+    if dv_tool_function.check_file(guild_id):
+        data = dv_tool_function.read_json(guild_id)
+        data["platform"] = platform
+    else:
+        data = {"platform": platform}
+
+    dv_tool_function.write_json(guild_id, data)
+    await ctx.reply(f"Set platform to {platform}.")
 
 
 if os.getenv("TEST_ENV"):

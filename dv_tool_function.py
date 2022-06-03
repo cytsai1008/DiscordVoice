@@ -61,3 +61,49 @@ def lang_command(lang: str, command: str) -> str:
     finally:
         return command_out
 """
+
+
+def id_check(self) -> str:
+    try:
+        server_id = str(self.guild.id)
+    except Exception:
+        server_id = f"user_{str(self.author.id)}"
+    return server_id
+
+
+def check_platform(
+        user_platform_set: bool,
+        user_id: [str, int],
+        guild_platform_set: bool,
+        guild_id: [str, int],
+) -> str:
+    if user_platform_set and read_json(f"{user_id}")["platform"] == "Google":
+        print("Init Google TTS API")
+        return "Google"
+
+    elif user_platform_set and read_json(f"{user_id}")["platform"] == "Azure":
+        print("Init Azure TTS API")
+        return "Azure"
+    elif guild_platform_set and read_json(f"{guild_id}")["platform"] == "Google":
+        print("Init Google TTS API")
+        return "Google"
+    elif guild_platform_set and read_json(f"{guild_id}")["platform"] == "Azure":
+        print("Init Azure TTS API")
+        return "Azure"
+    elif not user_platform_set and not guild_platform_set:
+        print("Init Google TTS API")
+        return "Google"
+    else:
+        print(
+            f"You found a bug\n"
+            f"User platform: {user_platform_set}\n"
+            f"User id: {user_id}\n"
+            f"Guild platform: {guild_platform_set}\n"
+            f"Guild id: {guild_id}\n"
+        )
+        return "Something wrong"
+
+
+def del_json(filename) -> None:
+    """Delete json value from redis (key: filename)"""
+    redis_client().delete(filename)
