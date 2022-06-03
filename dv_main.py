@@ -1417,6 +1417,7 @@ async def setvoice(ctx, platform: str):
     if dv_tool_function.check_file(guild_id) and is_guild:
         data = dv_tool_function.read_json(guild_id)
         data["platform"] = platform
+        dv_tool_function.write_json(guild_id, data)
     elif not is_guild:
         data = dv_tool_function.read_json("user_config")
         data[guild_id]["platform"] = platform
