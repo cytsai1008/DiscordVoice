@@ -906,7 +906,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         lang_code_list = dv_tool_function.new_read_json("languages.json")[
             "Support_Language"
         ]
-        azure_lang_code_list = dv_tool_function.new_read_json("languages.json")[
+        azure_lang_code_list = dv_tool_function.new_read_json("azure_languages.json")[
             "Support_Language"
         ]
 
