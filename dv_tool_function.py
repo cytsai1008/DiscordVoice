@@ -83,7 +83,7 @@ def check_platform(
             new_read_json("azure_languages.json")["Support_Language"]:
         return "Google"
     if lang in new_read_json("azure_languages.json")["Support_Language"] and lang not in \
-            new_read_json("languages.json.json")["Support_Language"]:
+            new_read_json("languages.json")["Support_Language"]:
         return "Azure"
     user_id = f"user_{str(user_id)}"
     if user_platform_set and read_json(f"{user_id}")["platform"] == "Google":
