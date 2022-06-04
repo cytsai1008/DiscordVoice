@@ -305,7 +305,7 @@ async def on_error(event, *args, **kwargs):
 """
 
 
-@bot.command(Name="help", alias=["h"])
+@bot.command(Name="help", aliases=["h"])
 async def help(ctx):  # sourcery skip: low-code-quality
     try:
         _ = ctx.guild.id
@@ -416,7 +416,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         )
 
 
-@bot.command(Name="join", alias=["j"])
+@bot.command(Name="join", aliases=["j"])
 @commands.guild_only()
 # @commands.bot_has_permissions(connect=True, speak=True)
 async def join(ctx):
@@ -490,7 +490,7 @@ async def setchannel_error(ctx, error):
         await ctx.message.add_reaction("❌")
 
 
-@bot.command(Name="say", alias=["s"])
+@bot.command(Name="say", aliases=["s"])
 @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
@@ -790,7 +790,7 @@ async def shutdown(ctx):
         os.kill(os.getpid(), signal.SIGTERM)
 
 
-@bot.command(Name="clear", alias=["c"])
+@bot.command(Name="clear", aliases=["c"])
 @commands.guild_only()
 async def clear(ctx):
     list_name = f"list_{ctx.guild.id}"
@@ -854,7 +854,7 @@ async def wrong_msg(ctx, msg: str):
         await ctx.message.add_reaction("🤔")
 
 
-@bot.command(Name="move", alias=["m"])
+@bot.command(Name="move", aliases=["m"])
 @commands.guild_only()
 async def move(ctx):
     joined_vc = dv_tool_function.read_json("joined_vc")
