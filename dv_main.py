@@ -445,7 +445,7 @@ async def join(ctx):
             dv_tool_function.write_json("joined_vc", joined_vc)
 
 
-@bot.command(Name="leave", alias=["disconnect", "dc"])
+@bot.command(Name="leave", aliases=["disconnect", "dc"])
 async def leave(ctx):
     try:
         await ctx.voice_client.disconnect()
@@ -490,7 +490,7 @@ async def setchannel_error(ctx, error):
         await ctx.message.add_reaction("❌")
 
 
-@bot.command(Name="say", aliases=["s"])
+@bot.command(Name="say", alias=["s"])
 @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
@@ -881,10 +881,11 @@ async def move(ctx):
     dv_tool_function.write_json("joined_vc", joined_vc)
 
 
-@bot.command(Name="say_lang", alias=["say-lang", "saylang", "sl"])
+@bot.command(Name="say_lang", aliases=["say-lang", "saylang", "sl"])
 @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
 async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
+    # sourcery skip: low-code-quality
     # get message channel id
 
     user_id = ctx.author.id
