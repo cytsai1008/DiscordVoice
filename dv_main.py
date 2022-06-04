@@ -305,7 +305,7 @@ async def on_error(event, *args, **kwargs):
 """
 
 
-@bot.command(Name="help")
+@bot.command(Name="help", alias=["h"])
 async def help(ctx):  # sourcery skip: low-code-quality
     try:
         _ = ctx.guild.id
@@ -416,7 +416,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         )
 
 
-@bot.command(Name="join")
+@bot.command(Name="join", alias=["j"])
 @commands.guild_only()
 # @commands.bot_has_permissions(connect=True, speak=True)
 async def join(ctx):
