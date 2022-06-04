@@ -122,7 +122,7 @@ async def on_ready():
             # join the vc
             try:
                 # noinspection PyUnresolvedReferences
-                await bot.fetch_channel(int(j)).connect()
+                await bot.get_channel(int(j)).connect()
             except Exception:
                 remove_vc.append(str(i))
                 print(f"Failed to connect to {j} in {i}.\n")
