@@ -121,7 +121,8 @@ async def on_ready():
         for i, j in joined_vc.items():
             # join the vc
             try:
-                await bot.get_channel(int(j)).connect()
+                # noinspection PyUnresolvedReferences
+                await bot.fetch_channel(int(j)).connect()
             except Exception:
                 remove_vc.append(str(i))
                 print(f"Failed to connect to {j} in {i}.\n")
@@ -1452,11 +1453,12 @@ if os.getenv("TEST_ENV"):
 else:
     print("Running on production environment")
     test_env = False
-subprocess.call(["python", "gcp-token-generator.py"])
-subprocess.call(["python", "get_lang_code.py"])
+
 if test_env:
     bot.run(os.environ["DISCORD_DV_TEST_TOKEN"])
 else:
+    subprocess.call(["python", "gcp-token-generator.py"])
+    subprocess.call(["python", "get_lang_code.py"])
     bot.run(os.environ["DISCORD_DV_TOKEN"])
 
 """
