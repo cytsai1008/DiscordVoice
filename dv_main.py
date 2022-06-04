@@ -445,7 +445,7 @@ async def join(ctx):
             dv_tool_function.write_json("joined_vc", joined_vc)
 
 
-@bot.command(Name="leave")
+@bot.command(Name="leave", alias=["disconnect", "dc"])
 async def leave(ctx):
     try:
         await ctx.voice_client.disconnect()
@@ -490,7 +490,7 @@ async def setchannel_error(ctx, error):
         await ctx.message.add_reaction("❌")
 
 
-@bot.command(Name="say")
+@bot.command(Name="say", aliases=["s"])
 @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
@@ -790,7 +790,7 @@ async def shutdown(ctx):
         os.kill(os.getpid(), signal.SIGTERM)
 
 
-@bot.command(Name="clear")
+@bot.command(Name="clear", alias=["c"])
 @commands.guild_only()
 async def clear(ctx):
     list_name = f"list_{ctx.guild.id}"
@@ -854,7 +854,7 @@ async def wrong_msg(ctx, msg: str):
         await ctx.message.add_reaction("🤔")
 
 
-@bot.command(Name="move")
+@bot.command(Name="move", alias=["m"])
 @commands.guild_only()
 async def move(ctx):
     joined_vc = dv_tool_function.read_json("joined_vc")
@@ -881,7 +881,7 @@ async def move(ctx):
     dv_tool_function.write_json("joined_vc", joined_vc)
 
 
-@bot.command(Name="say_lang")
+@bot.command(Name="say_lang", alias=["say-lang", "saylang", "sl"])
 @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
 async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
@@ -1076,7 +1076,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         )
 
 
-@bot.command(name="force_say")
+@bot.command(name="force_say", aliases=["fs", "forcesay"])
 @commands.guild_only()
 @commands.is_owner()
 async def force_say(
