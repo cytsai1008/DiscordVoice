@@ -15,5 +15,5 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "cytsai-discord-bots-1"
           heroku_email: ${{secrets.HEROKU_EMAIL}}
-          healthcheck: true
+          healthcheck: https://cytsai-discord-bots-1.herokuapp.com
           delay: 10
