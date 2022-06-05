@@ -947,9 +947,33 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 
             # export content to mp3 by google tts api
             # get username
+
+            """
+            Discord User ID RegExp
+            <@![0-9]{18}>
+            <@[0-9]{18}>
+            Role ID
+            <@&[0-9]{18}>
+            """
+
             content = await commands.clean_content(
                 fix_channel_mentions=True, use_nicknames=True
             ).convert(ctx, content)
+
+            # Animate Emoji Replace
+            if re.findall("<a:[^:]+:\d+>", content):
+                emoji_id = re.findall("<a:[^:]+:\d+>", content)
+                emoji_text = re.findall("<a:([^:]+):\d+>", content)
+                for i in range(len(emoji_id)):
+                    content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
+
+            # Standard Emoji Replace
+            if re.findall("<:[^:]+:\d+>", content):
+                emoji_id = re.findall("<:[^:]+:\d+>", content)
+                emoji_text = re.findall("<:([^:]+):\d+>", content)
+                for i in range(len(emoji_id)):
+                    content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
+
             say_this = ctx.author.id in (int(config["owner"]), 890234177767755849) or len(content) < 30
             try:
                 username = ctx.author.display_name
