@@ -10,10 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Deploy to heroku
       - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "cytsai-discord-bots-1"
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           healthcheck: https://cytsai-discord-bots-1.herokuapp.com
-          delay: 10
+          delay: 5
