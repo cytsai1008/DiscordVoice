@@ -133,12 +133,16 @@ async def on_ready():
             del joined_vc[i]
             dv_tool_function.write_json("joined_vc", joined_vc)
         for i, j in joined_vc.items():
-            channel_list += f"{i}: {j}\n\n"
+            channel_list += f"{i}: {j}\n"
+        channel_list = f"```\n" \
+                       f"{channel_list}\n" \
+                       f"```"
         if remove_vc:
             new_line = "\n"
             channel_list += (
-                f"Fail to connect to the following channels:\n"
+                f"Fail to connect to the following channels:\n```\n"
                 f"{new_line.join(remove_vc)}\n"
+                f"```"
             )
     await bot.change_presence(status=discord.Status.online, activity=game)
     owner = await bot.fetch_user(int(config["owner"]))
@@ -166,7 +170,6 @@ async def on_guild_join(guild):
     await owner.send(
         f"New server joined!\n" f"Guild Name: {guild_name}\n" f"Guild ID: {guild_id}\n"
     )
-
 
 
 @bot.event
@@ -214,7 +217,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         )
         await ctx.message.add_reaction("⏳")
     elif command == "setchannel" and isinstance(
-        error, discord.ext.commands.errors.ChannelNotFound
+            error, discord.ext.commands.errors.ChannelNotFound
     ):
         pass
     elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
