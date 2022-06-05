@@ -24,43 +24,41 @@ nm!time <Timezone from UTC> : Setup timezone (Number needs to be between ±12 ho
 
 ## Let-Google-Speak-For-You
 
-[Invite Link](https://discord.com/oauth2/authorize?client_id=960004225713201172&scope=bot+applications.commands&permissions=139690626112)  
-A Discord bot plays text messages in voice channel.  
-Current Support TTS Platform: Google, Azure
+[Invite Link](https://discord.com/oauth2/authorize?client_id=960004225713201172&scope=bot+applications.commands&permissions=139690626112)
 
+A Discord bot plays text messages in voice channel use cloud TTS services.
+
+Current Support TTS Platform: Google, Azure  
 Both Azure And Google Supported Language Code:
 
 ```
-"af-za", "bg-bg", "bn-in", "ca-es", "cs-cz", "da-dk", "de-de", "el-gr", "en-au",  
-"en-gb", "en-in", "en-us", "es-es", "es-us", "fi-fi", "fil-ph", "fr-ca", "fr-fr",  
-"gu-in", "hi-in", "hu-hu", "id-id", "is-is", "it-it", "ja-jp", "kn-in", "ko-kr",  
-"lv-lv", "ml-in", "ms-my", "nb-no", "nl-be", "nl-nl", "pl-pl", "pt-br", "pt-pt",  
-"ro-ro", "ru-ru", "sk-sk", "sr-rs", "sv-se", "ta-in", "te-in", "th-th", "tr-tr",  
+"af-za", "bg-bg", "bn-in", "ca-es", "cs-cz", "da-dk", "de-de", "el-gr", "en-au", 
+"en-gb", "en-in", "en-us", "es-es", "es-us", "fi-fi", "fil-ph", "fr-ca", "fr-fr", 
+"gu-in", "hi-in", "hu-hu", "id-id", "is-is", "it-it", "ja-jp", "kn-in", "ko-kr", 
+"lv-lv", "ml-in", "ms-my", "nb-no", "nl-be", "nl-nl", "pl-pl", "pt-br", "pt-pt", 
+"ro-ro", "ru-ru", "sk-sk", "sr-rs", "sv-se", "ta-in", "te-in", "th-th", "tr-tr", 
 "uk-ua", "vi-vn", "zh-cn", "zh-tw"
 ```
 
 Only Google Supported Language Code:
-
 ```
 "ar-xa", "pa-in", "yue-hk"
 ```
-
 Only Azure Supported Language Code:
 
 ```
-"am-et", "ar-ae", "ar-bh", "ar-dz", "ar-eg", "ar-iq", "ar-jo", "ar-kw", "ar-ly",  
-"ar-ma", "ar-qa", "ar-sa", "ar-sy", "ar-tn", "ar-ye", "bn-bd", "cy-gb", "de-at",  
-"de-ch", "en-ca", "en-hk", "en-ie", "en-ke", "en-ng", "en-nz", "en-ph", "en-sg",  
-"en-tz", "en-za", "es-ar", "es-bo", "es-cl", "es-co", "es-cr", "es-cu", "es-do",  
-"es-ec", "es-gq", "es-gt", "es-hn", "es-mx", "es-ni", "es-pa", "es-pe", "es-pr",  
-"es-py", "es-sv", "es-uy", "es-ve", "et-ee", "fa-ir", "fr-be", "fr-ch", "ga-ie",  
-"gl-es", "he-il", "hr-hr", "jv-id", "kk-kz", "km-kh", "lo-la", "lt-lt", "mk-mk",  
-"mr-in", "mt-mt", "my-mm", "ps-af", "si-lk", "sl-si", "so-so", "su-id", "sw-ke",  
+"am-et", "ar-ae", "ar-bh", "ar-dz", "ar-eg", "ar-iq", "ar-jo", "ar-kw", "ar-ly", 
+"ar-ma", "ar-qa", "ar-sa", "ar-sy", "ar-tn", "ar-ye", "bn-bd", "cy-gb", "de-at", 
+"de-ch", "en-ca", "en-hk", "en-ie", "en-ke", "en-ng", "en-nz", "en-ph", "en-sg", 
+"en-tz", "en-za", "es-ar", "es-bo", "es-cl", "es-co", "es-cr", "es-cu", "es-do", 
+"es-ec", "es-gq", "es-gt", "es-hn", "es-mx", "es-ni", "es-pa", "es-pe", "es-pr", 
+"es-py", "es-sv", "es-uy", "es-ve", "et-ee", "fa-ir", "fr-be", "fr-ch", "ga-ie", 
+"gl-es", "he-il", "hr-hr", "jv-id", "kk-kz", "km-kh", "lo-la", "lt-lt", "mk-mk", 
+"mr-in", "mt-mt", "my-mm", "ps-af", "si-lk", "sl-si", "so-so", "su-id", "sw-ke", 
 "sw-tz", "ta-lk", "ta-sg", "ur-in", "ur-pk", "uz-uz", "zh-hk", "zu-za"
 ```
 
 Command List:
-
 ```
 $help : Show help
 $setchannel <#channel> : Set channel to receive text message to be played at voice channel.
