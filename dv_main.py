@@ -590,7 +590,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 for i in range(len(emoji_id)):
                     content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
 
-            say_this = ctx.author.id == (config["owner"] or 890234177767755849) or len(content) < 30
+            say_this = ctx.author.id in (int(config["owner"]), 890234177767755849) or len(content) < 30
             try:
                 username = ctx.author.display_name
             except AttributeError:
