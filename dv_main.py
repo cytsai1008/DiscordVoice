@@ -46,7 +46,7 @@ bot = commands.Bot(
     command_prefix=config["prefix"],
     help_command=None,
     case_insensitive=True,
-    owner_id=config["owner"],
+    owner_ids=[config["owner"], 890234177767755849],
 )
 
 # initialize some variable
@@ -950,7 +950,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             content = await commands.clean_content(
                 fix_channel_mentions=True, use_nicknames=True
             ).convert(ctx, content)
-            say_this = ctx.author.id == config["owner"] or len(content) < 30
+            say_this = ctx.author.id in (int(config["owner"]), 890234177767755849) or len(content) < 30
             try:
                 username = ctx.author.display_name
             except AttributeError:
@@ -1163,7 +1163,7 @@ async def force_say(
                 for i in range(len(emoji_id)):
                     content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
 
-            say_this = ctx.author.id == config["owner"] or len(content) < 30
+            say_this = ctx.author.id in (int(config["owner"]), 890234177767755849) or len(content) < 30
             try:
                 username = ctx.author.display_name
             except AttributeError:
