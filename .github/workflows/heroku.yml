@@ -16,3 +16,4 @@ jobs:
           heroku_app_name: "cytsai-discord-bots-1"
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           healthcheck: true
+          delay: 10
