@@ -966,14 +966,14 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 emoji_id = re.findall("<a:[^:]+:\d+>", content)
                 emoji_text = re.findall("<a:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
-                    content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
+                    content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
 
             # Standard Emoji Replace
             if re.findall("<:[^:]+:\d+>", content):
                 emoji_id = re.findall("<:[^:]+:\d+>", content)
                 emoji_text = re.findall("<:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
-                    content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
+                    content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
 
             say_this = (
                     ctx.author.id in (int(config["owner"]), 890234177767755849)
@@ -1182,14 +1182,14 @@ async def force_say(
                 emoji_id = re.findall("<a:[^:]+:\d+>", content)
                 emoji_text = re.findall("<a:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
-                    content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
+                    content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
 
             # Standard Emoji Replace
             if re.findall("<:[^:]+:\d+>", content):
                 emoji_id = re.findall("<:[^:]+:\d+>", content)
                 emoji_text = re.findall("<:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
-                    content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
+                    content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
 
             say_this = (
                     ctx.author.id in (int(config["owner"]), 890234177767755849)
