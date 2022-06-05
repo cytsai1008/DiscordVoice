@@ -134,9 +134,7 @@ async def on_ready():
             dv_tool_function.write_json("joined_vc", joined_vc)
         for i, j in joined_vc.items():
             channel_list += f"{i}: {j}\n"
-        channel_list = f"```\n" \
-                       f"{channel_list}\n" \
-                       f"```"
+        channel_list = f"```\n" f"{channel_list}\n" f"```"
         if remove_vc:
             new_line = "\n"
             channel_list += (
@@ -590,7 +588,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 for i in range(len(emoji_id)):
                     content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
 
-            say_this = ctx.author.id in (int(config["owner"]), 890234177767755849) or len(content) < 30
+            say_this = (
+                    ctx.author.id in (int(config["owner"]), 890234177767755849)
+                    or len(content) < 30
+            )
             try:
                 username = ctx.author.display_name
             except AttributeError:
@@ -974,7 +975,10 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 for i in range(len(emoji_id)):
                     content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
 
-            say_this = ctx.author.id in (int(config["owner"]), 890234177767755849) or len(content) < 30
+            say_this = (
+                    ctx.author.id in (int(config["owner"]), 890234177767755849)
+                    or len(content) < 30
+            )
             try:
                 username = ctx.author.display_name
             except AttributeError:
@@ -1187,7 +1191,10 @@ async def force_say(
                 for i in range(len(emoji_id)):
                     content = content.replace(emoji_id[i], f" {emoji_text[i]} ")
 
-            say_this = ctx.author.id in (int(config["owner"]), 890234177767755849) or len(content) < 30
+            say_this = (
+                    ctx.author.id in (int(config["owner"]), 890234177767755849)
+                    or len(content) < 30
+            )
             try:
                 username = ctx.author.display_name
             except AttributeError:
