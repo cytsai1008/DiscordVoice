@@ -598,7 +598,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 username = ctx.author.name
             # get username length
             if len(username) > 20:
-                username = "someone"
+                if len(ctx.author.name) > 20:
+                    username = "someone"
+                else:
+                    username = ctx.author.name
             if ctx.author.voice is not None:
                 content = f"{username} said {content}"
             else:
@@ -985,7 +988,10 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 username = ctx.author.name
             # get username length
             if len(username) > 20:
-                username = "someone"
+                if len(ctx.author.name) > 20:
+                    username = "someone"
+                else:
+                    username = ctx.author.name
             if ctx.author.voice is not None:
                 content = f"{username} said {content}"
             else:
@@ -1201,7 +1207,10 @@ async def force_say(
                 username = ctx.author.name
             # get username length
             if len(username) > 20:
-                username = "someone"
+                if len(ctx.author.name) > 20:
+                    username = "someone"
+                else:
+                    username = ctx.author.name
             if ctx.author.voice is not None:
                 content = f"{username} said {content}"
             else:
