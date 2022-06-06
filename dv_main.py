@@ -50,6 +50,7 @@ bot = commands.Bot(
 
 # initialize some variable
 bot.remove_command("help")
+bot.Intent = discord.Intents.default()
 
 folder = "tts_temp"
 for filename in os.listdir(folder):
