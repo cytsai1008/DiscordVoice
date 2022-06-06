@@ -250,6 +250,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             except AttributeError:
                 await ctx.reply("Please join a voice channel first.")
                 await ctx.message.add_reaction("❌")
+                return
             else:
                 try:
                     with contextlib.suppress(AttributeError):
@@ -264,7 +265,6 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                     joined_vc[ctx.guild.id] = user_voice_channel.id
             dv_tool_function.write_json("joined_vc", joined_vc)
 
-
         else:
             await ctx.reply("Missing required argument.")
         if wrong_cmd:
@@ -276,9 +276,11 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         )
         await ctx.message.add_reaction("⏳")
 
-    elif command in ["setchannel", "join", "move"] or command in command_alias["join"] or command_alias[
-        "move"] and isinstance(
-            error, discord.ext.commands.errors.ChannelNotFound
+    elif (
+            command in ["setchannel", "join", "move"]
+            or command in command_alias["join"]
+            or command_alias["move"]
+            and isinstance(error, discord.ext.commands.errors.ChannelNotFound)
     ):
         pass
 
