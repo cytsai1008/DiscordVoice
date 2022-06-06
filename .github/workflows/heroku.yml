@@ -5,6 +5,10 @@ on:
     branches:
       - heroku
 
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     name: Deploy to Heroku
