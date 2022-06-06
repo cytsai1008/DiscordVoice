@@ -21,7 +21,7 @@ on:
     - cron: '00 00 * * 3'
 
 concurrency:
-  group: ${{ github.head_ref }}
+  group: ${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
