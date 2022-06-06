@@ -1,6 +1,5 @@
 import asyncio
 import contextlib
-import logging
 import os
 # import sys
 import queue
@@ -20,26 +19,26 @@ import tts_func
 # from io import BytesIO
 # from google.cloud import texttospeech
 
-# logging
-logger = logging.getLogger("discord")
-logger.setLevel(logging.DEBUG)
-if not os.path.exists("dv_log"):
-    os.mkdir("dv_log")
+
 if not os.path.exists("tts_temp"):
     os.mkdir("tts_temp")
-handler = logging.FileHandler(
-    filename="dv_log/discord_dv.log", encoding="utf-8", mode="w"
-)
-handler.setFormatter(
-    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
-)
-logger.addHandler(handler)
 
 load_dotenv()
 # check file
 config = {
     "prefix": f"{os.getenv('DISCORD_DV_PREFIX')}",
     "owner": int(os.getenv("DISCORD_OWNER")),
+}
+
+command_alias = {
+    "help": ["h"],
+    "join": ["j"],
+    "leave": ["l", "dc", "disconnect"],
+    "say": ["s"],
+    "clear": ["c"],
+    "move": ["m"],
+    "say_lang": ["sl", "saylang", "say-lang"],
+    "force_say": ["fs", "forcesay", "force-say"],
 }
 
 bot = commands.Bot(
@@ -174,15 +173,20 @@ async def on_guild_join(guild):
 async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass-elif
     # sourcery skip: low-code-quality, remove-pass-elif
     command = ctx.invoked_with.lower()
+
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
         await ctx.reply("Command not found.")
         await ctx.message.add_reaction("❌")
+
     elif isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
+        wrong_cmd = True
+
         if command == "setchannel":
             guild_system_channel = ctx.guild.system_channel
             await ctx.reply(
                 f"No channel providing, please set by {config['prefix']}setchannel <#{guild_system_channel.id}>"
             )
+
         elif command == "setlang":
             support_lang = dv_tool_function.new_read_json("languages.json")
             azure_lang = dv_tool_function.new_read_json("azure_languages.json")
@@ -193,39 +197,102 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 f"Azure supported languages: \n"
                 f"```\n{', '.join(azure_lang['Support_Language'])}```"
             )
-        elif command == "say":
+
+        elif command == "say" or command in command_alias["say"]:
             await ctx.reply("What can I say? :(")
-        elif command == "say_lang":
+
+        elif command == "say_lang" or command in command_alias["say_lang"]:
             await ctx.reply(
                 "What can I say? :(\n"
                 f"`{config['prefix']}say_lang some-lang-code say-something`"
             )
+
         elif command == "setvoice":
             await ctx.reply(
                 f"No voice platform providing, please set by `{config['prefix']}setvoice platform-name` or `{config['prefix']}setvoice reset` to reset.\n"
                 f"Current supported platforms: \n"
                 f"```\nAzure, Google```"
             )
+
+        elif command == "join" or command in command_alias["join"]:
+            wrong_cmd = False
+            try:
+                user_voice_channel = ctx.author.voice.channel
+            except AttributeError:
+                await ctx.reply("Please join a voice channel first.")
+                await ctx.message.add_reaction("❌")
+            # join
+            else:
+                try:
+                    await user_voice_channel.connect()
+                except discord.errors.ClientException:
+                    bot_voice_channel = ctx.guild.voice_client.channel
+                    await ctx.reply(
+                        f"I'm already in <#{bot_voice_channel.id}>.\n"
+                        f"To move, please use `{config['prefix']}move`."
+                    )
+                    await ctx.message.add_reaction("❌")
+                else:
+                    await ctx.message.add_reaction("✅")
+                    # write channel id to joined_vc dict
+                    joined_vc = dv_tool_function.read_json("joined_vc")
+                    joined_vc[ctx.guild.id] = user_voice_channel.id
+                    dv_tool_function.write_json("joined_vc", joined_vc)
+
+        elif command == "move" or command in command_alias["move"]:
+            wrong_cmd = False
+            joined_vc = dv_tool_function.read_json("joined_vc")
+            with contextlib.suppress(KeyError):
+                del joined_vc[str(ctx.guild.id)]
+            # get user voice channel
+            try:
+                user_voice_channel = ctx.author.voice.channel
+            except AttributeError:
+                await ctx.reply("Please join a voice channel first.")
+                await ctx.message.add_reaction("❌")
+            else:
+                try:
+                    with contextlib.suppress(AttributeError):
+                        await ctx.voice_client.disconnect()
+                    await user_voice_channel.connect()
+                except discord.errors.ClientException:
+                    pass
+                else:
+                    await ctx.message.add_reaction("✅")
+                # get joined_vc
+                if user_voice_channel is not None:
+                    joined_vc[ctx.guild.id] = user_voice_channel.id
+            dv_tool_function.write_json("joined_vc", joined_vc)
+
+
         else:
             await ctx.reply("Missing required argument.")
-        await ctx.message.add_reaction("❓")
+        if wrong_cmd:
+            await ctx.message.add_reaction("❓")
+
     elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
         await ctx.reply(
             f"You're too fast! Please wait for {round(error.retry_after)} seconds."
         )
         await ctx.message.add_reaction("⏳")
-    elif command == "setchannel" and isinstance(
+
+    elif command in ["setchannel", "join", "move"] or command in command_alias["join"] or command_alias[
+        "move"] and isinstance(
             error, discord.ext.commands.errors.ChannelNotFound
     ):
         pass
+
     elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
         await ctx.reply("This command cannot be used in private messages.")
         await ctx.message.add_reaction("❌")
+
     elif isinstance(error, discord.ext.commands.errors.TooManyArguments):
         await ctx.reply("Too many arguments.")
         await ctx.message.add_reaction("❌")
+
     elif isinstance(error, discord.ext.commands.errors.NotOwner):
         pass
+
     else:
         not_able_reply = ""
         not_able_send = ""
@@ -307,7 +374,7 @@ async def on_error(event, *args, **kwargs):
 """
 
 
-@bot.command(Name="help", aliases=["h"])
+@bot.command(Name="help", aliases=command_alias["help"])
 async def help(ctx):  # sourcery skip: low-code-quality
     try:
         _ = ctx.guild.id
@@ -418,36 +485,40 @@ async def help(ctx):  # sourcery skip: low-code-quality
         )
 
 
-@bot.command(Name="join", aliases=["j"])
+@bot.command(Name="join", aliases=command_alias["join"])
 @commands.guild_only()
 # @commands.bot_has_permissions(connect=True, speak=True)
-async def join(ctx):
-    # get user voice channel
-    try:
-        user_voice_channel = ctx.author.voice.channel
-    except AttributeError:
-        await ctx.reply("Please join a voice channel first.")
-        await ctx.message.add_reaction("❌")
+async def join(ctx, *, channel: discord.VoiceChannel):
     # join
+    user_voice_channel = channel
+    try:
+        await user_voice_channel.connect()
+    except discord.errors.ClientException:
+        bot_voice_channel = ctx.guild.voice_client.channel
+        await ctx.reply(
+            f"I'm already in <#{bot_voice_channel.id}>.\n"
+            f"To move, please use `{config['prefix']}move`."
+        )
+        await ctx.message.add_reaction("❌")
     else:
-        try:
-            await user_voice_channel.connect()
-        except discord.errors.ClientException:
-            bot_voice_channel = ctx.guild.voice_client.channel
-            await ctx.reply(
-                f"I'm already in <#{bot_voice_channel.id}>.\n"
-                f"To move, please use `{config['prefix']}move`."
-            )
-            await ctx.message.add_reaction("❌")
-        else:
-            await ctx.message.add_reaction("✅")
-            # write channel id to joined_vc dict
-            joined_vc = dv_tool_function.read_json("joined_vc")
-            joined_vc[ctx.guild.id] = user_voice_channel.id
-            dv_tool_function.write_json("joined_vc", joined_vc)
+        await ctx.message.add_reaction("✅")
+        # write channel id to joined_vc dict
+        joined_vc = dv_tool_function.read_json("joined_vc")
+        joined_vc[ctx.guild.id] = user_voice_channel.id
+        dv_tool_function.write_json("joined_vc", joined_vc)
 
 
-@bot.command(Name="leave", aliases=["disconnect", "dc", "l"])
+@join.error
+async def join_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        # get guild system channel
+        await ctx.reply(
+            f"Please enter a valid voice channel or join a voice channel and type `{config['prefix']}join` directly.\n"
+        )
+        await ctx.message.add_reaction("❌")
+
+
+@bot.command(Name="leave", aliases=command_alias["leave"])
 async def leave(ctx):
     try:
         await ctx.voice_client.disconnect()
@@ -492,7 +563,7 @@ async def setchannel_error(ctx, error):
         await ctx.message.add_reaction("❌")
 
 
-@bot.command(Name="say", aliases=["s"])
+@bot.command(Name="say", aliases=command_alias["say"])
 @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
@@ -859,34 +930,40 @@ async def wrong_msg(ctx, msg: str):
         await ctx.message.add_reaction("🤔")
 
 
-@bot.command(Name="move", aliases=["m"])
+@bot.command(Name="move", aliases=command_alias["move"])
 @commands.guild_only()
-async def move(ctx):
+async def move(ctx, *, channel: discord.VoiceChannel):
     joined_vc = dv_tool_function.read_json("joined_vc")
     with contextlib.suppress(KeyError):
         del joined_vc[str(ctx.guild.id)]
     # get user voice channel
+    user_voice_channel = channel
     try:
-        user_voice_channel = ctx.author.voice.channel
-    except AttributeError:
-        await ctx.reply("Please join a voice channel first.")
-        await ctx.message.add_reaction("❌")
+        with contextlib.suppress(AttributeError):
+            await ctx.voice_client.disconnect()
+        await user_voice_channel.connect()
+    except discord.errors.ClientException:
+        connect_failed: bool = True
     else:
-        try:
-            with contextlib.suppress(AttributeError):
-                await ctx.voice_client.disconnect()
-            await user_voice_channel.connect()
-        except discord.errors.ClientException:
-            pass
-        else:
-            await ctx.message.add_reaction("✅")
-        # get joined_vc
-        if user_voice_channel is not None:
-            joined_vc[ctx.guild.id] = user_voice_channel.id
+        await ctx.message.add_reaction("✅")
+        connect_failed: bool = False
+    # get joined_vc
+    if not connect_failed:
+        joined_vc[ctx.guild.id] = user_voice_channel.id
     dv_tool_function.write_json("joined_vc", joined_vc)
 
 
-@bot.command(Name="say_lang", aliases=["say-lang", "saylang", "sl"])
+@move.error
+async def move_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        # get guild system channel
+        await ctx.reply(
+            f"Please enter a valid voice channel or join a voice channel and type `{config['prefix']}move` directly.\n"
+        )
+        await ctx.message.add_reaction("❌")
+
+
+@bot.command(Name="say_lang", aliases=command_alias["say_lang"])
 @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
 async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
@@ -1109,7 +1186,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         )
 
 
-@bot.command(name="force_say", aliases=["fs", "forcesay"])
+@bot.command(name="force_say", aliases=command_alias["force_say"])
 @commands.guild_only()
 @commands.is_owner()
 async def force_say(
@@ -1503,3 +1580,5 @@ Note:
 `os.environ[]` raises an exception if the environmental variable does not exist
 
 """
+
+# TODO: `say_del` command
