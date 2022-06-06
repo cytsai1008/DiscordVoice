@@ -755,7 +755,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         await tts_func.process_voice(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
-
+                    send_time = int(time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple()))
                     msg_tmp = {0: send_time, 1: user_id}
                     dv_tool_function.new_write_json(
                         f"msg_temp/{guild_id}.json", msg_tmp
@@ -1175,6 +1175,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         await ctx.message.add_reaction("🐛")
                         await tts_func.process_voice(content, lang, f"{guild_id}.mp3")
 
+                    send_time = int(time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple()))
                     msg_tmp = {0: send_time, 1: user_id}
                     dv_tool_function.new_write_json(
                         f"msg_temp/{guild_id}.json", msg_tmp
