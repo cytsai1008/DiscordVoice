@@ -37,6 +37,12 @@ def write_json(filename: str, data: dict) -> None:
     # return False if args is type(None)
 
 
+def new_write_json(filename: str, data: dict) -> None:
+    """Writes dictionary to json file"""
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=2)
+
+
 def check_dict_data(data: dict, arg) -> bool:
     """Check if arg is in data"""
     try:
@@ -50,6 +56,11 @@ def check_dict_data(data: dict, arg) -> bool:
 def check_file(filename) -> bool:
     """Check if filename exist in redis key"""
     return bool(redis_client().exists(filename))
+
+
+def new_check_file(filename) -> bool:
+    """Check if filename exist in file"""
+    return os.path.isfile(filename)
 
 
 """
