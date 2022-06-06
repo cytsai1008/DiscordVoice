@@ -3,7 +3,7 @@ name: Deploy To Heroku
 on:
   push:
     branches:
-      - heroku
+      - main
   workflow_dispatch:
 
 concurrency:
