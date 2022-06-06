@@ -6,10 +6,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--content", required=True)
 parser.add_argument("--lang", required=True)
 parser.add_argument("--filename", required=True)
+parser.add_argument("--platform", required=False, default="Google")
 
 content = parser.parse_args().content
 lang_code = parser.parse_args().lang
 filename = parser.parse_args().filename
+platform = parser.parse_args().platform
 str(content)
 str(lang_code)
 str(filename)
@@ -57,4 +59,33 @@ def process_voice(content: str, lang_code: str, filename: str) -> None:
         print(f'Audio content written to file "{filename}"')
 
 
-process_voice(content, lang_code, filename)
+def azure_tts_converter(content: str, lang_code: str, filename: str) -> None:
+    import os
+    import azure.cognitiveservices.speech as speechsdk
+
+    subscription_key = os.getenv("AZURE_TTS_KEY")
+
+    speech_config = speechsdk.SpeechConfig(
+        subscription=subscription_key, region="eastus"
+    )
+    audio_config = speechsdk.audio.AudioOutputConfig(filename=f"./tts_temp/{filename}")
+
+    # The language of the voice that speaks.
+    speech_config.speech_synthesis_language = lang_code
+
+    speech_synthesizer = speechsdk.SpeechSynthesizer(
+        speech_config=speech_config, audio_config=audio_config
+    )
+
+    # Get text from the console and synthesize to the default speaker.
+
+    speech_synthesizer.speak_text_async(content)
+    print(f'Audio content written to file "{filename}"')
+
+
+if platform == "Google":
+    process_voice(content, lang_code, filename)
+elif platform == "Azure":
+    azure_tts_converter(content, lang_code, filename)
+else:
+    print("?????")
