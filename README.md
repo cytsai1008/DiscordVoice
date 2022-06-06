@@ -67,8 +67,8 @@ $setvoice <"Azure", "Google", "Reset"> : Set default TTS platform (support user 
 $say <messages> : Speak text message.
 $say_lang <language code> <messages> : Speak text message in specified language.
 $stop : Stop speaking.
-$join : Join voice channel.
-$move : Move to another voice channel.
+$join <voice channel (optional)> : Join voice channel.
+$move <voice channel (optional)> : Move to another voice channel.
 $leave : Leave voice channel.
 $ping : Test ping latency.
 $invite : Get a link to invite this bot into your server.
