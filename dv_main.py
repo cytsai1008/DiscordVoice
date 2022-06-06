@@ -447,7 +447,7 @@ async def join(ctx):
             dv_tool_function.write_json("joined_vc", joined_vc)
 
 
-@bot.command(Name="leave", aliases=["disconnect", "dc"])
+@bot.command(Name="leave", aliases=["disconnect", "dc", "l"])
 async def leave(ctx):
     try:
         await ctx.voice_client.disconnect()
