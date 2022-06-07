@@ -119,9 +119,9 @@ async def on_ready():
     for guild in bot.guilds:
         print(guild.name + "\n")
     channel_list = ""
-    if dv_tool_function.check_file("joined_vc") and os.getenv("TEST_ENV") != "True":
+    if dv_tool_function.check_db_file("joined_vc") and os.getenv("TEST_ENV") != "True":
         remove_vc = []
-        joined_vc = dv_tool_function.read_json("joined_vc")
+        joined_vc = dv_tool_function.read_db_json("joined_vc")
         print(f"joined_vc: \n" f"{joined_vc}")
         for i, j in joined_vc.items():
             # join the vc
@@ -136,7 +136,7 @@ async def on_ready():
                 print(f"Successfully connected to {j} in {i}.\n")
         for i in remove_vc:
             del joined_vc[i]
-            dv_tool_function.write_json("joined_vc", joined_vc)
+            dv_tool_function.write_db_json("joined_vc", joined_vc)
         for i, j in joined_vc.items():
             channel_list += f"{i}: {j}\n"
         channel_list = f"```\n" f"{channel_list}\n" f"```"
@@ -194,8 +194,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             )
 
         elif command == "setlang":
-            support_lang = dv_tool_function.new_read_json("languages.json")
-            azure_lang = dv_tool_function.new_read_json("azure_languages.json")
+            support_lang = dv_tool_function.read_file_json("languages.json")
+            azure_lang = dv_tool_function.read_file_json("azure_languages.json")
             await ctx.reply(
                 f"No language providing, please set by `{config['prefix']}setlang some-lang-code`.\n"
                 f"Google supported languages: \n"
@@ -241,13 +241,13 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 else:
                     await ctx.message.add_reaction("✅")
                     # write channel id to joined_vc dict
-                    joined_vc = dv_tool_function.read_json("joined_vc")
+                    joined_vc = dv_tool_function.read_db_json("joined_vc")
                     joined_vc[ctx.guild.id] = user_voice_channel.id
-                    dv_tool_function.write_json("joined_vc", joined_vc)
+                    dv_tool_function.write_db_json("joined_vc", joined_vc)
 
         elif command == "move" or command in command_alias["move"]:
             wrong_cmd = False
-            joined_vc = dv_tool_function.read_json("joined_vc")
+            joined_vc = dv_tool_function.read_db_json("joined_vc")
             with contextlib.suppress(KeyError):
                 del joined_vc[str(ctx.guild.id)]
             # get user voice channel
@@ -269,7 +269,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 # get joined_vc
                 if user_voice_channel is not None:
                     joined_vc[ctx.guild.id] = user_voice_channel.id
-            dv_tool_function.write_json("joined_vc", joined_vc)
+            dv_tool_function.write_db_json("joined_vc", joined_vc)
 
         else:
             await ctx.reply("Missing required argument.")
@@ -390,13 +390,13 @@ async def help(ctx):  # sourcery skip: low-code-quality
         guild_msg = False
     else:
         guild_msg = True
-    if guild_msg and dv_tool_function.check_file(f"{ctx.guild.id}"):
-        data = dv_tool_function.read_json(f"{ctx.guild.id}")
+    if guild_msg and dv_tool_function.check_db_file(f"{ctx.guild.id}"):
+        data = dv_tool_function.read_db_json(f"{ctx.guild.id}")
         if dv_tool_function.check_dict_data(data, "lang"):
             lang_msg = f"Use `{config['prefix']}setlang` to set a language. (Current: `{data['lang']}`)\n"
         else:
-            support_lang = dv_tool_function.new_read_json("languages.json")
-            azure_lang = dv_tool_function.new_read_json("azure_languages.json")
+            support_lang = dv_tool_function.read_file_json("languages.json")
+            azure_lang = dv_tool_function.read_file_json("azure_languages.json")
             lang_msg = (
                 f"Use `{config['prefix']}setlang` to set a language. (ex. `{config['prefix']}setlang en-us`)\n"
                 f"Please use `{config['prefix']}setlang` to get a list of supported languages list.\n"
@@ -434,17 +434,19 @@ async def help(ctx):  # sourcery skip: low-code-quality
     elif (
         not guild_msg
         and dv_tool_function.check_dict_data(
-            dv_tool_function.read_json("user_config"),
+            dv_tool_function.read_db_json("user_config"),
             f"user_{int(ctx.author.id)}",
         )
         and dv_tool_function.check_dict_data(
-            dv_tool_function.read_json("user_config")[f"user_{int(ctx.author.id)}"],
+            dv_tool_function.read_db_json("user_config")[f"user_{int(ctx.author.id)}"],
             "platform",
         )
     ):
-        support_lang = dv_tool_function.new_read_json("languages.json")
-        azure_lang = dv_tool_function.new_read_json("azure_languages.json")
-        data = dv_tool_function.read_json("user_config")[f"user_{int(ctx.author.id)}"]
+        support_lang = dv_tool_function.read_file_json("languages.json")
+        azure_lang = dv_tool_function.read_file_json("azure_languages.json")
+        data = dv_tool_function.read_db_json("user_config")[
+            f"user_{int(ctx.author.id)}"
+        ]
 
         if dv_tool_function.check_dict_data(data, "platform"):
             platform_msg = f"Use `{config['prefix']}setvoice` to set a platform. (Current: `{data['platform']}`)\n"
@@ -472,8 +474,8 @@ async def help(ctx):  # sourcery skip: low-code-quality
         )
 
     else:
-        support_lang = dv_tool_function.new_read_json("languages.json")
-        azure_lang = dv_tool_function.new_read_json("azure_languages.json")
+        support_lang = dv_tool_function.read_file_json("languages.json")
+        azure_lang = dv_tool_function.read_file_json("azure_languages.json")
         await ctx.reply(
             f"Use `{config['prefix']}help` to see the help message.\n"
             f"Use `{config['prefix']}setchannel` to set a channel. (ex. `{config['prefix']}setchannel #general`)\n"
@@ -511,9 +513,9 @@ async def join(ctx, *, channel: discord.VoiceChannel):
     else:
         await ctx.message.add_reaction("✅")
         # write channel id to joined_vc dict
-        joined_vc = dv_tool_function.read_json("joined_vc")
+        joined_vc = dv_tool_function.read_db_json("joined_vc")
         joined_vc[ctx.guild.id] = user_voice_channel.id
-        dv_tool_function.write_json("joined_vc", joined_vc)
+        dv_tool_function.write_db_json("joined_vc", joined_vc)
 
 
 @join.error
@@ -535,10 +537,10 @@ async def leave(ctx):
     else:
         await ctx.message.add_reaction("🖐")
         # delete channel id from joined_vc dict
-    joined_vc = dv_tool_function.read_json("joined_vc")
+    joined_vc = dv_tool_function.read_db_json("joined_vc")
     with contextlib.suppress(KeyError):
         del joined_vc[str(ctx.guild.id)]
-    dv_tool_function.write_json("joined_vc", joined_vc)
+    dv_tool_function.write_db_json("joined_vc", joined_vc)
 
 
 @bot.command(Name="setchannel")
@@ -549,13 +551,13 @@ async def setchannel(ctx, channel: discord.TextChannel):
     # get guild id
     guild_id = ctx.guild.id
     # write to db folder with guild id filename
-    if dv_tool_function.check_file(f"{guild_id}"):
-        data = dv_tool_function.read_json(f"{guild_id}")
+    if dv_tool_function.check_db_file(f"{guild_id}"):
+        data = dv_tool_function.read_db_json(f"{guild_id}")
         data["channel"] = channel_id
     else:
         data = {"channel": channel_id}
 
-    dv_tool_function.write_json(f"{guild_id}", data)
+    dv_tool_function.write_db_json(f"{guild_id}", data)
     await ctx.reply(f"channel set to <#{channel.id}>")
 
 
@@ -581,19 +583,19 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
     user_id = ctx.author.id
     user_platform_set = bool(
         dv_tool_function.check_dict_data(
-            dv_tool_function.read_json("user_config"), f"user_{user_id}"
+            dv_tool_function.read_db_json("user_config"), f"user_{user_id}"
         )
         and dv_tool_function.check_dict_data(
-            dv_tool_function.read_json("user_config")[f"user_{user_id}"], "platform"
+            dv_tool_function.read_db_json("user_config")[f"user_{user_id}"], "platform"
         )
     )
 
     channel_id = ctx.channel.id
     # get guild id
     guild_id = ctx.guild.id
-    if dv_tool_function.check_file(f"{guild_id}"):
+    if dv_tool_function.check_db_file(f"{guild_id}"):
         # read db file
-        db = dv_tool_function.read_json(f"{guild_id}")
+        db = dv_tool_function.read_db_json(f"{guild_id}")
         # check channel id
         # check if is in voice channel
 
@@ -606,10 +608,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             is_connected = True
 
         if not is_connected:
-            joined_vc = dv_tool_function.read_json("joined_vc")
+            joined_vc = dv_tool_function.read_db_json("joined_vc")
             with contextlib.suppress(KeyError):
                 del joined_vc[str(guild_id)]
-            dv_tool_function.write_json("joined_vc", joined_vc)
+            dv_tool_function.write_db_json("joined_vc", joined_vc)
 
         channelissetup = dv_tool_function.check_dict_data(db, "channel")
         langissetup = dv_tool_function.check_dict_data(db, "lang")
@@ -681,7 +683,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple())
             )
             if dv_tool_function.new_check_file(f"msg_temp/{guild_id}.json"):
-                old_msg_temp = dv_tool_function.new_read_json(
+                old_msg_temp = dv_tool_function.read_file_json(
                     f"msg_temp/{guild_id}.json"
                 )
                 if (
@@ -780,9 +782,13 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                                 "Sorry, queue function is under development and current not supported."
                             )
                     else:
-                        send_time = int(time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple()))
+                        send_time = int(
+                            time.mktime(
+                                datetime.datetime.now(datetime.timezone.utc).timetuple()
+                            )
+                        )
                         msg_tmp = {0: send_time, 1: user_id}
-                        dv_tool_function.new_write_json(
+                        dv_tool_function.write_file_json(
                             f"msg_temp/{guild_id}.json", msg_tmp
                         )
 
@@ -846,23 +852,23 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
 async def setlang(ctx, lang: str):
     # get guild id
     guild_id = ctx.guild.id
-    support_lang = dv_tool_function.new_read_json("languages.json")
-    azure_lang = dv_tool_function.new_read_json("azure_languages.json")
+    support_lang = dv_tool_function.read_file_json("languages.json")
+    azure_lang = dv_tool_function.read_file_json("azure_languages.json")
     lang = lang.lower()
     lang = lang.replace("_", "-")
     if (
         lang in support_lang["Support_Language"]
         or lang in azure_lang["Support_Language"]
     ):
-        if dv_tool_function.check_file(f"{guild_id}"):
+        if dv_tool_function.check_db_file(f"{guild_id}"):
             # read db file
-            db = dv_tool_function.read_json(f"{guild_id}")
+            db = dv_tool_function.read_db_json(f"{guild_id}")
             # add lang to db
             db["lang"] = lang
             # write to db file
-            dv_tool_function.write_json(f"{guild_id}", db)
+            dv_tool_function.write_db_json(f"{guild_id}", db)
         else:
-            dv_tool_function.write_json(f"{guild_id}", {"lang": lang})
+            dv_tool_function.write_db_json(f"{guild_id}", {"lang": lang})
         await ctx.reply(f"Language set to `{lang}`.")
         await ctx.message.add_reaction("✅")
     elif lang == "supported-languages":
@@ -949,11 +955,11 @@ async def invite(ctx):
 @bot.command(Name="wrong_msg")
 @commands.guild_only()
 async def wrong_msg(ctx, msg: str):
-    if dv_tool_function.check_file(f"{ctx.guild.id}"):
-        db = dv_tool_function.read_json(f"{ctx.guild.id}")
+    if dv_tool_function.check_db_file(f"{ctx.guild.id}"):
+        db = dv_tool_function.read_db_json(f"{ctx.guild.id}")
         if msg in {"on", "off"}:
             db["not_this_channel_msg"] = msg
-            dv_tool_function.write_json(f"{ctx.guild.id}", db)
+            dv_tool_function.write_db_json(f"{ctx.guild.id}", db)
             if msg == "on":
                 reply_msg = "From now on I will tell if you sent to an wrong channel."
             elif msg == "off":
@@ -977,7 +983,7 @@ async def wrong_msg(ctx, msg: str):
 @bot.command(Name="move", aliases=command_alias["move"])
 @commands.guild_only()
 async def move(ctx, *, channel: discord.VoiceChannel):
-    joined_vc = dv_tool_function.read_json("joined_vc")
+    joined_vc = dv_tool_function.read_db_json("joined_vc")
     with contextlib.suppress(KeyError):
         del joined_vc[str(ctx.guild.id)]
     # get user voice channel
@@ -994,7 +1000,7 @@ async def move(ctx, *, channel: discord.VoiceChannel):
     # get joined_vc
     if not connect_failed:
         joined_vc[ctx.guild.id] = user_voice_channel.id
-    dv_tool_function.write_json("joined_vc", joined_vc)
+    dv_tool_function.write_db_json("joined_vc", joined_vc)
 
 
 @move.error
@@ -1017,19 +1023,19 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
     user_id = ctx.author.id
     user_platform_set = bool(
         dv_tool_function.check_dict_data(
-            dv_tool_function.read_json("user_config"), f"user_{user_id}"
+            dv_tool_function.read_db_json("user_config"), f"user_{user_id}"
         )
         and dv_tool_function.check_dict_data(
-            dv_tool_function.read_json("user_config")[f"user_{user_id}"], "platform"
+            dv_tool_function.read_db_json("user_config")[f"user_{user_id}"], "platform"
         )
     )
 
     channel_id = ctx.channel.id
     # get guild id
     guild_id = ctx.guild.id
-    if dv_tool_function.check_file(f"{guild_id}"):
+    if dv_tool_function.check_db_file(f"{guild_id}"):
         # read db file
-        db = dv_tool_function.read_json(f"{guild_id}")
+        db = dv_tool_function.read_db_json(f"{guild_id}")
         # check channel id
         # check if is in voice channel
 
@@ -1042,15 +1048,15 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             is_connected = True
 
         if not is_connected:
-            joined_vc = dv_tool_function.read_json("joined_vc")
+            joined_vc = dv_tool_function.read_db_json("joined_vc")
             with contextlib.suppress(KeyError):
                 del joined_vc[str(guild_id)]
-            dv_tool_function.write_json("joined_vc", joined_vc)
+            dv_tool_function.write_db_json("joined_vc", joined_vc)
 
-        lang_code_list = dv_tool_function.new_read_json("languages.json")[
+        lang_code_list = dv_tool_function.read_file_json("languages.json")[
             "Support_Language"
         ]
-        azure_lang_code_list = dv_tool_function.new_read_json("azure_languages.json")[
+        azure_lang_code_list = dv_tool_function.read_file_json("azure_languages.json")[
             "Support_Language"
         ]
 
@@ -1110,7 +1116,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple())
             )
             if dv_tool_function.new_check_file(f"msg_temp/{guild_id}.json"):
-                old_msg_temp = dv_tool_function.new_read_json(
+                old_msg_temp = dv_tool_function.read_file_json(
                     f"msg_temp/{guild_id}.json"
                 )
                 if (
@@ -1202,9 +1208,13 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                             )
 
                     else:
-                        send_time = int(time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple()))
+                        send_time = int(
+                            time.mktime(
+                                datetime.datetime.now(datetime.timezone.utc).timetuple()
+                            )
+                        )
                         msg_tmp = {0: send_time, 1: user_id}
-                        dv_tool_function.new_write_json(
+                        dv_tool_function.write_file_json(
                             f"msg_temp/{guild_id}.json", msg_tmp
                         )
 
@@ -1280,19 +1290,19 @@ async def force_say(
     user_id = ctx.author.id
     user_platform_set = bool(
         dv_tool_function.check_dict_data(
-            dv_tool_function.read_json("user_config"), f"user_{user_id}"
+            dv_tool_function.read_db_json("user_config"), f"user_{user_id}"
         )
         and dv_tool_function.check_dict_data(
-            dv_tool_function.read_json("user_config")[f"user_{user_id}"], "platform"
+            dv_tool_function.read_db_json("user_config")[f"user_{user_id}"], "platform"
         )
     )
 
     channel_id = ctx.channel.id
     # get guild id
     guild_id = ctx.guild.id
-    if dv_tool_function.check_file(f"{guild_id}"):
+    if dv_tool_function.check_db_file(f"{guild_id}"):
         # read db file
-        db = dv_tool_function.read_json(f"{guild_id}")
+        db = dv_tool_function.read_db_json(f"{guild_id}")
         # check channel id
         # check if is in voice channel
 
@@ -1305,10 +1315,10 @@ async def force_say(
             is_connected = True
 
         if not is_connected:
-            joined_vc = dv_tool_function.read_json("joined_vc")
+            joined_vc = dv_tool_function.read_db_json("joined_vc")
             with contextlib.suppress(KeyError):
                 del joined_vc[str(guild_id)]
-            dv_tool_function.write_json("joined_vc", joined_vc)
+            dv_tool_function.write_db_json("joined_vc", joined_vc)
 
         channelissetup = dv_tool_function.check_dict_data(db, "channel")
         langissetup = dv_tool_function.check_dict_data(db, "lang")
@@ -1585,57 +1595,57 @@ async def setvoice(ctx, platform: str):
             "or `reset` to reset."
         )
         return
-    is_guild = dv_tool_function.check_id2(ctx)
-    guild_id = dv_tool_function.id_check(ctx)
+    is_guild = dv_tool_function.check_guild_or_dm(ctx)
+    guild_id = dv_tool_function.get_id(ctx)
 
     if platform == "reset":
         if not is_guild and (
             not dv_tool_function.check_dict_data(
-                dv_tool_function.read_json("user_config"), guild_id
+                dv_tool_function.read_db_json("user_config"), guild_id
             )
             or not dv_tool_function.check_dict_data(
-                dv_tool_function.read_json("user_config")[guild_id], "platform"
+                dv_tool_function.read_db_json("user_config")[guild_id], "platform"
             )
         ):
             await ctx.reply("Platform is not set.")
             return
 
         if is_guild and (
-            not dv_tool_function.check_file(guild_id)
+            not dv_tool_function.check_db_file(guild_id)
             or not dv_tool_function.check_dict_data(
-                dv_tool_function.read_json(guild_id), "platform"
+                dv_tool_function.read_db_json(guild_id), "platform"
             )
         ):
             await ctx.reply("Platform is not set.")
             return
 
         if is_guild:
-            data = dv_tool_function.read_json(guild_id)
+            data = dv_tool_function.read_db_json(guild_id)
             del data["platform"]
-            dv_tool_function.write_json(guild_id, data)
+            dv_tool_function.write_db_json(guild_id, data)
         else:
-            data = dv_tool_function.read_json("user_config")
+            data = dv_tool_function.read_db_json("user_config")
             del data[guild_id]["platform"]
             if data[guild_id] == {}:
                 del data[guild_id]
-            dv_tool_function.write_json("user_config", data)
+            dv_tool_function.write_db_json("user_config", data)
 
         await ctx.reply("Reset platform.")
         return
     platform = platform.capitalize()
-    if dv_tool_function.check_file(guild_id) and is_guild:
-        data = dv_tool_function.read_json(guild_id)
+    if dv_tool_function.check_db_file(guild_id) and is_guild:
+        data = dv_tool_function.read_db_json(guild_id)
         data["platform"] = platform
-        dv_tool_function.write_json(guild_id, data)
+        dv_tool_function.write_db_json(guild_id, data)
     elif not is_guild:
-        data = dv_tool_function.read_json("user_config")
+        data = dv_tool_function.read_db_json("user_config")
         data[guild_id] = {
             "platform": platform,
         }
-        dv_tool_function.write_json("user_config", data)
+        dv_tool_function.write_db_json("user_config", data)
     else:
         data = {"platform": platform}
-        dv_tool_function.write_json(guild_id, data)
+        dv_tool_function.write_db_json(guild_id, data)
 
     await ctx.reply(f"Set platform to {platform}.")
 

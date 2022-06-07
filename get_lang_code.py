@@ -67,4 +67,4 @@ if __name__ == "__main__":
     list_azure_languages()
     print("Updating languages.json...")
     list_languages()
-    # Why it returns 0xC0000005 error?
+    # Why it returns 0xC0000005 error? Reason: google.cloud.texttospeech bug :(

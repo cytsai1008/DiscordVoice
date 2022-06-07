@@ -18,26 +18,26 @@ def redis_client() -> redis.Redis:
     )
 
 
-def read_json(filename) -> dict:
+def read_db_json(filename) -> dict:
     """Reads json value from redis (key: filename, value: data)"""
     client = redis_client()
     return client.json().get(filename)
 
 
-def new_read_json(filename) -> dict:
+def read_file_json(filename) -> dict:
     """Returns dictionary from a json file"""
     with open(filename, "r") as f:
         data = json.load(f)
     return data
 
 
-def write_json(filename: str, data: dict) -> None:
+def write_db_json(filename: str, data: dict) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
     redis_client().json().set(filename, ".", data)
     # return False if args is type(None)
 
 
-def new_write_json(filename: str, data: dict) -> None:
+def write_file_json(filename: str, data: dict) -> None:
     """Writes dictionary to json file"""
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
@@ -53,7 +53,7 @@ def check_dict_data(data: dict, arg) -> bool:
         return True
 
 
-def check_file(filename) -> bool:
+def check_db_file(filename) -> bool:
     """Check if filename exist in redis key"""
     return bool(redis_client().exists(filename))
 
@@ -74,7 +74,8 @@ def lang_command(lang: str, command: str) -> str:
 """
 
 
-def id_check(self) -> str:
+def get_id(self) -> str:
+    """Return the id of the user or guild (user id start with `user_`)"""
     try:
         server_id = str(self.guild.id)
     except Exception:
@@ -82,11 +83,12 @@ def id_check(self) -> str:
     return server_id
 
 
-def check_id2(self) -> bool:
+def check_guild_or_dm(self) -> bool:
+    """Return if this is a guild or a DM"""
     try:
-        server_id = str(self.guild.id)
+        _ = str(self.guild.id)
     except Exception:
-        server_id = f"user_{str(self.author.id)}"
+        _ = f"user_{str(self.author.id)}"
         return False
     else:
         return True
@@ -101,27 +103,33 @@ def check_platform(
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""
     if (
-        lang in new_read_json("languages.json")["Support_Language"]
-        and lang not in new_read_json("azure_languages.json")["Support_Language"]
+        lang in read_file_json("languages.json")["Support_Language"]
+        and lang not in read_file_json("azure_languages.json")["Support_Language"]
     ):
         return "Google"
     if (
-        lang in new_read_json("azure_languages.json")["Support_Language"]
-        and lang not in new_read_json("languages.json")["Support_Language"]
+        lang in read_file_json("azure_languages.json")["Support_Language"]
+        and lang not in read_file_json("languages.json")["Support_Language"]
     ):
         return "Azure"
     user_id = f"user_{str(user_id)}"
-    if user_platform_set and read_json("user_config")[user_id]["platform"] == "Google":
+    if (
+        user_platform_set
+        and read_db_json("user_config")[user_id]["platform"] == "Google"
+    ):
         print("Init Google TTS API 1")
         return "Google"
 
-    elif user_platform_set and read_json("user_config")[user_id]["platform"] == "Azure":
+    elif (
+        user_platform_set
+        and read_db_json("user_config")[user_id]["platform"] == "Azure"
+    ):
         print("Init Azure TTS API 1")
         return "Azure"
-    elif guild_platform_set and read_json(f"{guild_id}")["platform"] == "Google":
+    elif guild_platform_set and read_db_json(f"{guild_id}")["platform"] == "Google":
         print("Init Google TTS API 2")
         return "Google"
-    elif guild_platform_set and read_json(f"{guild_id}")["platform"] == "Azure":
+    elif guild_platform_set and read_db_json(f"{guild_id}")["platform"] == "Azure":
         print("Init Azure TTS API 2")
         return "Azure"
     elif not user_platform_set and not guild_platform_set:
