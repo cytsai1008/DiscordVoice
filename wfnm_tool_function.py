@@ -1,3 +1,4 @@
+import itertools
 import json
 import os
 
@@ -48,7 +49,7 @@ def id_check(self) -> str:
 
 
 def check_args_one(args) -> bool:
-    return args is not type(None)
+    return not isinstance(args, type(None))
     # return False if args is type(None)
 
 
@@ -62,13 +63,11 @@ def check_dict_data(data: dict, arg) -> bool:
 
 
 def check_duplicate_data(existing_data, new_data: list) -> list:
-    # sourcery skip: for-index-replacement
-    del_key = []
-    for i in range(len(existing_data)):
-        for j in range(len(new_data)):
-            if existing_data[i] == new_data[j]:
-                del_key.append(new_data[j])
-    return del_key
+    return [
+        new_data[j]
+        for i, j in itertools.product(range(len(existing_data)), range(len(new_data)))
+        if existing_data[i] == new_data[j]
+    ]
 
 
 def check_file(filename) -> bool:
