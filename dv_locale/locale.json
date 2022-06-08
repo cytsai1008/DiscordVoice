@@ -1,0 +1,291 @@
+{
+  "en": {
+    "command": {
+      "help": {
+        "help": [
+          "Use `{{prefix}}help` to see the help message.\n",
+          "{{channel_msg}}\n",
+          "{{lang_msg}}\n",
+          "{{platform_msg}}\n",
+          "Use `{{prefix}}say` to speak in voice channel. (ex. `{{prefix}}say ABCD`)\n",
+          "Use `{{prefix}}say_lang` to speak in voice channel with another language. (ex. `{{prefix}}say_lang en-us ABCD`)\n",
+          "Use `{{prefix}}stop` to stop speaking.\n",
+          "Use `{{prefix}}join` to let me join to a voice channel.\n",
+          "Use `{{prefix}}move` to let me move to another voice channel.\n",
+          "Use `{{prefix}}leave` to let me leave the voice channel.\n",
+          "Use `{{prefix}}ping` to check my latency.\n",
+          "Use `{{prefix}}invite` to get the bot's invite link.\n"
+        ]
+      },
+      "join": {
+        "join_already_in": [
+          "I'm already in <#{{join_vc}}>.\n",
+          "To move, please use `{{prefix}}move`."
+        ],
+        "join_bad_arg": [
+          "Please enter a valid voice channel or join a voice channel and type `{{prefix}}join` directly.\n"
+        ],
+        "join_not_in": [
+          "Please join a voice channel first."
+        ]
+      },
+      "move": {
+        "move_bad_arg": [
+          "Please enter a valid voice channel or join a voice channel and type `{{prefix}}move` directly.\n"
+        ],
+        "move_not_in": [
+          "Please join a voice channel first."
+        ]
+      },
+      "setchannel": {
+        "setchannel_success": [
+          "channel set to <#{{data_channel}}>"
+        ],
+        "setchannel_bad_arg": [
+          "Please enter a valid channel. (Must have blue background and is clickable, ex. {{prefix}}setchannel <#{{sys_channel}}>)"
+        ],
+        "setchannel_no_arg": [
+          "No channel providing, please set by {{prefix}}setchannel <#{{sys_channel}}>"
+        ]
+      },
+      "setlang": {
+        "setlang_success": [
+          "Default language set to `{{data_lang}}`"
+        ],
+        "setlang_lang_list": [
+          "Google supported languages: \n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```",
+          "Azure supported languages: \n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
+        ],
+        "setlang_no_arg": [
+          "No language providing, please set by `{{prefix}}setlang some-lang-code`.\n",
+          "Google supported languages: \n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```",
+          "Azure supported languages: \n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
+        ],
+        "setlang_bad_arg": [
+          "`{{current_lang}}` is not supported.\n",
+          "Google supported languages: \n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```",
+          "Azure supported languages: \n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
+        ]
+      },
+      "setvoice": {
+        "setvoice_arg_not_supported": [
+          "Not supported platform.\n",
+          "Currently supported platform: \n",
+          "```\n",
+          "{{data_support_platform}}\n",
+          "```\n",
+          "or `reset` to reset."
+        ],
+        "setvoice_reset_no_setting": [
+          "Platform is not set."
+        ],
+        "setvoice_reset_success": [
+          "Platform reset to default."
+        ],
+        "setvoice_success": [
+          "Platform set to `{{data_voice}}`."
+        ],
+        "setvoice_no_arg": [
+          "No platform providing, please set by `{{prefix}}setvoice platform-name` or `{{prefix}}setvoice reset` to reset.\n",
+          "Currently supported platform: \n",
+          "```\n",
+          "{{data_support_platform}}\n",
+          "```"
+        ]
+      },
+      "say": {
+        "say_queue_not_support": [
+          "Sorry, queue function is under development and current not supported."
+        ],
+        "say_too_long": [
+          "Too long to say."
+        ],
+        "say_wrong_channel": [
+          "This channel is not made for me to speaking.\n",
+          "{{channel_msg}}",
+          "To change channel, use {{prefix}}setchannel <#{{current_channel}}>.\n",
+          "To disable this message, use `{{prefix}}wrong_msg off`."
+        ],
+        "say_no_setting": [
+          "Setting file not exist.\n",
+          "Please set channel by `{{prefix}}setchannel`\n",
+          "Please set language by `{{prefix}}setlang`\n"
+        ],
+        "say_no_arg": [
+          "What can I say? :("
+        ]
+      },
+      "say_lang": {
+        "say_lang_no_setting": [
+          "Setting file not exist.\n",
+          "Please set channel by `{{prefix}}setchannel`.\n",
+          "Please set language by `{{prefix}}setlang`. (This command does not required in `{{prefix}}say_lang`)\n"
+        ],
+        "say_no_arg": [
+          "What can I say? :(\n",
+          "`{{prefix}}say_lang some-lang-code say-something`"
+        ]
+      },
+      "clear": {
+        "clear": [
+          "Cleared."
+        ]
+      },
+      "invite": {
+        "invite": [
+          "Invite me to your server: \n",
+          "{{invite_link}}"
+        ]
+      },
+      "wrong_msg": {
+        "wrong_msg_on": [
+          "From now on I will tell if you sent to an wrong channel."
+        ],
+        "wrong_msg_off": [
+          "From now on I will not tell if you sent to an wrong channel."
+        ],
+        "wrong_msg_bad_arg": [
+          "Not recognized command.\n",
+          "Usage: `wrong_msg on` or `wrong_msg off`"
+        ]
+      },
+      "on_command_error": {
+        "command_not_found": [
+          "Command not found.\n"
+        ],
+        "missing_required_argument": [
+          "Missing required argument.\n"
+        ],
+        "command_on_cooldown": [
+          "You're too fast! Please wait for {{cooldown_time}} seconds."
+        ],
+        "no_private_message": [
+          "This command is not available in private message."
+        ],
+        "too_many_arguments": [
+          "Too many arguments.\n"
+        ],
+        "unknown_error": [
+          "Unknown command error, please report to developer (<@{{owner_id}}> or `{{owner_full_name}}`).\n",
+          "```\n",
+          "Error: {{error_msg}}\n",
+          "Error Type: {{error_type}}\n",
+          "```"
+        ]
+      }
+    },
+    "variable": {
+      "help": {
+        "channel_msg": {
+          "default": [
+            "Use `{{prefix}}setchannel` to set a channel. (ex. {{prefix}}setchannel <#{{sys_channel}}>)\n"
+          ],
+          "current": [
+            "Use `{{prefix}}setchannel` to set a channel. (Current: <#{{data_channel}}>)\n"
+          ],
+          "else": [
+            "Use `{{prefix}}setchannel` to set a channel. (ex. `{{prefix}}setchannel #general`)\n"
+          ]
+        },
+        "lang_msg": {
+          "default": [
+            "Use `{{prefix}}setlang` to set a language. (ex. `{{prefix}}setlang en-us`)\n",
+            "Please use `{{prefix}}setlang` to get a list of supported languages list.\n"
+          ],
+          "current": [
+            "Use `{{prefix}}setlang` to set a language. (Current: `{{data_lang}}`)\n"
+          ]
+        },
+        "platform_msg": {
+          "default": [
+            "Use `{{prefix}}setvoice` to set a platform. (ex. `{{prefix}}setvoice Google`)\n",
+            "Current supported platforms: \n",
+            "```\n",
+            "Google, Azure\n",
+            "```\n"
+          ],
+          "current": [
+            "Use `{{prefix}}setvoice` to set a platform. (Current: `{{data_platform}}`)\n"
+          ]
+        }
+      },
+      "say": {
+        "emoji": [
+          "Emoji: {{data_emoji}}"
+        ],
+        "inside_said": [
+          "{{user}} said {{data_content}}"
+        ],
+        "outside_said": [
+          "{{user}} from outside said {{data_content}}"
+        ],
+        "someone_name": [
+          "someone"
+        ],
+        "channel_msg": [
+          "Please run this command in <#{{data_channel}}>.\n"
+        ],
+        "err_not_join": [
+          "Please join voice channel by `{{prefix}}join`\n"
+        ],
+        "err_no_channel_set": [
+          "Please set a channel by `{{prefix}}setchannel`\n"
+        ],
+        "err_no_lang_set": [
+          "Please set a language by `{{prefix}}setlang`\n"
+        ]
+      },
+      "say_lang": {
+        "err_lang_not_in_list": [
+          "`{{current_lang}}` is not supported.\n",
+          "Google supported languages: \n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```",
+          "Azure supported languages: \n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
+        ]
+      }
+    }
+  },
+  "zh-tw": {
+  },
+  "lang_list": {
+    "en": [
+      "en-au",
+      "en-gb",
+      "en-in",
+      "en-us",
+      "en-ca",
+      "en-hk",
+      "en-ie",
+      "en-ke",
+      "en-ng",
+      "en-nz",
+      "en-ph",
+      "en-sg",
+      "en-tz",
+      "en-za"
+    ]
+  }
+}
