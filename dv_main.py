@@ -834,7 +834,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             if not is_connected:
                 errormsg += f"Please join voice channel by `{config['prefix']}join`\n"
             if not channelissetup:
-                guild_system_channel = ctx.guild.system_channel
+                # guild_system_channel = ctx.guild.system_channel
                 errormsg += f"Please set channel by {config['prefix']}setchannel\n"
             if not langissetup:
                 errormsg += f"Please set language by `{config['prefix']}setlang`\n"
