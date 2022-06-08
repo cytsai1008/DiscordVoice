@@ -269,6 +269,88 @@
     }
   },
   "zh-tw": {
+    "command": {
+      "help": {
+        "help": [
+
+        ]
+      }
+    },
+    "variable": {
+      "help": {
+        "channel_msg": {
+          "default": [
+            "請使用 `{{prefix}}setchannel` 設定一個頻道。 (ex. {{prefix}}setchannel <#{{sys_channel}}>)\n"
+          ],
+          "current": [
+            "請使用 `{{prefix}}setchannel` 設定一個頻道。 (目前: <#{{data_channel}}>)\n"
+          ],
+          "else": [
+            "請使用 `{{prefix}}setchannel` 設定一個頻道。 (ex. {{prefix}}setchannel #一般)\n"
+          ]
+        },
+        "lang_msg": {
+          "default": [
+            "請使用 `{{prefix}}setlang` 設定語言。 (ex. `{{prefix}}setlang en-us`)\n",
+            "請使用 `{{prefix}}setlang` 取得支援的語言列表。\n"
+          ],
+          "current": [
+            "請使用 `{{prefix}}setlang` 設定語言。 (目前: `{{data_lang}}`)\n"
+          ]
+        },
+        "platform_msg": {
+          "default": [
+            "請使用 `{{prefix}}setvoice` 設定平台。 (ex. `{{prefix}}setvoice Google`)\n",
+            "目前支援的平台: \n",
+            "```\n",
+            "Google, Azure\n",
+            "```\n"
+          ],
+          "current": [
+            "請使用 `{{prefix}}setvoice` 設定平台。 (目前: `{{data_platform}}`)\n"
+          ]
+        }
+      },
+      "say": {
+        "emoji": [
+          "表情符號: {{data_emoji}}"
+        ],
+        "inside_said": [
+          "{{user}} 說 {{data_content}}"
+        ],
+        "outside_said": [
+          "{{user}} 在外面說 {{data_content}}"
+        ],
+        "someone_name": [
+          "某人"
+        ],
+        "channel_msg": [
+          "請在 <#{{data_channel}}> 中執行此指令。\n"
+        ],
+        "err_not_join": [
+          "請先透過 `{{prefix}}join` 加入語音頻道。\n"
+        ],
+        "err_no_channel_set": [
+          "請先透過 `{{prefix}}setchannel` 設定頻道。\n"
+        ],
+        "err_no_lang_set": [
+          "請先透過 `{{prefix}}setlang` 設定語言。\n"
+        ]
+      },
+        "say_lang": {
+            "err_lang_not_in_list": [
+            "`{{current_lang}}` 不在支援的語言列表中。\n",
+            "Google 支援的語言: \n",
+            "```\n",
+            "{{google_lang_list}}\n",
+            "```",
+            "Azure 支援的語言: \n",
+            "```\n",
+            "{{azure_lang_list}}\n",
+            "```"
+            ]
+        }
+    }
   },
   "lang_list": {
     "en": [
