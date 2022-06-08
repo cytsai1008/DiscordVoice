@@ -58,7 +58,7 @@ def check_db_file(filename) -> bool:
     return bool(redis_client().exists(filename))
 
 
-def new_check_file(filename) -> bool:
+def check_file_file(filename) -> bool:
     """Check if filename exist in file"""
     return os.path.isfile(filename)
 
@@ -95,34 +95,34 @@ def check_guild_or_dm(self) -> bool:
 
 
 def check_platform(
-    user_platform_set: bool,
-    user_id: [str, int],
-    guild_platform_set: bool,
-    guild_id: [str, int],
-    lang: str,
+        user_platform_set: bool,
+        user_id: [str, int],
+        guild_platform_set: bool,
+        guild_id: [str, int],
+        lang: str,
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""
     if (
-        lang in read_file_json("languages.json")["Support_Language"]
-        and lang not in read_file_json("azure_languages.json")["Support_Language"]
+            lang in read_file_json("languages.json")["Support_Language"]
+            and lang not in read_file_json("azure_languages.json")["Support_Language"]
     ):
         return "Google"
     if (
-        lang in read_file_json("azure_languages.json")["Support_Language"]
-        and lang not in read_file_json("languages.json")["Support_Language"]
+            lang in read_file_json("azure_languages.json")["Support_Language"]
+            and lang not in read_file_json("languages.json")["Support_Language"]
     ):
         return "Azure"
     user_id = f"user_{str(user_id)}"
     if (
-        user_platform_set
-        and read_db_json("user_config")[user_id]["platform"] == "Google"
+            user_platform_set
+            and read_db_json("user_config")[user_id]["platform"] == "Google"
     ):
         print("Init Google TTS API 1")
         return "Google"
 
     elif (
-        user_platform_set
-        and read_db_json("user_config")[user_id]["platform"] == "Azure"
+            user_platform_set
+            and read_db_json("user_config")[user_id]["platform"] == "Azure"
     ):
         print("Init Azure TTS API 1")
         return "Azure"
@@ -146,6 +146,6 @@ def check_platform(
         return "Something wrong"
 
 
-def del_json(filename) -> None:
+def del_db_json(filename) -> None:
     """Delete json value from redis (key: filename)"""
     redis_client().delete(filename)
