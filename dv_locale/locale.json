@@ -194,38 +194,32 @@
     },
     "variable": {
       "help": {
-        "channel_msg": {
-          "default": [
-            "Use `{{prefix}}setchannel` to set a channel. (ex. {{prefix}}setchannel <#{{sys_channel}}>)\n"
-          ],
-          "current": [
-            "Use `{{prefix}}setchannel` to set a channel. (Current: <#{{data_channel}}>)\n"
-          ],
-          "else": [
-            "Use `{{prefix}}setchannel` to set a channel. (ex. `{{prefix}}setchannel #general`)\n"
-          ]
-        },
-        "lang_msg": {
-          "default": [
-            "Use `{{prefix}}setlang` to set a language. (ex. `{{prefix}}setlang en-us`)\n",
-            "Please use `{{prefix}}setlang` to get a list of supported languages list.\n"
-          ],
-          "current": [
-            "Use `{{prefix}}setlang` to set a language. (Current: `{{data_lang}}`)\n"
-          ]
-        },
-        "platform_msg": {
-          "default": [
-            "Use `{{prefix}}setvoice` to set a platform. (ex. `{{prefix}}setvoice Google`)\n",
-            "Current supported platforms: \n",
-            "```\n",
-            "Google, Azure\n",
-            "```\n"
-          ],
-          "current": [
-            "Use `{{prefix}}setvoice` to set a platform. (Current: `{{data_platform}}`)\n"
-          ]
-        }
+        "channel_msg_default": [
+          "Use `{{prefix}}setchannel` to set a channel. (ex. {{prefix}}setchannel <#{{sys_channel}}>)\n"
+        ],
+        "channel_msg_current": [
+          "Use `{{prefix}}setchannel` to set a channel. (Current: <#{{data_channel}}>)\n"
+        ],
+        "channel_msg_else": [
+          "Use `{{prefix}}setchannel` to set a channel. (ex. `{{prefix}}setchannel #general`)\n"
+        ],
+        "lang_msg_default": [
+          "Use `{{prefix}}setlang` to set a language. (ex. `{{prefix}}setlang en-us`)\n",
+          "Please use `{{prefix}}setlang` to get a list of supported languages list.\n"
+        ],
+        "lang_msg_current": [
+          "Use `{{prefix}}setlang` to set a language. (Current: `{{data_lang}}`)\n"
+        ],
+        "platform_msg_default": [
+          "Use `{{prefix}}setvoice` to set a platform. (ex. `{{prefix}}setvoice Google`)\n",
+          "Current supported platforms: \n",
+          "```\n",
+          "Google, Azure\n",
+          "```\n"
+        ],
+        "platform_msg_current": [
+          "Use `{{prefix}}setvoice` to set a platform. (Current: `{{data_platform}}`)\n"
+        ]
       },
       "say": {
         "emoji": [

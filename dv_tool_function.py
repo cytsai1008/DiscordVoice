@@ -149,3 +149,30 @@ def check_platform(
 def del_db_json(filename) -> None:
     """Delete json value from redis (key: filename)"""
     redis_client().delete(filename)
+
+
+def get_translate_lang(lang: str, locale_dict: dict) -> str:
+    """Return i if lang is in locale_dict["lang_list"][i]"""
+    for i in locale_dict["lang_list"]:
+        for j in locale_dict["lang_list"][i]:
+            if lang == j:
+                return i
+    return "en"
+
+
+def convert_msg(locale_dict: dict, lang: str, msg_type: str, command: str, name: str,
+                convert_text: [list, None]) -> str:
+    """
+    Convert message from locale\n
+    ex.\n
+    ```
+    convert_msg(locale, 'en','variable', 'help', 'channel_msg_default', ['prefix', config['prefix'], 'sys_channel', guild_system_channel.id])```\n
+    ```convert_msg(locale, 'en', 'command', 'say', 'say_queue_not_support', None)```
+    """
+    lang = get_translate_lang(lang, locale_dict)
+    a = "".join(locale_dict[lang][msg_type][command][name])
+    if convert_text is not None:
+        for i in range(0, len(convert_text), 2):
+            a = a.replace(f"{{{{{convert_text[i]}}}}}", convert_text[i + 1])
+        return a
+    return a
