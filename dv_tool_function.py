@@ -95,34 +95,34 @@ def check_guild_or_dm(self) -> bool:
 
 
 def check_platform(
-        user_platform_set: bool,
-        user_id: [str, int],
-        guild_platform_set: bool,
-        guild_id: [str, int],
-        lang: str,
+    user_platform_set: bool,
+    user_id: [str, int],
+    guild_platform_set: bool,
+    guild_id: [str, int],
+    lang: str,
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""
     if (
-            lang in read_file_json("languages.json")["Support_Language"]
-            and lang not in read_file_json("azure_languages.json")["Support_Language"]
+        lang in read_file_json("languages.json")["Support_Language"]
+        and lang not in read_file_json("azure_languages.json")["Support_Language"]
     ):
         return "Google"
     if (
-            lang in read_file_json("azure_languages.json")["Support_Language"]
-            and lang not in read_file_json("languages.json")["Support_Language"]
+        lang in read_file_json("azure_languages.json")["Support_Language"]
+        and lang not in read_file_json("languages.json")["Support_Language"]
     ):
         return "Azure"
     user_id = f"user_{str(user_id)}"
     if (
-            user_platform_set
-            and read_db_json("user_config")[user_id]["platform"] == "Google"
+        user_platform_set
+        and read_db_json("user_config")[user_id]["platform"] == "Google"
     ):
         print("Init Google TTS API 1")
         return "Google"
 
     elif (
-            user_platform_set
-            and read_db_json("user_config")[user_id]["platform"] == "Azure"
+        user_platform_set
+        and read_db_json("user_config")[user_id]["platform"] == "Azure"
     ):
         print("Init Azure TTS API 1")
         return "Azure"
@@ -160,8 +160,14 @@ def get_translate_lang(lang: str, locale_dict: dict) -> str:
     return "en"
 
 
-def convert_msg(locale_dict: dict, lang: str, msg_type: str, command: str, name: str,
-                convert_text: [list, None]) -> str:
+def convert_msg(
+    locale_dict: dict,
+    lang: str,
+    msg_type: str,
+    command: str,
+    name: str,
+    convert_text: [list, None],
+) -> str:
     """
     Convert message from locale\n
     ex.\n
@@ -176,3 +182,16 @@ def convert_msg(locale_dict: dict, lang: str, msg_type: str, command: str, name:
             a = a.replace(f"{{{{{convert_text[i]}}}}}", convert_text[i + 1])
         return a
     return a
+
+
+def get_lang_in_db(self) -> str:
+    """Return the language of the user or guild (default: en)"""
+    return (
+        read_db_json(get_id(self))["lang"]
+        if (
+            check_guild_or_dm(self)
+            and check_db_file(get_id(self))
+            and check_dict_data(read_db_json(get_id(self)), "lang")
+        )
+        else "en"
+    )

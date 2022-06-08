@@ -41,6 +41,9 @@ command_alias = {
     "force_say": ["fs", "forcesay", "force-say"],
 }
 
+locale = dv_tool_function.read_file_json("dv_locale/locale.json")
+supported_platform = {"Google", "Azure"}
+
 bot = commands.Bot(
     command_prefix=config["prefix"],
     help_command=None,
@@ -174,6 +177,7 @@ async def on_guild_join(guild):
 @bot.event
 async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass-elif
     # sourcery skip: low-code-quality, remove-pass-elif
+    lang = dv_tool_function.get_lang_in_db(ctx)
     command = ctx.invoked_with.lower()
 
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
@@ -186,34 +190,84 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         if command == "setchannel":
             guild_system_channel = ctx.guild.system_channel
             await ctx.reply(
-                f"No channel providing, please set by {config['prefix']}setchannel <#{guild_system_channel.id}>"
+                dv_tool_function.convert_msg(
+                    locale,
+                    lang,
+                    "command",
+                    "setchannel",
+                    "setchannel_no_arg",
+                    [
+                        "prefix",
+                        config["prefix"],
+                        "sys_channel",
+                        guild_system_channel.id,
+                    ],
+                )
             )
 
         elif command == "setlang":
             support_lang = dv_tool_function.read_file_json("languages.json")
             azure_lang = dv_tool_function.read_file_json("azure_languages.json")
             await ctx.reply(
-                f"No language providing, please set by `{config['prefix']}setlang some-lang-code`.\n"
-                f"Google supported languages: \n"
-                f"```\n{', '.join(support_lang['Support_Language'])}```\n"
-                f"Azure supported languages: \n"
-                f"```\n{', '.join(azure_lang['Support_Language'])}```"
+                dv_tool_function.convert_msg(
+                    locale,
+                    lang,
+                    "command",
+                    "setlang",
+                    "setlang_no_arg",
+                    [
+                        "prefix",
+                        config["prefix"],
+                        "google_lang_list",
+                        support_lang,
+                        "azure_lang_list",
+                        azure_lang,
+                    ],
+                )
             )
 
         elif command == "say" or command in command_alias["say"]:
-            await ctx.reply("What can I say? :(")
+            await ctx.reply(
+                dv_tool_function.convert_msg(
+                    locale,
+                    lang,
+                    "command",
+                    "say",
+                    "say_no_arg",
+                    None,
+                )
+            )
 
         elif command == "say_lang" or command in command_alias["say_lang"]:
             await ctx.reply(
-                "What can I say? :(\n"
-                f"`{config['prefix']}say_lang some-lang-code say-something`"
+                dv_tool_function.convert_msg(
+                    locale,
+                    lang,
+                    "command",
+                    "say_lang",
+                    "say_lang_no_arg",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
             )
 
         elif command == "setvoice":
             await ctx.reply(
-                f"No voice platform providing, please set by `{config['prefix']}setvoice platform-name` or `{config['prefix']}setvoice reset` to reset.\n"
-                f"Current supported platforms: \n"
-                f"```\nAzure, Google```"
+                dv_tool_function.convert_msg(
+                    locale,
+                    lang,
+                    "command",
+                    "setvoice",
+                    "setvoice_no_arg",
+                    [
+                        "prefix",
+                        config["prefix"],
+                        "data_support_platform",
+                        ", ".join(list(supported_platform)),
+                    ],
+                )
             )
 
         elif command == "join" or command in command_alias["join"]:
@@ -221,7 +275,16 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             try:
                 user_voice_channel = ctx.author.voice.channel
             except AttributeError:
-                await ctx.reply("Please join a voice channel first.")
+                await ctx.reply(
+                    dv_tool_function.convert_msg(
+                        locale,
+                        lang,
+                        "command",
+                        "join",
+                        "join_not_in",
+                        None,
+                    )
+                )
                 await ctx.message.add_reaction("❌")
             # join
             else:
@@ -230,8 +293,19 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 except discord.errors.ClientException:
                     bot_voice_channel = ctx.guild.voice_client.channel
                     await ctx.reply(
-                        f"I'm already in <#{bot_voice_channel.id}>.\n"
-                        f"To move, please use `{config['prefix']}move`."
+                        dv_tool_function.convert_msg(
+                            locale,
+                            lang,
+                            "command",
+                            "join",
+                            "join_already_in",
+                            [
+                                "prefix",
+                                config["prefix"],
+                                "join_vc",
+                                bot_voice_channel.id,
+                            ],
+                        )
                     )
                     await ctx.message.add_reaction("❌")
                 else:
@@ -250,7 +324,16 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             try:
                 user_voice_channel = ctx.author.voice.channel
             except AttributeError:
-                await ctx.reply("Please join a voice channel first.")
+                await ctx.reply(
+                    dv_tool_function.convert_msg(
+                        locale,
+                        lang,
+                        "command",
+                        "move",
+                        "move_not_in",
+                        None,
+                    )
+                )
                 await ctx.message.add_reaction("❌")
                 return
             else:
@@ -268,30 +351,67 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             dv_tool_function.write_db_json("joined_vc", joined_vc)
 
         else:
-            await ctx.reply("Missing required argument.")
+            await ctx.reply(
+                dv_tool_function.convert_msg(
+                    locale,
+                    lang,
+                    "command",
+                    "on_command_error",
+                    "missing_required_argument",
+                    None,
+                )
+            )
         if wrong_cmd:
             await ctx.message.add_reaction("❓")
 
     elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
         await ctx.reply(
-            f"You're too fast! Please wait for {round(error.retry_after)} seconds."
+            dv_tool_function.convert_msg(
+                locale,
+                lang,
+                "command",
+                "on_command_error",
+                "command_on_cooldown",
+                [
+                    "cooldown_time",
+                    str(round(error.retry_after)),
+                ],
+            )
         )
         await ctx.message.add_reaction("⏳")
 
     elif (
-            command in ["setchannel", "join", "move"]
-            or command in command_alias["join"]
-            or command_alias["move"]
-            and isinstance(error, discord.ext.commands.errors.ChannelNotFound)
+        command in ["setchannel", "join", "move"]
+        or command in command_alias["join"]
+        or command_alias["move"]
+        and isinstance(error, discord.ext.commands.errors.ChannelNotFound)
     ):
         pass
 
     elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
-        await ctx.reply("This command cannot be used in private messages.")
+        await ctx.reply(
+            dv_tool_function.convert_msg(
+                locale,
+                lang,
+                "command",
+                "on_command_error",
+                "no_private_message",
+                None,
+            )
+        )
         await ctx.message.add_reaction("❌")
 
     elif isinstance(error, discord.ext.commands.errors.TooManyArguments):
-        await ctx.reply("Too many arguments.")
+        await ctx.reply(
+            dv_tool_function.convert_msg(
+                locale,
+                lang,
+                "command",
+                "on_command_error",
+                "too_many_arguments",
+                None,
+            )
+        )
         await ctx.message.add_reaction("❌")
 
     elif isinstance(error, discord.ext.commands.errors.NotOwner):
@@ -317,11 +437,23 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             owner_discriminator = owner_data.discriminator
             owner_full_id = f"{owner_name}#{owner_discriminator}"
             await ctx.reply(
-                f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
-                "```"
-                f"Error: {error}\n"
-                f"Error Type: {type(error)}\n"
-                "```"
+                dv_tool_function.convert_msg(
+                    locale,
+                    lang,
+                    "command",
+                    "on_command_error",
+                    "unknown_error",
+                    [
+                        "owner_id",
+                        config["owner"],
+                        "owner_full_name",
+                        owner_full_id,
+                        "error_msg",
+                        error,
+                        "error_type",
+                        type(error),
+                    ],
+                )
             )
         except Exception:
             not_able_reply = traceback.format_exc()
@@ -331,11 +463,23 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             owner_full_id = f"{owner_name}#{owner_discriminator}"
             try:
                 await ctx.send(
-                    f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
-                    "```"
-                    f"Error: {error}\n"
-                    f"Error Type: {type(error)}\n"
-                    "```"
+                    dv_tool_function.convert_msg(
+                        locale,
+                        lang,
+                        "command",
+                        "on_command_error",
+                        "unknown_error",
+                        [
+                            "owner_id",
+                            config["owner"],
+                            "owner_full_name",
+                            owner_full_id,
+                            "error_msg",
+                            error,
+                            "error_type",
+                            type(error),
+                        ],
+                    )
                 )
             except Exception:
                 not_able_send = traceback.format_exc()
@@ -356,6 +500,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             f"Sender: {sender_name}#{ctx.author.discriminator}\n"
             "```"
         )
+        await owner_data.send(ctx.message.content)
 
 
 """
@@ -380,6 +525,7 @@ async def on_error(event, *args, **kwargs):
 
 @bot.command(Name="help", aliases=command_alias["help"])
 async def help(ctx):  # sourcery skip: low-code-quality
+    locale_lang = dv_tool_function.get_lang_in_db(ctx)
     try:
         _ = ctx.guild.id
     except Exception:
@@ -389,54 +535,102 @@ async def help(ctx):  # sourcery skip: low-code-quality
     if guild_msg and dv_tool_function.check_db_file(f"{ctx.guild.id}"):
         data = dv_tool_function.read_db_json(f"{ctx.guild.id}")
         if dv_tool_function.check_dict_data(data, "lang"):
-            lang_msg = f"Use `{config['prefix']}setlang` to set a language. (Current: `{data['lang']}`)\n"
+            lang_msg = dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "help",
+                "lang_msg_current",
+                ["prefix", config["prefix"], "data_lang", data["lang"]],
+            )
         else:
             # support_lang = dv_tool_function.read_file_json("languages.json")
             # azure_lang = dv_tool_function.read_file_json("azure_languages.json")
-            lang_msg = (
-                f"Use `{config['prefix']}setlang` to set a language. (ex. `{config['prefix']}setlang en-us`)\n"
-                f"Please use `{config['prefix']}setlang` to get a list of supported languages list.\n"
+            lang_msg = dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "help",
+                "lang_msg_default",
+                [
+                    "prefix",
+                    config["prefix"],
+                ],
             )
 
         if dv_tool_function.check_dict_data(data, "channel"):
-            channel_msg = f"Use `{config['prefix']}setchannel` to set a channel. (Current: <#{data['channel']}>)\n"
+            channel_msg = dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "help",
+                "channel_msg_current",
+                ["prefix", config["prefix"], "data_channel", data["channel"]],
+            )
         else:
             guild_system_channel = ctx.guild.system_channel
-            channel_msg = f"Use `{config['prefix']}setchannel` to set a channel. (ex. {config['prefix']}setchannel <#{guild_system_channel.id}>)\n"
+            channel_msg = dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "help",
+                "channel_msg_default",
+                ["prefix", config["prefix"], "sys_channel", guild_system_channel.id],
+            )
 
         if dv_tool_function.check_dict_data(data, "platform"):
-            platform_msg = f"Use `{config['prefix']}setvoice` to set a platform. (Current: `{data['platform']}`)\n"
+            platform_msg = dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "help",
+                "platform_msg_current",
+                ["prefix", config["prefix"], "data_platform", data["platform"]],
+            )
         else:
-            platform_msg = (
-                f"Use `{config['prefix']}setvoice` to set a platform. (ex. `{config['prefix']}setvoice Google`)\n"
-                f"Current supported platforms: \n"
-                f"```\nGoogle, Azure```\n"
+            platform_msg = dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "help",
+                "platform_msg_default",
+                [
+                    "prefix",
+                    config["prefix"],
+                    "data_support_platform",
+                    ", ".join(list(supported_platform)),
+                ],
             )
 
         await ctx.reply(
-            f"Use `{config['prefix']}help` to see the help message.\n"
-            f"{channel_msg}"
-            f"{lang_msg}"
-            f"{platform_msg}"
-            f"Use `{config['prefix']}say` to speak in voice channel. (ex. `{config['prefix']}say ABCD`)\n"
-            f"Use `{config['prefix']}say_lang` to speak in voice channel with another language. (ex. `{config['prefix']}say_lang en-us ABCD`)\n"
-            f"Use `{config['prefix']}stop` to stop speaking.\n"
-            f"Use `{config['prefix']}join` to let me join to a voice channel.\n"
-            f"Use `{config['prefix']}move` to let me move to another voice channel.\n"
-            f"Use `{config['prefix']}leave` to let me leave the voice channel.\n"
-            f"Use `{config['prefix']}ping` to check my latency.\n"
-            f"Use `{config['prefix']}invite` to get the bot's invite link.\n"
+            dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "command",
+                "help",
+                "help",
+                [
+                    "prefix",
+                    config["prefix"],
+                    "channel_msg",
+                    channel_msg,
+                    "lang_msg",
+                    lang_msg,
+                    "platform_msg",
+                    platform_msg,
+                ],
+            )
         )
     elif (
-            not guild_msg
-            and dv_tool_function.check_dict_data(
-        dv_tool_function.read_db_json("user_config"),
-        f"user_{int(ctx.author.id)}",
-    )
-            and dv_tool_function.check_dict_data(
-        dv_tool_function.read_db_json("user_config")[f"user_{int(ctx.author.id)}"],
-        "platform",
-    )
+        not guild_msg
+        and dv_tool_function.check_dict_data(
+            dv_tool_function.read_db_json("user_config"),
+            f"user_{int(ctx.author.id)}",
+        )
+        and dv_tool_function.check_dict_data(
+            dv_tool_function.read_db_json("user_config")[f"user_{int(ctx.author.id)}"],
+            "platform",
+        )
     ):
         # support_lang = dv_tool_function.read_file_json("languages.json")
         # azure_lang = dv_tool_function.read_file_json("azure_languages.json")
@@ -445,49 +639,123 @@ async def help(ctx):  # sourcery skip: low-code-quality
         ]
 
         if dv_tool_function.check_dict_data(data, "platform"):
-            platform_msg = f"Use `{config['prefix']}setvoice` to set a platform. (Current: `{data['platform']}`)\n"
+            platform_msg = dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "help",
+                "platform_msg_current",
+                ["prefix", config["prefix"], "data_platform", data["platform"]],
+            )
+            # platform_msg = f"Use `{config['prefix']}setvoice` to set a platform. (Current: `{data['platform']}`)\n"
         else:
-            platform_msg = (
-                f"Use `{config['prefix']}setvoice` to set a platform. (ex. `{config['prefix']}setvoice Google`)\n"
-                f"Current supported platforms: \n"
-                f"```\nGoogle, Azure```\n"
+            platform_msg = dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "help",
+                "platform_msg_default",
+                [
+                    "prefix",
+                    config["prefix"],
+                    "data_support_platform",
+                    ", ".join(list(supported_platform)),
+                ],
             )
 
         await ctx.reply(
-            f"Use `{config['prefix']}help` to see the help message.\n"
-            f"Use `{config['prefix']}setchannel` to set a channel. (ex. `{config['prefix']}setchannel #general`)\n"
-            f"Use `{config['prefix']}setlang` to set a language. (ex. `{config['prefix']}setlang en-us`)\n"
-            f"Please use `{config['prefix']}setlang` to get a list of supported languages list.\n"
-            f"{platform_msg}"
-            f"Use `{config['prefix']}say` to speak in voice channel. (ex. `{config['prefix']}say ABCD`)\n"
-            f"Use `{config['prefix']}say_lang` to speak in voice channel with another language. (ex. `{config['prefix']}say_lang en-us ABCD`)\n"
-            f"Use `{config['prefix']}stop` to stop speaking.\n"
-            f"Use `{config['prefix']}join` to let me join to a voice channel.\n"
-            f"Use `{config['prefix']}move` to let me move to another voice channel.\n"
-            f"Use `{config['prefix']}leave` to let me leave the voice channel.\n"
-            f"Use `{config['prefix']}ping` to check my latency.\n"
-            f"Use `{config['prefix']}invite` to get the bot's invite link.\n"
+            dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "command",
+                "help",
+                "help",
+                [
+                    "prefix",
+                    config["prefix"],
+                    "platform_msg",
+                    platform_msg,
+                    "channel_msg",
+                    dv_tool_function.convert_msg(
+                        locale,
+                        locale_lang,
+                        "variable",
+                        "help",
+                        "channel_msg_else",
+                        [
+                            "prefix",
+                            config["prefix"],
+                        ],
+                    ),
+                    "lang_msg",
+                    dv_tool_function.convert_msg(
+                        locale,
+                        locale_lang,
+                        "variable",
+                        "help",
+                        "lang_msg_default",
+                        [
+                            "prefix",
+                            config["prefix"],
+                        ],
+                    ),
+                ],
+            )
         )
 
     else:
         # support_lang = dv_tool_function.read_file_json("languages.json")
         # azure_lang = dv_tool_function.read_file_json("azure_languages.json")
         await ctx.reply(
-            f"Use `{config['prefix']}help` to see the help message.\n"
-            f"Use `{config['prefix']}setchannel` to set a channel. (ex. `{config['prefix']}setchannel #general`)\n"
-            f"Use `{config['prefix']}setlang` to set a language. (ex. `{config['prefix']}setlang en-us`)\n"
-            f"Please use `{config['prefix']}setlang` to get a list of supported languages list.\n"
-            f"Use `{config['prefix']}setvoice` to set a platform. (ex. `{config['prefix']}setvoice Google`)\n"
-            f"Current supported platforms: \n"
-            f"```\nGoogle, Azure```\n"
-            f"Use `{config['prefix']}say` to speak in voice channel. (ex. `{config['prefix']}say ABCD`)\n"
-            f"Use `{config['prefix']}say_lang` to speak in voice channel with another language. (ex. `{config['prefix']}say_lang en-us ABCD`)\n"
-            f"Use `{config['prefix']}stop` to stop speaking.\n"
-            f"Use `{config['prefix']}join` to let me join to a voice channel.\n"
-            f"Use `{config['prefix']}move` to let me move to another voice channel.\n"
-            f"Use `{config['prefix']}leave` to let me leave the voice channel.\n"
-            f"Use `{config['prefix']}ping` to check my latency.\n"
-            f"Use `{config['prefix']}invite` to get the bot's invite link.\n"
+            dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "command",
+                "help",
+                "help",
+                [
+                    "prefix",
+                    config["prefix"],
+                    "platform_msg",
+                    dv_tool_function.convert_msg(
+                        locale,
+                        locale_lang,
+                        "variable",
+                        "help",
+                        "platform_msg_default",
+                        [
+                            "prefix",
+                            config["prefix"],
+                            "data_support_platform",
+                            ", ".join(list(supported_platform)),
+                        ],
+                    ),
+                    "channel_msg",
+                    dv_tool_function.convert_msg(
+                        locale,
+                        locale_lang,
+                        "variable",
+                        "help",
+                        "channel_msg_else",
+                        [
+                            "prefix",
+                            config["prefix"],
+                        ],
+                    ),
+                    "lang_msg",
+                    dv_tool_function.convert_msg(
+                        locale,
+                        locale_lang,
+                        "variable",
+                        "help",
+                        "lang_msg_default",
+                        [
+                            "prefix",
+                            config["prefix"],
+                        ],
+                    ),
+                ],
+            )
         )
 
 
@@ -496,14 +764,21 @@ async def help(ctx):  # sourcery skip: low-code-quality
 # @commands.bot_has_permissions(connect=True, speak=True)
 async def join(ctx, *, channel: discord.VoiceChannel):
     # join
+    locale_lang = dv_tool_function.get_lang_in_db(ctx)
     user_voice_channel = channel
     try:
         await user_voice_channel.connect()
     except discord.errors.ClientException:
         bot_voice_channel = ctx.guild.voice_client.channel
         await ctx.reply(
-            f"I'm already in <#{bot_voice_channel.id}>.\n"
-            f"To move, please use `{config['prefix']}move`."
+            dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "command",
+                "join",
+                "join_already_in",
+                ["prefix", config["prefix"], "join_vc", bot_voice_channel.id],
+            )
         )
         await ctx.message.add_reaction("❌")
     else:
@@ -519,7 +794,17 @@ async def join_error(ctx, error):
     if isinstance(error, commands.BadArgument):
         # get guild system channel
         await ctx.reply(
-            f"Please enter a valid voice channel or join a voice channel and type `{config['prefix']}join` directly.\n"
+            dv_tool_function.convert_msg(
+                locale,
+                dv_tool_function.get_lang_in_db(ctx),
+                "command",
+                "join",
+                "join_bad_arg",
+                [
+                    "prefix",
+                    config["prefix"],
+                ],
+            )
         )
         await ctx.message.add_reaction("❌")
 
@@ -554,7 +839,19 @@ async def setchannel(ctx, channel: discord.TextChannel):
         data = {"channel": channel_id}
 
     dv_tool_function.write_db_json(f"{guild_id}", data)
-    await ctx.reply(f"channel set to <#{channel.id}>")
+    await ctx.reply(
+        dv_tool_function.convert_msg(
+            locale,
+            dv_tool_function.get_lang_in_db(ctx),
+            "command",
+            "setchannel",
+            "setchannel_success",
+            [
+                "data_channel",
+                channel.id,
+            ],
+        )
+    )
 
 
 @setchannel.error
@@ -563,8 +860,14 @@ async def setchannel_error(ctx, error):
         # get guild system channel
         guild_system_channel = ctx.guild.system_channel
         await ctx.reply(
-            f"Please enter a valid channel. (Must have blue background and is clickable, ex. {config['prefix']}setchannel "
-            f"<#{guild_system_channel.id}>)"
+            dv_tool_function.convert_msg(
+                locale,
+                dv_tool_function.get_lang_in_db(ctx),
+                "command",
+                "setchannel",
+                "setchannel_bad_arg",
+                ["prefix", config["prefix"], "sys_channel", guild_system_channel.id],
+            )
         )
         await ctx.message.add_reaction("❌")
 
@@ -574,7 +877,8 @@ async def setchannel_error(ctx, error):
 @commands.guild_only()
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # sourcery skip: low-code-quality
-    # get message channel id
+
+    locale_lang = dv_tool_function.get_lang_in_db(ctx)
 
     user_id = ctx.author.id
     user_platform_set = bool(
@@ -613,10 +917,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
         langissetup = dv_tool_function.check_dict_data(db, "lang")
 
         if (
-                is_connected
-                and channelissetup
-                and langissetup
-                and channel_id == db["channel"]
+            is_connected
+            and channelissetup
+            and langissetup
+            and channel_id == db["channel"]
         ):
 
             # use cld to detect language
@@ -656,18 +960,38 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 emoji_id = re.findall("<a:[^:]+:\d+>", content)
                 emoji_text = re.findall("<a:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
-                    content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
+                    content = content.replace(
+                        emoji_id[i],
+                        dv_tool_function.convert_msg(
+                            locale,
+                            db["lang"],
+                            "variable",
+                            "say",
+                            "emoji",
+                            ["data_emoji", emoji_text[i]],
+                        ),
+                    )
 
             # Standard Emoji Replace
             if re.findall("<:[^:]+:\d+>", content):
                 emoji_id = re.findall("<:[^:]+:\d+>", content)
                 emoji_text = re.findall("<:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
-                    content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
+                    content = content.replace(
+                        emoji_id[i],
+                        dv_tool_function.convert_msg(
+                            locale,
+                            db["lang"],
+                            "variable",
+                            "say",
+                            "emoji",
+                            ["data_emoji", emoji_text[i]],
+                        ),
+                    )
 
             say_this = (
-                    ctx.author.id in (int(config["owner"]), 890234177767755849)
-                    or len(content) < 30
+                ctx.author.id in (int(config["owner"]), 890234177767755849)
+                or len(content) < 30
             )
             try:
                 username = ctx.author.display_name
@@ -683,8 +1007,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     f"msg_temp/{guild_id}.json"
                 )
                 if (
-                        old_msg_temp["1"] == user_id
-                        and send_time - int(old_msg_temp["0"]) <= 15
+                    old_msg_temp["1"] == user_id
+                    and send_time - int(old_msg_temp["0"]) <= 15
                 ):
                     no_name = True
             id_too_long = False
@@ -695,16 +1019,71 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     username = ctx.author.name
 
             if id_too_long:
-                username = "someone"
+                username = dv_tool_function.convert_msg(
+                    locale,
+                    db["lang"],
+                    "variable",
+                    "say",
+                    "someone_name",
+                    None,
+                )
                 if ctx.author.voice is not None:
-                    content = f"{username} said {content}"
+                    content = dv_tool_function.convert_msg(
+                        locale,
+                        db["lang"],
+                        "variable",
+                        "say",
+                        "inside_said",
+                        [
+                            "user",
+                            username,
+                            "data_content",
+                            content,
+                        ],
+                    )
                 else:
-                    content = f"{username} from outside said {content}"
+                    content = dv_tool_function.convert_msg(
+                        locale,
+                        db["lang"],
+                        "variable",
+                        "say",
+                        "outside_said",
+                        [
+                            "user",
+                            username,
+                            "data_content",
+                            content,
+                        ],
+                    )
             elif not no_name:
                 content = (
-                    f"{username} said {content}"
+                    dv_tool_function.convert_msg(
+                        locale,
+                        db["lang"],
+                        "variable",
+                        "say",
+                        "inside_said",
+                        [
+                            "user",
+                            username,
+                            "data_content",
+                            content,
+                        ],
+                    )
                     if ctx.author.voice is not None
-                    else f"{username} from outside said {content}"
+                    else dv_tool_function.convert_msg(
+                        locale,
+                        db["lang"],
+                        "variable",
+                        "say",
+                        "outside_said",
+                        [
+                            "user",
+                            username,
+                            "data_content",
+                            content,
+                        ],
+                    )
                 )
             else:
                 content = content
@@ -765,8 +1144,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
                         if (
-                                dv_tool_function.check_dict_data(db, "queue")
-                                and db["queue"]
+                            dv_tool_function.check_dict_data(db, "queue")
+                            and db["queue"]
                         ):
                             globals()[list_name].put(content)
                             # add reaction
@@ -775,7 +1154,14 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                             playnext(ctx, db["lang"], guild_id, globals()[list_name])
                         else:
                             await ctx.reply(
-                                "Sorry, queue function is under development and current not supported."
+                                dv_tool_function.convert_msg(
+                                    locale,
+                                    db["lang"],
+                                    "command",
+                                    "say",
+                                    "say_queue_not_support",
+                                    None,
+                                )
                             )
                     else:
                         send_time = int(
@@ -796,50 +1182,125 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     playnext(ctx, db["lang"], guild_id, globals()[list_name])
                 else:
                     await ctx.reply(
-                        "Sorry, queue function is under development and current not supported."
+                        dv_tool_function.convert_msg(
+                            locale,
+                            db["lang"],
+                            "command",
+                            "say",
+                            "say_queue_not_support",
+                            None,
+                        )
                     )
             else:
-                await ctx.reply("Too long to say.")
+                await ctx.reply(
+                    dv_tool_function.convert_msg(
+                        locale,
+                        db["lang"],
+                        "command",
+                        "say",
+                        "say_too_long",
+                        None,
+                    )
+                )
 
         elif (
-                channelissetup
-                and channel_id != db["channel"]
-                and (
-                        not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                        or db["not_this_channel_msg"] != "off"
-                )
+            channelissetup
+            and channel_id != db["channel"]
+            and (
+                not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+                or db["not_this_channel_msg"] != "off"
+            )
         ):
-            channel_msg = f"Please run this command in <#{db['channel']}>.\n"
+            channel_msg = dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "say",
+                "wrong_channel",
+                [
+                    "data_channel",
+                    db["channel"],
+                ],
+            )
             await ctx.reply(
-                "This channel is not made for me to speaking.\n"
-                f"{channel_msg}"
-                f"To change channel, use {config['prefix']}setchannel <#{channel_id}>.\n"
-                f"To disable this message, use `{config['prefix']}wrong_msg off`."
+                dv_tool_function.convert_msg(
+                    locale,
+                    locale_lang,
+                    "command",
+                    "say",
+                    "say_wrong_channel",
+                    [
+                        "prefix",
+                        config["prefix"],
+                        "channel_msg",
+                        channel_msg,
+                        "current_channel",
+                        channel_id,
+                    ],
+                )
             )
             await ctx.message.add_reaction("🤔")
 
         elif (
-                dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                and db["not_this_channel_msg"] == "off"
+            dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+            and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
         else:
             errormsg = ""
             if not is_connected:
-                errormsg += f"Please join voice channel by `{config['prefix']}join`\n"
+                errormsg += dv_tool_function.convert_msg(
+                    locale,
+                    locale_lang,
+                    "variable",
+                    "say",
+                    "err_not_join",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
             if not channelissetup:
                 # guild_system_channel = ctx.guild.system_channel
-                errormsg += f"Please set channel by {config['prefix']}setchannel\n"
+                errormsg += dv_tool_function.convert_msg(
+                    locale,
+                    locale_lang,
+                    "variable",
+                    "say",
+                    "err_no_channel_set",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
             if not langissetup:
-                errormsg += f"Please set language by `{config['prefix']}setlang`\n"
+                errormsg += dv_tool_function.convert_msg(
+                    locale,
+                    locale_lang,
+                    "variable",
+                    "say",
+                    "err_no_lang_set",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
             await ctx.reply(errormsg)
             await ctx.message.add_reaction("❌")
     else:
         await ctx.send(
-            "Setting file not exist.\n"
-            f"Please set channel by `{config['prefix']}setchannel`\n"
-            f"Please set language by `{config['prefix']}setlang`\n"
+            dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "command",
+                "say",
+                "say_no_setting",
+                [
+                    "prefix",
+                    config["prefix"],
+                ],
+            )
         )
 
 
@@ -847,14 +1308,15 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
 @commands.guild_only()
 async def setlang(ctx, lang: str):
     # get guild id
+    locale_lang = dv_tool_function.get_lang_in_db(ctx)
     guild_id = ctx.guild.id
     support_lang = dv_tool_function.read_file_json("languages.json")
     azure_lang = dv_tool_function.read_file_json("azure_languages.json")
     lang = lang.lower()
     lang = lang.replace("_", "-")
     if (
-            lang in support_lang["Support_Language"]
-            or lang in azure_lang["Support_Language"]
+        lang in support_lang["Support_Language"]
+        or lang in azure_lang["Support_Language"]
     ):
         if dv_tool_function.check_db_file(f"{guild_id}"):
             # read db file
@@ -865,22 +1327,53 @@ async def setlang(ctx, lang: str):
             dv_tool_function.write_db_json(f"{guild_id}", db)
         else:
             dv_tool_function.write_db_json(f"{guild_id}", {"lang": lang})
-        await ctx.reply(f"Language set to `{lang}`.")
+        await ctx.reply(
+            dv_tool_function.convert_msg(
+                locale,
+                lang,
+                "command",
+                "setlang",
+                "setlang_success",
+                [
+                    "data_lang",
+                    lang,
+                ],
+            )
+        )
         await ctx.message.add_reaction("✅")
     elif lang == "supported-languages":
         await ctx.reply(
-            f"Google supported languages: \n"
-            f"```\n{', '.join(support_lang['Support_Language'])}```"
-            f"Azure supported languages: \n"
-            f"```\n{', '.join(azure_lang['Support_Language'])}```"
+            dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "command",
+                "setlang",
+                "setlang_lang_list",
+                [
+                    "google_lang_list",
+                    ", ".join(support_lang["Support_Language"]),
+                    "azure_lang_list",
+                    ", ".join(azure_lang["Support_Language"]),
+                ],
+            )
         )
     else:
         await ctx.reply(
-            f"`{lang}` is not supported.\n"
-            f"Google supported languages: \n"
-            f"```\n{', '.join(support_lang['Support_Language'])}```"
-            f"Azure supported languages: \n"
-            f"```\n{', '.join(azure_lang['Support_Language'])}```"
+            dv_tool_function.convert_msg(
+                locale,
+                "en",
+                "command",
+                "setlang",
+                "setlang_bad_arg",
+                [
+                    "current_lang",
+                    lang,
+                    "google_lang_list",
+                    ", ".join(support_lang["Support_Language"]),
+                    "azure_lang_list",
+                    ", ".join(azure_lang["Support_Language"]),
+                ],
+            )
         )
         await ctx.message.add_reaction("❌")
 
@@ -918,7 +1411,16 @@ async def clear(ctx):
     list_name = f"list_{ctx.guild.id}"
     if list_name in globals():
         globals()[list_name].queue.clear()
-        await ctx.reply("Cleared.")
+        await ctx.reply(
+            dv_tool_function.convert_msg(
+                locale,
+                dv_tool_function.get_lang_in_db(ctx),
+                "command",
+                "clear",
+                "clear",
+                None,
+            )
+        )
 
 
 @bot.command(Name="stop")
@@ -943,8 +1445,17 @@ async def stop(ctx):
 @bot.command(Name="invite")
 async def invite(ctx):
     await ctx.reply(
-        f"Invite me to your server: \n"
-        f"{discord.utils.oauth_url(client_id='960004225713201172', permissions=discord.Permissions(139690626112), scopes=('bot', 'applications.commands'))}"
+        dv_tool_function.convert_msg(
+            locale,
+            dv_tool_function.get_lang_in_db(ctx),
+            "command",
+            "invite",
+            "invite",
+            [
+                "invite_link",
+                f"{discord.utils.oauth_url(client_id='960004225713201172', permissions=discord.Permissions(139690626112), scopes=('bot', 'applications.commands'))}",
+            ],
+        )
     )
 
 
@@ -957,10 +1468,22 @@ async def wrong_msg(ctx, msg: str):
             db["not_this_channel_msg"] = msg
             dv_tool_function.write_db_json(f"{ctx.guild.id}", db)
             if msg == "on":
-                reply_msg = "From now on I will tell if you sent to an wrong channel."
+                reply_msg = dv_tool_function.convert_msg(
+                    locale,
+                    dv_tool_function.get_lang_in_db(ctx),
+                    "command",
+                    "wrong_msg",
+                    "wrong_msg_on",
+                    None,
+                )
             elif msg == "off":
-                reply_msg = (
-                    "From now on I will not tell if you sent to an wrong channel."
+                reply_msg = dv_tool_function.convert_msg(
+                    locale,
+                    dv_tool_function.get_lang_in_db(ctx),
+                    "command",
+                    "wrong_msg",
+                    "wrong_msg_off",
+                    None,
                 )
             else:
                 reply_msg = "How did you trigger this?"
@@ -968,11 +1491,30 @@ async def wrong_msg(ctx, msg: str):
             await ctx.message.add_reaction("✅")
         else:
             await ctx.reply(
-                "Not recognized command.\n" "Usage: `wrong_msg on` or `wrong_msg off`"
+                dv_tool_function.convert_msg(
+                    locale,
+                    dv_tool_function.get_lang_in_db(ctx),
+                    "command",
+                    "wrong_msg",
+                    "wrong_msg_bad_arg",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
             )
             await ctx.message.add_reaction("❌")
     else:
-        await ctx.reply("You haven't set up anything yet.\n")
+        await ctx.reply(
+            dv_tool_function.convert_msg(
+                locale,
+                dv_tool_function.get_lang_in_db(ctx),
+                "command",
+                "wrong_msg",
+                "wrong_msg_no_setting",
+                None,
+            )
+        )
         await ctx.message.add_reaction("🤔")
 
 
@@ -1004,7 +1546,17 @@ async def move_error(ctx, error):
     if isinstance(error, commands.BadArgument):
         # get guild system channel
         await ctx.reply(
-            f"Please enter a valid voice channel or join a voice channel and type `{config['prefix']}move` directly.\n"
+            dv_tool_function.convert_msg(
+                locale,
+                dv_tool_function.get_lang_in_db(ctx),
+                "command",
+                "move",
+                "move_bad_arg",
+                [
+                    "prefix",
+                    config["prefix"],
+                ],
+            )
         )
         await ctx.message.add_reaction("❌")
 
@@ -1015,6 +1567,8 @@ async def move_error(ctx, error):
 async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
     # sourcery skip: low-code-quality
     # get message channel id
+
+    locale_lang = dv_tool_function.get_lang_in_db(ctx)
 
     user_id = ctx.author.id
     user_platform_set = bool(
@@ -1063,10 +1617,10 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         channelissetup = dv_tool_function.check_dict_data(db, "channel")
 
         if (
-                is_connected
-                and channelissetup
-                and lang_code_is_right
-                and channel_id == db["channel"]
+            is_connected
+            and channelissetup
+            and lang_code_is_right
+            and channel_id == db["channel"]
         ):
 
             # export content to mp3 by google tts api
@@ -1089,18 +1643,38 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 emoji_id = re.findall("<a:[^:]+:\d+>", content)
                 emoji_text = re.findall("<a:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
-                    content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
+                    content = content.replace(
+                        emoji_id[i],
+                        dv_tool_function.convert_msg(
+                            locale,
+                            lang,
+                            "variable",
+                            "say",
+                            "emoji",
+                            ["data_emoji", emoji_text[i]],
+                        ),
+                    )
 
             # Standard Emoji Replace
             if re.findall("<:[^:]+:\d+>", content):
                 emoji_id = re.findall("<:[^:]+:\d+>", content)
                 emoji_text = re.findall("<:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
-                    content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
+                    content = content.replace(
+                        emoji_id[i],
+                        dv_tool_function.convert_msg(
+                            locale,
+                            lang,
+                            "variable",
+                            "say",
+                            "emoji",
+                            ["data_emoji", emoji_text[i]],
+                        ),
+                    )
 
             say_this = (
-                    ctx.author.id in (int(config["owner"]), 890234177767755849)
-                    or len(content) < 30
+                ctx.author.id in (int(config["owner"]), 890234177767755849)
+                or len(content) < 30
             )
             try:
                 username = ctx.author.display_name
@@ -1116,8 +1690,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                     f"msg_temp/{guild_id}.json"
                 )
                 if (
-                        old_msg_temp["1"] == user_id
-                        and send_time - int(old_msg_temp["0"]) <= 15
+                    old_msg_temp["1"] == user_id
+                    and send_time - int(old_msg_temp["0"]) <= 15
                 ):
                     no_name = True
             id_too_long = False
@@ -1128,16 +1702,71 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                     username = ctx.author.name
 
             if id_too_long:
-                username = "someone"
+                username = dv_tool_function.convert_msg(
+                    locale,
+                    lang,
+                    "variable",
+                    "say",
+                    "someone_name",
+                    None,
+                )
                 if ctx.author.voice is not None:
-                    content = f"{username} said {content}"
+                    content = dv_tool_function.convert_msg(
+                        locale,
+                        lang,
+                        "variable",
+                        "say",
+                        "inside_said",
+                        [
+                            "user",
+                            username,
+                            "data_content",
+                            content,
+                        ],
+                    )
                 else:
-                    content = f"{username} from outside said {content}"
+                    content = dv_tool_function.convert_msg(
+                        locale,
+                        lang,
+                        "variable",
+                        "say",
+                        "outside_said",
+                        [
+                            "user",
+                            username,
+                            "data_content",
+                            content,
+                        ],
+                    )
             elif not no_name:
                 content = (
-                    f"{username} said {content}"
+                    dv_tool_function.convert_msg(
+                        locale,
+                        lang,
+                        "variable",
+                        "say",
+                        "inside_said",
+                        [
+                            "user",
+                            username,
+                            "data_content",
+                            content,
+                        ],
+                    )
                     if ctx.author.voice is not None
-                    else f"{username} from outside said {content}"
+                    else dv_tool_function.convert_msg(
+                        locale,
+                        lang,
+                        "variable",
+                        "say",
+                        "outside_said",
+                        [
+                            "user",
+                            username,
+                            "data_content",
+                            content,
+                        ],
+                    )
                 )
             else:
                 content = content
@@ -1190,8 +1819,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
                         if (
-                                dv_tool_function.check_dict_data(db, "queue")
-                                and db["queue"]
+                            dv_tool_function.check_dict_data(db, "queue")
+                            and db["queue"]
                         ):
                             globals()[list_name].put(content)
                             # add reaction
@@ -1222,55 +1851,128 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                     playnext(ctx, db["lang"], guild_id, globals()[list_name])
                 else:
                     await ctx.reply(
-                        "Sorry, queue function is under development and current not supported."
+                        dv_tool_function.convert_msg(
+                            locale,
+                            lang,
+                            "command",
+                            "say",
+                            "say_queue_not_support",
+                            None,
+                        )
                     )
             else:
-                await ctx.reply("Too long to say.")
+                await ctx.reply(
+                    dv_tool_function.convert_msg(
+                        locale,
+                        lang,
+                        "command",
+                        "say",
+                        "say_too_long",
+                        None,
+                    )
+                )
 
         elif (
-                channelissetup
-                and channel_id != db["channel"]
-                and (
-                        not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                        or db["not_this_channel_msg"] != "off"
-                )
+            channelissetup
+            and channel_id != db["channel"]
+            and (
+                not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+                or db["not_this_channel_msg"] != "off"
+            )
         ):
-            channel_msg = f"Please run this command in <#{db['channel']}>.\n"
+            channel_msg = dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "say",
+                "wrong_channel",
+                [
+                    "data_channel",
+                    db["channel"],
+                ],
+            )
             await ctx.reply(
-                "This channel is not made for me to speaking.\n"
-                f"{channel_msg}"
-                f"To change channel, use {config['prefix']}setchannel <#{channel_id}>.\n"
-                f"To disable this message, use `{config['prefix']}wrong_msg off`."
+                dv_tool_function.convert_msg(
+                    locale,
+                    locale_lang,
+                    "command",
+                    "say",
+                    "say_wrong_channel",
+                    [
+                        "prefix",
+                        config["prefix"],
+                        "channel_msg",
+                        channel_msg,
+                        "current_channel",
+                        channel_id,
+                    ],
+                )
             )
             await ctx.message.add_reaction("🤔")
 
         elif (
-                dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                and db["not_this_channel_msg"] == "off"
+            dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+            and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
         else:
             errormsg = ""
             if not is_connected:
-                errormsg += f"Please join voice channel by `{config['prefix']}join`.\n"
+                errormsg += dv_tool_function.convert_msg(
+                    locale,
+                    locale_lang,
+                    "variable",
+                    "say",
+                    "err_not_join",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
             if not channelissetup:
-                errormsg += f"Please set channel by `{config['prefix']}setchannel`.\n"
+                errormsg += dv_tool_function.convert_msg(
+                    locale,
+                    locale_lang,
+                    "variable",
+                    "say",
+                    "err_no_channel_set",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
             if not lang_code_is_right:
-                errormsg += (
-                    f"Not supported language.\n"
-                    f"Google supported languages: \n"
-                    f"```\n{', '.join(lang_code_list)}```\n"
-                    f"Azure supported languages: \n"
-                    f"```\n{', '.join(azure_lang_code_list)}```\n"
+                errormsg += dv_tool_function.convert_msg(
+                    locale,
+                    locale_lang,
+                    "variable",
+                    "say_lang",
+                    "err_lang_not_in_list",
+                    [
+                        "current_lang",
+                        lang,
+                        "google_lang_list",
+                        ", ".join(lang_code_list),
+                        "azure_lang_list",
+                        ", ".join(azure_lang_code_list),
+                    ],
                 )
             await ctx.reply(errormsg)
             await ctx.message.add_reaction("❌")
     else:
         await ctx.send(
-            "Setting file not exist.\n"
-            f"Please set channel by `{config['prefix']}setchannel`.\n"
-            f"Please set language by `{config['prefix']}setlang`. (This command does not required in `{config['prefix']}say_lang`)\n"
+            dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "command",
+                "say_lang",
+                "say_lang_no_setting",
+                [
+                    "prefix",
+                    config["prefix"],
+                ],
+            )
         )
 
 
@@ -1278,10 +1980,12 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 @commands.guild_only()
 @commands.is_owner()
 async def force_say(
-        ctx, *, content: str
+    ctx, *, content: str
 ):  # sourcery no-metrics skip: for-index-replacement
     # sourcery skip: low-code-quality
     # get message channel id
+
+    locale_lang = dv_tool_function.get_lang_in_db(ctx)
 
     user_id = ctx.author.id
     user_platform_set = bool(
@@ -1320,10 +2024,10 @@ async def force_say(
         langissetup = dv_tool_function.check_dict_data(db, "lang")
 
         if (
-                is_connected
-                and channelissetup
-                and langissetup
-                and channel_id == db["channel"]
+            is_connected
+            and channelissetup
+            and langissetup
+            and channel_id == db["channel"]
         ):
 
             # use cld to detect language
@@ -1347,18 +2051,38 @@ async def force_say(
                 emoji_id = re.findall("<a:[^:]+:\d+>", content)
                 emoji_text = re.findall("<a:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
-                    content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
+                    content = content.replace(
+                        emoji_id[i],
+                        dv_tool_function.convert_msg(
+                            locale,
+                            db["lang"],
+                            "variable",
+                            "say",
+                            "emoji",
+                            ["data_emoji", emoji_text[i]],
+                        ),
+                    )
 
             # Standard Emoji Replace
             if re.findall("<:[^:]+:\d+>", content):
                 emoji_id = re.findall("<:[^:]+:\d+>", content)
                 emoji_text = re.findall("<:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
-                    content = content.replace(emoji_id[i], f" Emoji:{emoji_text[i]} ")
+                    content = content.replace(
+                        emoji_id[i],
+                        dv_tool_function.convert_msg(
+                            locale,
+                            db["lang"],
+                            "variable",
+                            "say",
+                            "emoji",
+                            ["data_emoji", emoji_text[i]],
+                        ),
+                    )
 
             say_this = (
-                    ctx.author.id in (int(config["owner"]), 890234177767755849)
-                    or len(content) < 30
+                ctx.author.id in (int(config["owner"]), 890234177767755849)
+                or len(content) < 30
             )
             try:
                 username = ctx.author.display_name
@@ -1366,11 +2090,46 @@ async def force_say(
                 username = ctx.author.name
             # get username length
             if len(username) > 20:
-                username = "someone" if len(ctx.author.name) > 20 else ctx.author.name
+                username = (
+                    dv_tool_function.convert_msg(
+                        locale,
+                        db["lang"],
+                        "variable",
+                        "say",
+                        "someone_name",
+                        None,
+                    )
+                    if len(ctx.author.name) > 20
+                    else ctx.author.name
+                )
             if ctx.author.voice is not None:
-                content = f"{username} said {content}"
+                content = dv_tool_function.convert_msg(
+                    locale,
+                    db["lang"],
+                    "variable",
+                    "say",
+                    "inside_said",
+                    [
+                        "user",
+                        username,
+                        "data_content",
+                        content,
+                    ],
+                )
             else:
-                content = f"{username} from outside said {content}"
+                content = dv_tool_function.convert_msg(
+                    locale,
+                    db["lang"],
+                    "variable",
+                    "say",
+                    "outside_said",
+                    [
+                        "user",
+                        username,
+                        "data_content",
+                        content,
+                    ],
+                )
             if say_this:
                 list_name = f"list_{str(guild_id)}"
                 if list_name not in globals():
@@ -1426,8 +2185,8 @@ async def force_say(
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
                         if (
-                                dv_tool_function.check_dict_data(db, "queue")
-                                and db["queue"]
+                            dv_tool_function.check_dict_data(db, "queue")
+                            and db["queue"]
                         ):
                             globals()[list_name].put(content)
                             # add reaction
@@ -1535,60 +2294,135 @@ async def force_say(
                     )
                     await ctx.message.add_reaction("⁉")
             else:
-                await ctx.reply("Too long to say.")
+                await ctx.reply(
+                    dv_tool_function.convert_msg(
+                        locale,
+                        db["lang"],
+                        "command",
+                        "say",
+                        "say_too_long",
+                        None,
+                    )
+                )
 
         elif (
-                channelissetup
-                and channel_id != db["channel"]
-                and (
-                        not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                        or db["not_this_channel_msg"] != "off"
-                )
+            channelissetup
+            and channel_id != db["channel"]
+            and (
+                not dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+                or db["not_this_channel_msg"] != "off"
+            )
         ):
-            channel_msg = f"Please run this command in <#{db['channel']}>.\n"
+            channel_msg = dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "say",
+                "wrong_channel",
+                [
+                    "data_channel",
+                    db["channel"],
+                ],
+            )
             await ctx.reply(
-                "This channel is not made for me to speaking.\n"
-                f"{channel_msg}"
-                f"To change channel, use {config['prefix']}setchannel <#{channel_id}>.\n"
-                f"To disable this message, use `{config['prefix']}wrong_msg off`."
+                dv_tool_function.convert_msg(
+                    locale,
+                    locale_lang,
+                    "command",
+                    "say",
+                    "say_wrong_channel",
+                    [
+                        "prefix",
+                        config["prefix"],
+                        "channel_msg",
+                        channel_msg,
+                        "current_channel",
+                        channel_id,
+                    ],
+                )
             )
             await ctx.message.add_reaction("🤔")
 
         elif (
-                dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                and db["not_this_channel_msg"] == "off"
+            dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+            and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
         else:
             errormsg = ""
             if not is_connected:
-                errormsg += f"Please join voice channel by `{config['prefix']}join`.\n"
+                errormsg += dv_tool_function.convert_msg(
+                    locale,
+                    locale_lang,
+                    "variable",
+                    "say",
+                    "err_not_join",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
             if not channelissetup:
-                errormsg += f"Please set channel by `{config['prefix']}setchannel`.\n"
+                errormsg += dv_tool_function.convert_msg(
+                    locale,
+                    locale_lang,
+                    "variable",
+                    "say",
+                    "err_no_channel_set",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
             if not langissetup:
-                errormsg += f"Please set language by `{config['prefix']}setlang`.\n"
+                errormsg += dv_tool_function.convert_msg(
+                    locale,
+                    locale_lang,
+                    "variable",
+                    "say",
+                    "err_no_lang_set",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
             await ctx.reply(errormsg)
             await ctx.message.add_reaction("❌")
     else:
         await ctx.send(
-            "Setting file not exist.\n"
-            f"Please set channel by `{config['prefix']}setchannel`.\n"
-            f"Please set language by `{config['prefix']}setlang`.\n"
+            dv_tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "command",
+                "say",
+                "say_no_setting",
+                [
+                    "prefix",
+                    config["prefix"],
+                ],
+            )
         )
 
 
 @bot.command(name="setvoice")
 async def setvoice(ctx, platform: str):
-    supported_platform = {"Google", "Azure"}
+
     if platform.capitalize() not in supported_platform and platform.lower() != "reset":
         await ctx.reply(
-            "Not supported platform.\n"
-            "Currently supported platform: \n"
-            "```\n"
-            f"{', '.join(list(supported_platform))}\n"
-            "```\n"
-            "or `reset` to reset."
+            dv_tool_function.convert_msg(
+                locale,
+                dv_tool_function.get_lang_in_db(ctx),
+                "command",
+                "setvoice",
+                "setvoice_arg_not_supported",
+                [
+                    "prefix",
+                    config["prefix"],
+                    "data_support_platform",
+                    ", ".join(supported_platform),
+                ],
+            )
         )
         return
     is_guild = dv_tool_function.check_guild_or_dm(ctx)
@@ -1596,23 +2430,41 @@ async def setvoice(ctx, platform: str):
 
     if platform.lower() == "reset":
         if not is_guild and (
-                not dv_tool_function.check_dict_data(
-                    dv_tool_function.read_db_json("user_config"), guild_id
-                )
-                or not dv_tool_function.check_dict_data(
-            dv_tool_function.read_db_json("user_config")[guild_id], "platform"
-        )
+            not dv_tool_function.check_dict_data(
+                dv_tool_function.read_db_json("user_config"), guild_id
+            )
+            or not dv_tool_function.check_dict_data(
+                dv_tool_function.read_db_json("user_config")[guild_id], "platform"
+            )
         ):
-            await ctx.reply("Platform is not set.")
+            await ctx.reply(
+                dv_tool_function.convert_msg(
+                    locale,
+                    dv_tool_function.get_lang_in_db(ctx),
+                    "command",
+                    "setvoice",
+                    "setvoice_reset_no_setting",
+                    None,
+                )
+            )
             return
 
         if is_guild and (
-                not dv_tool_function.check_db_file(guild_id)
-                or not dv_tool_function.check_dict_data(
-            dv_tool_function.read_db_json(guild_id), "platform"
-        )
+            not dv_tool_function.check_db_file(guild_id)
+            or not dv_tool_function.check_dict_data(
+                dv_tool_function.read_db_json(guild_id), "platform"
+            )
         ):
-            await ctx.reply("Platform is not set.")
+            await ctx.reply(
+                dv_tool_function.convert_msg(
+                    locale,
+                    dv_tool_function.get_lang_in_db(ctx),
+                    "command",
+                    "setvoice",
+                    "setvoice_reset_no_setting",
+                    None,
+                )
+            )
             return
 
         if is_guild:
@@ -1626,7 +2478,16 @@ async def setvoice(ctx, platform: str):
                 del data[guild_id]
             dv_tool_function.write_db_json("user_config", data)
 
-        await ctx.reply("Reset platform.")
+        await ctx.reply(
+            dv_tool_function.convert_msg(
+                locale,
+                dv_tool_function.get_lang_in_db(ctx),
+                "command",
+                "setvoice",
+                "setvoice_reset_success",
+                None,
+            )
+        )
         return
     platform = platform.capitalize()
     if dv_tool_function.check_db_file(guild_id) and is_guild:
@@ -1643,7 +2504,19 @@ async def setvoice(ctx, platform: str):
         data = {"platform": platform}
         dv_tool_function.write_db_json(guild_id, data)
 
-    await ctx.reply(f"Set platform to {platform}.")
+    await ctx.reply(
+        dv_tool_function.convert_msg(
+            locale,
+            dv_tool_function.get_lang_in_db(ctx),
+            "command",
+            "setvoice",
+            "setvoice_success",
+            [
+                "data_voice",
+                platform,
+            ],
+        )
+    )
 
 
 if os.getenv("TEST_ENV"):
