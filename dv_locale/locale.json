@@ -92,7 +92,7 @@
           "```\n",
           "{{data_support_platform}}\n",
           "```\n",
-          "or `reset` to reset."
+          "or `{{prefix}}setvoice reset` to reset."
         ],
         "setvoice_reset_no_setting": [
           "Platform is not set."
@@ -164,7 +164,10 @@
         ],
         "wrong_msg_bad_arg": [
           "Not recognized command.\n",
-          "Usage: `wrong_msg on` or `wrong_msg off`"
+          "Usage: `{{prefix}}wrong_msg on` or `{{prefix}}wrong_msg off`"
+        ],
+        "wrong_msg_no_setting": [
+          "You haven't set up anything yet.\n"
         ]
       },
       "on_command_error": {
@@ -214,7 +217,7 @@
           "Use `{{prefix}}setvoice` to set a platform. (ex. `{{prefix}}setvoice Google`)\n",
           "Current supported platforms: \n",
           "```\n",
-          "Google, Azure\n",
+          "{{data_support_platform}}\n",
           "```\n"
         ],
         "platform_msg_current": [
@@ -234,7 +237,7 @@
         "someone_name": [
           "someone"
         ],
-        "channel_msg": [
+        "wrong_channel": [
           "Please run this command in <#{{data_channel}}>.\n"
         ],
         "err_not_join": [
@@ -257,7 +260,7 @@
           "Azure supported languages: \n",
           "```\n",
           "{{azure_lang_list}}\n",
-          "```"
+          "```\n"
         ]
       }
     }
