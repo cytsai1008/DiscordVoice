@@ -139,7 +139,7 @@
           "Please set channel by `{{prefix}}setchannel`.\n",
           "Please set language by `{{prefix}}setlang`. (This command does not required in `{{prefix}}say_lang`)\n"
         ],
-        "say_no_arg": [
+        "say_lang_no_arg": [
           "What can I say? :(\n",
           "`{{prefix}}say_lang some-lang-code say-something`"
         ]
@@ -198,30 +198,30 @@
     "variable": {
       "help": {
         "channel_msg_default": [
-          "Use `{{prefix}}setchannel` to set a channel. (ex. {{prefix}}setchannel <#{{sys_channel}}>)\n"
+          "Use `{{prefix}}setchannel` to set a channel. (ex. {{prefix}}setchannel <#{{sys_channel}}>)"
         ],
         "channel_msg_current": [
-          "Use `{{prefix}}setchannel` to set a channel. (Current: <#{{data_channel}}>)\n"
+          "Use `{{prefix}}setchannel` to set a channel. (Current: <#{{data_channel}}>)"
         ],
         "channel_msg_else": [
-          "Use `{{prefix}}setchannel` to set a channel. (ex. `{{prefix}}setchannel #general`)\n"
+          "Use `{{prefix}}setchannel` to set a channel. (ex. `{{prefix}}setchannel #general`)"
         ],
         "lang_msg_default": [
           "Use `{{prefix}}setlang` to set a language. (ex. `{{prefix}}setlang en-us`)\n",
-          "Please use `{{prefix}}setlang` to get a list of supported languages list.\n"
+          "Please use `{{prefix}}setlang` to get a list of supported languages list."
         ],
         "lang_msg_current": [
-          "Use `{{prefix}}setlang` to set a language. (Current: `{{data_lang}}`)\n"
+          "Use `{{prefix}}setlang` to set a language. (Current: `{{data_lang}}`)"
         ],
         "platform_msg_default": [
           "Use `{{prefix}}setvoice` to set a platform. (ex. `{{prefix}}setvoice Google`)\n",
           "Current supported platforms: \n",
           "```\n",
           "{{data_support_platform}}\n",
-          "```\n"
+          "```"
         ],
         "platform_msg_current": [
-          "Use `{{prefix}}setvoice` to set a platform. (Current: `{{data_platform}}`)\n"
+          "Use `{{prefix}}setvoice` to set a platform. (Current: `{{data_platform}}`)"
         ]
       },
       "say": {
@@ -275,30 +275,30 @@
     "variable": {
       "help": {
         "channel_msg_default": [
-          "請使用 `{{prefix}}setchannel` 設定一個頻道。 (ex. {{prefix}}setchannel <#{{sys_channel}}>)\n"
+          "請使用 `{{prefix}}setchannel` 設定一個頻道。 (ex. {{prefix}}setchannel <#{{sys_channel}}>)"
         ],
         "channel_msg_current": [
-          "請使用 `{{prefix}}setchannel` 設定一個頻道。 (目前: <#{{data_channel}}>)\n"
+          "請使用 `{{prefix}}setchannel` 設定一個頻道。 (目前: <#{{data_channel}}>)"
         ],
         "channel_msg_else": [
-          "請使用 `{{prefix}}setchannel` 設定一個頻道。 (ex. {{prefix}}setchannel #一般)\n"
+          "請使用 `{{prefix}}setchannel` 設定一個頻道。 (ex. {{prefix}}setchannel #一般)"
         ],
         "lang_msg_default": [
           "請使用 `{{prefix}}setlang` 設定語言。 (ex. `{{prefix}}setlang en-us`)\n",
-          "請使用 `{{prefix}}setlang` 取得支援的語言列表。\n"
+          "請使用 `{{prefix}}setlang` 取得支援的語言列表。"
         ],
         "lang_msg_current": [
-          "請使用 `{{prefix}}setlang` 設定語言。 (目前: `{{data_lang}}`)\n"
+          "請使用 `{{prefix}}setlang` 設定語言。 (目前: `{{data_lang}}`)"
         ],
         "platform_msg_default": [
           "請使用 `{{prefix}}setvoice` 設定文字轉語音引擎提供者。 (ex. `{{prefix}}setvoice Google`)\n",
           "目前支援的平台: \n",
           "```\n",
           "Google, Azure\n",
-          "```\n"
+          "```"
         ],
         "platform_msg_current": [
-          "請使用 `{{prefix}}setvoice` 設定文字轉語音引擎提供者。 (目前: `{{data_platform}}`)\n"
+          "請使用 `{{prefix}}setvoice` 設定文字轉語音引擎提供者。 (目前: `{{data_platform}}`)"
         ]
       },
       "say": {

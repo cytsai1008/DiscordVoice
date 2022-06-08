@@ -219,9 +219,9 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                         "prefix",
                         config["prefix"],
                         "google_lang_list",
-                        support_lang,
+                        ", ".join(support_lang["Support_Language"]),
                         "azure_lang_list",
-                        azure_lang,
+                        ", ".join(azure_lang["Support_Language"]),
                     ],
                 )
             )

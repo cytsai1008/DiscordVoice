@@ -179,7 +179,7 @@ def convert_msg(
     a = "".join(locale_dict[lang][msg_type][command][name])
     if convert_text is not None:
         for i in range(0, len(convert_text), 2):
-            a = a.replace(f"{{{{{convert_text[i]}}}}}", convert_text[i + 1])
+            a = a.replace(f"{{{{{convert_text[i]}}}}}", f"{convert_text[i + 1]}")
         return a
     return a
 
