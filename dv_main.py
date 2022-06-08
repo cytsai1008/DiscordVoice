@@ -163,7 +163,8 @@ async def on_guild_join(guild):
             f"To speak something, please use `{config['prefix']}say`. (ex. `{config['prefix']}say ABCD`)\n"
             f"To join a voice channel, please use `{config['prefix']}join`.\n"
             f"To leave a voice channel, please use `{config['prefix']}leave`.\n"
-            f"For more information, please type `{config['prefix']}help`."
+            f"For more information, please type `{config['prefix']}help`.\n"
+            f"Warning: Current not support text channel in voice channel.\n"
         )
     # get guild name
     guild_name = guild.name
@@ -395,8 +396,8 @@ async def help(ctx):  # sourcery skip: low-code-quality
         if dv_tool_function.check_dict_data(data, "lang"):
             lang_msg = f"Use `{config['prefix']}setlang` to set a language. (Current: `{data['lang']}`)\n"
         else:
-            support_lang = dv_tool_function.read_file_json("languages.json")
-            azure_lang = dv_tool_function.read_file_json("azure_languages.json")
+            # support_lang = dv_tool_function.read_file_json("languages.json")
+            # azure_lang = dv_tool_function.read_file_json("azure_languages.json")
             lang_msg = (
                 f"Use `{config['prefix']}setlang` to set a language. (ex. `{config['prefix']}setlang en-us`)\n"
                 f"Please use `{config['prefix']}setlang` to get a list of supported languages list.\n"
@@ -442,8 +443,8 @@ async def help(ctx):  # sourcery skip: low-code-quality
             "platform",
         )
     ):
-        support_lang = dv_tool_function.read_file_json("languages.json")
-        azure_lang = dv_tool_function.read_file_json("azure_languages.json")
+        # support_lang = dv_tool_function.read_file_json("languages.json")
+        # azure_lang = dv_tool_function.read_file_json("azure_languages.json")
         data = dv_tool_function.read_db_json("user_config")[
             f"user_{int(ctx.author.id)}"
         ]
@@ -474,8 +475,8 @@ async def help(ctx):  # sourcery skip: low-code-quality
         )
 
     else:
-        support_lang = dv_tool_function.read_file_json("languages.json")
-        azure_lang = dv_tool_function.read_file_json("azure_languages.json")
+        # support_lang = dv_tool_function.read_file_json("languages.json")
+        # azure_lang = dv_tool_function.read_file_json("azure_languages.json")
         await ctx.reply(
             f"Use `{config['prefix']}help` to see the help message.\n"
             f"Use `{config['prefix']}setchannel` to set a channel. (ex. `{config['prefix']}setchannel #general`)\n"
@@ -834,7 +835,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 errormsg += f"Please join voice channel by `{config['prefix']}join`\n"
             if not channelissetup:
                 guild_system_channel = ctx.guild.system_channel
-                errormsg += f"Please set channel by {config['prefix']}setchannel {guild_system_channel.id}\n"
+                errormsg += f"Please set channel by {config['prefix']}setchannel\n"
             if not langissetup:
                 errormsg += f"Please set language by `{config['prefix']}setlang`\n"
             await ctx.reply(errormsg)
@@ -1598,7 +1599,7 @@ async def setvoice(ctx, platform: str):
     is_guild = dv_tool_function.check_guild_or_dm(ctx)
     guild_id = dv_tool_function.get_id(ctx)
 
-    if platform == "reset":
+    if platform.lower() == "reset":
         if not is_guild and (
             not dv_tool_function.check_dict_data(
                 dv_tool_function.read_db_json("user_config"), guild_id
