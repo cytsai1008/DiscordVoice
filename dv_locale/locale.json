@@ -300,14 +300,14 @@
         },
         "platform_msg": {
           "default": [
-            "請使用 `{{prefix}}setvoice` 設定平台。 (ex. `{{prefix}}setvoice Google`)\n",
+            "請使用 `{{prefix}}setvoice` 設定文字轉語音引擎提供者。 (ex. `{{prefix}}setvoice Google`)\n",
             "目前支援的平台: \n",
             "```\n",
             "Google, Azure\n",
             "```\n"
           ],
           "current": [
-            "請使用 `{{prefix}}setvoice` 設定平台。 (目前: `{{data_platform}}`)\n"
+            "請使用 `{{prefix}}setvoice` 設定文字轉語音引擎提供者。 (目前: `{{data_platform}}`)\n"
           ]
         }
       },
