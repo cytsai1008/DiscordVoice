@@ -73,3 +73,10 @@ $leave : Leave voice channel.
 $ping : Test ping latency.
 $invite : Get a link to invite this bot into your server.
 ```
+
+## Todo (Contribute Welcome)
+ * Queue
+ * Auto disconnect
+ * Translate
+ * Rewrite some codeblocks into function
+ * Update to `py-cord` 2.0
