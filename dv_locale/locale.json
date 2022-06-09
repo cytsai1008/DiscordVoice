@@ -498,7 +498,7 @@
           "{{user}} 說 {{data_content}}"
         ],
         "outside_said": [
-          "{{user}} 從外面說 {{data_content}}"
+          "{{user}} 在語音外說 {{data_content}}"
         ],
         "someone_name": [
           "某人"
