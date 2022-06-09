@@ -269,26 +269,27 @@
     "command": {
       "help": {
         "help": [
+
         ]
       }
     },
     "variable": {
       "help": {
         "channel_msg_default": [
-          "請使用 `{{prefix}}setchannel` 設定一個頻道。 (ex. {{prefix}}setchannel <#{{sys_channel}}>)"
+          "請使用 `{{prefix}}setchannel` 設定文字頻道。 (ex. {{prefix}}setchannel <#{{sys_channel}}>)"
         ],
         "channel_msg_current": [
-          "請使用 `{{prefix}}setchannel` 設定一個頻道。 (目前: <#{{data_channel}}>)"
+          "請使用 `{{prefix}}setchannel` 設定文字頻道。 (目前: <#{{data_channel}}>)"
         ],
         "channel_msg_else": [
-          "請使用 `{{prefix}}setchannel` 設定一個頻道。 (ex. {{prefix}}setchannel #一般)"
+          "請使用 `{{prefix}}setchannel` 設定文字頻道。 (ex. {{prefix}}setchannel #一般)"
         ],
         "lang_msg_default": [
-          "請使用 `{{prefix}}setlang` 設定語言。 (ex. `{{prefix}}setlang en-us`)\n",
+          "請使用 `{{prefix}}setlang` 設定語音語言。 (ex. `{{prefix}}setlang en-us`)\n",
           "請使用 `{{prefix}}setlang` 取得支援的語言列表。"
         ],
         "lang_msg_current": [
-          "請使用 `{{prefix}}setlang` 設定語言。 (目前: `{{data_lang}}`)"
+          "請使用 `{{prefix}}setlang` 設定語音語言。 (目前: `{{data_lang}}`)"
         ],
         "platform_msg_default": [
           "請使用 `{{prefix}}setvoice` 設定文字轉語音引擎提供者。 (ex. `{{prefix}}setvoice Google`)\n",
