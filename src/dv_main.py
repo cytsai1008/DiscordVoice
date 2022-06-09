@@ -2532,8 +2532,8 @@ else:
 if test_env:
     bot.run(os.environ["DISCORD_DV_TEST_TOKEN"])
 else:
-    subprocess.call(["python", "gcp-token-generator.py"])
-    subprocess.call(["python", "get_lang_code.py"])
+    subprocess.call(["python", "src/gcp-token-generator.py"])
+    subprocess.call(["python", "src/get_lang_code.py"])
     bot.run(os.environ["DISCORD_DV_TOKEN"])
 
 """
