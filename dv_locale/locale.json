@@ -56,7 +56,7 @@
           "Google supported languages: \n",
           "```\n",
           "{{google_lang_list}}\n",
-          "```",
+          "```\n",
           "Azure supported languages: \n",
           "```\n",
           "{{azure_lang_list}}\n",
@@ -67,7 +67,7 @@
           "Google supported languages: \n",
           "```\n",
           "{{google_lang_list}}\n",
-          "```",
+          "```\n",
           "Azure supported languages: \n",
           "```\n",
           "{{azure_lang_list}}\n",
@@ -78,7 +78,7 @@
           "Google supported languages: \n",
           "```\n",
           "{{google_lang_list}}\n",
-          "```",
+          "```\n",
           "Azure supported languages: \n",
           "```\n",
           "{{azure_lang_list}}\n",
@@ -91,7 +91,7 @@
           "Currently supported platform: \n",
           "```\n",
           "{{data_support_platform}}\n",
-          "```\n",
+          "```",
           "or `{{prefix}}setvoice reset` to reset."
         ],
         "setvoice_reset_no_setting": [
@@ -217,7 +217,7 @@
           "Use `{{prefix}}setvoice` to set a platform. (ex. `{{prefix}}setvoice Google`)\n",
           "Current supported platforms: \n",
           "```\n",
-          "{{data_support_platform}}\n",
+          "{{data_support_platform}}",
           "```"
         ],
         "platform_msg_current": [
@@ -269,33 +269,221 @@
     "command": {
       "help": {
         "help": [
-
+          "使用 `{{prefix}}help` 以取得指令說明。\n",
+          "{{channel_msg}}\n",
+          "{{lang_msg}}\n",
+          "{{platform_msg}}\n",
+          "使用 `{{prefix}}say` 以在語音頻道說話。(ex. `{{prefix}}say ABCD`)\n",
+          "使用 `{{prefix}}say_lang` 以透過指定語言在語音頻道說話。 (ex. `{{prefix}}say_lang en-us ABCD`)\n",
+          "使用 `{{prefix}}stop` 以停止目前撥放內容。\n",
+          "使用 `{{prefix}}join` 讓機器人加入語音頻道。\n",
+          "使用 `{{prefix}}move` 讓機器人移至其他語音頻道。\n",
+          "使用 `{{prefix}}leave` 以讓機器人離開語音頻道。\n",
+          "使用 `{{prefix}}ping` 以取得機器人的通訊延遲。\n",
+          "使用 `{{prefix}}invite` 以取得機器人的邀請連結。\n"
+        ]
+      },
+      "join": {
+        "join_already_in": [
+          "我已經在<#{{join_vc}}>中了。\n",
+          "請使用 `{{prefix}}move` 以讓機器人移至其他語音頻道。"
+        ],
+        "join_bad_arg": [
+          "請輸入一個符合規定的頻道或是直接在加入語音頻道後輸入 `{{prefix}}join`。\n"
+        ],
+        "join_not_in": [
+          "請先加入語音頻道。"
+        ]
+      },
+      "move": {
+        "move_bad_arg": [
+          "請輸入一個符合規定的頻道或是直接在加入語音頻道後輸入 `{{prefix}}move`。\n"
+        ],
+        "move_not_in": [
+          "請先加入語音頻道。"
+        ]
+      },
+      "setchannel": {
+        "setchannel_success": [
+          "成功設定文字頻道為 <#{{data_channel}}>。"
+        ],
+        "setchannel_bad_arg": [
+          "請輸入一個符合規定的頻道。 (必須是能點擊的並且有藍底， ex. {{prefix}}setchannel <#{{sys_channel}}>)\n"
+        ],
+        "setchannel_no_arg": [
+          "未提供頻道，請透過 {{prefix}}setchannel <#{{sys_channel}}> 設定。"
+        ]
+      },
+      "setlang": {
+        "setlang_success": [
+          "成功設定預設語言為 {{data_lang}}。"
+        ],
+        "setlang_lang_list": [
+          "Google支援的語言有：\n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```\n",
+          "Azure支援的語言有：\n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
+        ],
+        "setlang_no_arg": [
+          "未提供語言，請透過 {{prefix}}setlang <{{current_lang}}> 設定。",
+          "Google支援的語言有：\n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```\n",
+          "Azure支援的語言有：\n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
+        ],
+        "setlang_bad_arg": [
+          "{{current_lang}} 不是支援的語言，請輸入一個支援的語言。\n",
+          "Google支援的語言有：\n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```\n",
+          "Azure支援的語言有：\n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
+        ]
+      },
+      "setvoice": {
+        "setvoice_arg_not_supported": [
+          "不支援的語音轉文字引擎。\n",
+          "目前支援的引擎:\n",
+          "```\n",
+          "{{data_support_platform}}\n",
+          "```",
+          "或使用 `{{prefix}}setvoice reset` 以重置。"
+        ],
+        "setvoice_reset_no_setting": [
+          "未設定語音轉文字引擎。"
+        ],
+        "setvoice_reset_success": [
+          "成功重置語音轉文字引擎。"
+        ],
+        "setvoice_success": [
+          "成功設定預設語音為 {{data_voice}}。"
+        ],
+        "setvoice_no_arg": [
+          "未提供引擎，請透過 `{{prefix}}setvoice platform-name` 設定，或 `{{prefix}}setvoice reset` 以重置。\n",
+          "目前支援的引擎:\n",
+          "```\n",
+          "{{data_support_platform}}\n",
+          "```"
+        ]
+      },
+      "say": {
+        "say_queue_not_support": [
+          "很抱歉，目前不支援訊息排隊功能。"
+        ],
+        "say_too_long": [
+          "話太長了我說不出來。"
+        ],
+        "say_wrong_channel": [
+          "此頻道並非用於讓我說話。\n",
+          "{{channel_msg}}",
+          "要更改設定至此頻道，輸入 {{prefix}}setchannel <#{{current_channel}}>.\n",
+          "要禁用此通知，輸入 `{{prefix}}wrong_msg off`。"
+        ],
+        "say_no_setting": [
+          "設定檔不存在。\n",
+          "請使用 `{{prefix}}setchannel` 設定頻道。\n",
+          "請使用 `{{prefix}}setlang` 設定語言。"
+        ],
+        "say_no_arg": [
+          "我能說甚麼? :("
+        ]
+      },
+      "say_lang": {
+        "say_lang_no_setting": [
+          "設定檔不存在。\n",
+          "請使用 `{{prefix}}setchannel` 設定頻道。\n",
+          "請使用 `{{prefix}}setlang` 設定語言。(此指令在 `{{prefix}}say_lang` 並非必填)"
+        ],
+        "say_lang_no_arg": [
+          "我能說甚麼? :(\n",
+          "`{{prefix}}say_lang 某個-語言-代碼 說點甚麼`"
+        ]
+      },
+      "clear": {
+        "clear": [
+          "都清乾淨了。"
+        ]
+      },
+      "invite": {
+        "invite": [
+          "使用此連結邀請我至你的伺服器：\n",
+          "{{invite_link}}"
+        ]
+      },
+      "wrong_msg": {
+        "wrong_msg_on": [
+          "已開啟錯誤頻道通知。"
+        ],
+        "wrong_msg_off": [
+          "已關閉錯誤頻道通知。"
+        ],
+        "wrong_msg_bad_arg": [
+          "不明指令\n",
+          "請使用 `{{prefix}}wrong_msg on` 或 `{{prefix}}wrong_msg off` 來開啟或關閉此功能。"
+        ],
+        "wrong_msg_no_setting": [
+          "你甚麼都還沒開始做。\n"
+        ]
+      },
+      "on_command_error": {
+        "command_not_found": [
+          "指令不存在。\n"
+        ],
+        "command_required_argument": [
+          "指令缺少必要參數。\n"
+        ],
+        "command_on_cooldown": [
+          "你太快了! 請等待 {{cooldown_time}} 秒。\n"
+        ],
+        "no_private_message": [
+          "此指令不支援在私訊中使用。"
+        ],
+        "too_many_arguments": [
+          "指令參數太多。\n"
+        ],
+        "unknown_error": [
+          "發生未知錯誤，請通知開發者。(<@{{owner_id}}> 或 `{{owner_full_name}}`)\n",
+          "```\n",
+          "Error: {{error_msg}}\n",
+          "Error Type: {{error_type}}\n",
+          "```"
         ]
       }
     },
     "variable": {
       "help": {
         "channel_msg_default": [
-          "請使用 `{{prefix}}setchannel` 設定文字頻道。 (ex. {{prefix}}setchannel <#{{sys_channel}}>)"
+          "使用 `{{prefix}}setchannel` 設定文字頻道。 (ex. {{prefix}}setchannel <#{{sys_channel}}>)"
         ],
         "channel_msg_current": [
-          "請使用 `{{prefix}}setchannel` 設定文字頻道。 (目前: <#{{data_channel}}>)"
+          "使用 `{{prefix}}setchannel` 設定文字頻道。 (目前: <#{{data_channel}}>)"
         ],
         "channel_msg_else": [
-          "請使用 `{{prefix}}setchannel` 設定文字頻道。 (ex. {{prefix}}setchannel #一般)"
+          "使用 `{{prefix}}setchannel` 設定文字頻道。 (ex. {{prefix}}setchannel #一般)"
         ],
         "lang_msg_default": [
-          "請使用 `{{prefix}}setlang` 設定語音語言。 (ex. `{{prefix}}setlang en-us`)\n",
-          "請使用 `{{prefix}}setlang` 取得支援的語言列表。"
+          "使用 `{{prefix}}setlang` 設定語音語言。 (ex. `{{prefix}}setlang en-us`)\n",
+          "使用 `{{prefix}}setlang` 取得支援的語言列表。"
         ],
         "lang_msg_current": [
-          "請使用 `{{prefix}}setlang` 設定語音語言。 (目前: `{{data_lang}}`)"
+          "使用 `{{prefix}}setlang` 設定語音語言。 (目前: `{{data_lang}}`)"
         ],
         "platform_msg_default": [
-          "請使用 `{{prefix}}setvoice` 設定文字轉語音引擎提供者。 (ex. `{{prefix}}setvoice Google`)\n",
+          "使用 `{{prefix}}setvoice` 設定文字轉語音引擎提供者。 (ex. `{{prefix}}setvoice Google`)\n",
           "目前支援的平台: \n",
           "```\n",
-          "Google, Azure\n",
+          "{{data_support_platform}}",
           "```"
         ],
         "platform_msg_current": [
@@ -360,6 +548,9 @@
       "en-sg",
       "en-tz",
       "en-za"
+    ],
+    "zh-tw": [
+      "zh-tw"
     ]
   }
 }
