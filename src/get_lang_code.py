@@ -26,7 +26,7 @@ def list_languages():
     languages = list(languages.split(", "))
     languages = sorted(languages)
     json_lang = {"Support_Language": languages}
-    with open("languages.json", "w") as f:
+    with open("lang_list/languages.json", "w") as f:
         json.dump(json_lang, f)
 
 
@@ -58,7 +58,7 @@ def list_azure_languages():
     azure_langs = sorted(azure_langs)
 
     azure_langs = {"Support_Language": azure_langs}
-    with open("azure_languages.json", "w") as f:
+    with open("lang_list/azure_languages.json", "w") as f:
         json.dump(azure_langs, f)
 
 

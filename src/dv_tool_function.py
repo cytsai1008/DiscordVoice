@@ -33,7 +33,7 @@ def read_file_json(filename) -> dict:
 
 def write_db_json(filename: str, data: dict) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
-    redis_client().json().set(filename, ".", data)
+    redis_client().json().set(filename, "..", data)
     # return False if args is type(None)
 
 
@@ -103,13 +103,13 @@ def check_platform(
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""
     if (
-        lang in read_file_json("languages.json")["Support_Language"]
-        and lang not in read_file_json("azure_languages.json")["Support_Language"]
+        lang in read_file_json("lang_list/languages.json")["Support_Language"]
+        and lang not in read_file_json("lang_list/azure_languages.json")["Support_Language"]
     ):
         return "Google"
     if (
-        lang in read_file_json("azure_languages.json")["Support_Language"]
-        and lang not in read_file_json("languages.json")["Support_Language"]
+        lang in read_file_json("lang_list/azure_languages.json")["Support_Language"]
+        and lang not in read_file_json("lang_list/languages.json")["Support_Language"]
     ):
         return "Azure"
     user_id = f"user_{str(user_id)}"

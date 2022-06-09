@@ -1,6 +1,6 @@
 # CYTsai's Discord Bots (Old Name: DiscordVoice)
 
-Warning: The `replit` and `master` branch has deprecated, do not use.
+**Warning: The `old` and `replit` branch has deprecated, do not use.**
 
 ## What-For-Next-Meal
 
