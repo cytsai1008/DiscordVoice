@@ -10,8 +10,7 @@ import discord
 import dotenv
 from discord.ext import commands
 
-import load_command
-import wfnm_tool_function as tool_function
+from src.modules import load_command, wfnm_tool_function as tool_function
 
 # import time
 

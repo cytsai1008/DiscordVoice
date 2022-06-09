@@ -14,8 +14,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-import dv_tool_function
-import tts_func
+from src.modules import tts_func, dv_tool_function
 
 if "src" in os.getcwd():
     os.chdir("../")
@@ -210,7 +209,9 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
 
         elif command == "setlang":
             support_lang = dv_tool_function.read_file_json("lang_list/languages.json")
-            azure_lang = dv_tool_function.read_file_json("lang_list/azure_languages.json")
+            azure_lang = dv_tool_function.read_file_json(
+                "lang_list/azure_languages.json"
+            )
             await ctx.reply(
                 dv_tool_function.convert_msg(
                     locale,
@@ -625,12 +626,12 @@ async def help(ctx):  # sourcery skip: low-code-quality
             )
         )
     elif (
-            not guild_msg
-            and dv_tool_function.check_dict_data(
+        not guild_msg
+        and dv_tool_function.check_dict_data(
             dv_tool_function.read_db_json("user_config"),
             f"user_{int(ctx.author.id)}",
         )
-            and dv_tool_function.check_dict_data(
+        and dv_tool_function.check_dict_data(
             dv_tool_function.read_db_json("user_config")[f"user_{int(ctx.author.id)}"],
             "platform",
         )
@@ -1245,8 +1246,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             await ctx.message.add_reaction("🤔")
 
         elif (
-                dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                and db["not_this_channel_msg"] == "off"
+            dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+            and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
@@ -1609,9 +1610,9 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         lang_code_list = dv_tool_function.read_file_json("lang_list/languages.json")[
             "Support_Language"
         ]
-        azure_lang_code_list = dv_tool_function.read_file_json("lang_list/azure_languages.json")[
-            "Support_Language"
-        ]
+        azure_lang_code_list = dv_tool_function.read_file_json(
+            "lang_list/azure_languages.json"
+        )["Support_Language"]
 
         lang = lang.lower()
         lang = lang.replace("_", "-")
@@ -1914,8 +1915,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             await ctx.message.add_reaction("🤔")
 
         elif (
-                dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                and db["not_this_channel_msg"] == "off"
+            dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+            and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
@@ -2347,8 +2348,8 @@ async def force_say(
             await ctx.message.add_reaction("🤔")
 
         elif (
-                dv_tool_function.check_dict_data(db, "not_this_channel_msg")
-                and db["not_this_channel_msg"] == "off"
+            dv_tool_function.check_dict_data(db, "not_this_channel_msg")
+            and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender

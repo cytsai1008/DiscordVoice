@@ -104,7 +104,8 @@ def check_platform(
     """Return the platform of the user or guild (default: Google)"""
     if (
         lang in read_file_json("lang_list/languages.json")["Support_Language"]
-        and lang not in read_file_json("lang_list/azure_languages.json")["Support_Language"]
+        and lang
+        not in read_file_json("lang_list/azure_languages.json")["Support_Language"]
     ):
         return "Google"
     if (
