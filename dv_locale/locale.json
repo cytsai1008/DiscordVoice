@@ -226,10 +226,10 @@
       },
       "say": {
         "emoji": [
-          "Emoji: {{data_emoji}}"
+          " Emoji: {{data_emoji}} "
         ],
         "link": [
-          "link: {{data_link}}"
+          " link: {{data_link}} "
         ],
         "inside_said": [
           "{{user}} said {{data_content}}"
@@ -495,10 +495,10 @@
       },
       "say": {
         "emoji": [
-          "表情符號: {{data_emoji}}"
+          " 表情符號: {{data_emoji}} "
         ],
         "link": [
-          "連結: {{data_link}}"
+          " 連結: {{data_link}} "
         ],
         "inside_said": [
           "{{user}} 說 {{data_content}}"
@@ -538,7 +538,6 @@
     }
   },
   "zh-cn": {
-
   },
   "lang_list": {
     "en": [
