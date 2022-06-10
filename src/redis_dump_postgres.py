@@ -67,11 +67,15 @@ heroku_postgres.commit()
 
 print("Dumping DV data to Postgres")
 postgres_dv_data = json.dumps(dv_dump_data)
+# clear old data
+cur.execute("DELETE FROM dv_dump_data;")
 cur.execute("INSERT INTO dv_dump_data (data) VALUES (%s)", (postgres_dv_data,))
 heroku_postgres.commit()
 
 print("Dumping WFNM data to Postgres")
 postgres_wfnm_data = json.dumps(wfnm_dump_data)
+# clear old data
+cur.execute("DELETE FROM wfnm_dump_data;")
 cur.execute("INSERT INTO wfnm_dump_data (data) VALUES (%s)", (postgres_wfnm_data,))
 heroku_postgres.commit()
 
