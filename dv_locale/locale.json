@@ -503,7 +503,7 @@
         "someone_name": [
           "某人"
         ],
-        "channel_msg": [
+        "wrong_channel": [
           "請在 <#{{data_channel}}> 中執行此指令。\n"
         ],
         "err_not_join": [
@@ -530,6 +530,9 @@
         ]
       }
     }
+  },
+  "zh-cn": {
+
   },
   "lang_list": {
     "en": [
