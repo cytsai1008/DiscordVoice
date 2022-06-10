@@ -387,7 +387,7 @@
         "say_wrong_channel": [
           "此頻道並非用於讓我說話。\n",
           "{{channel_msg}}",
-          "要更改設定至此頻道，輸入 {{prefix}}setchannel <#{{current_channel}}>.\n",
+          "要更改設定至此頻道，輸入 {{prefix}}setchannel <#{{current_channel}}>。\n",
           "要禁用此通知，輸入 `{{prefix}}wrong_msg off`。"
         ],
         "say_no_setting": [
