@@ -8,3 +8,4 @@ redis>=4.1.4
 flask
 gunicorn
 mechanize
+psycopg2
