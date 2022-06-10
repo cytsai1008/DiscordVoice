@@ -201,7 +201,7 @@ def get_lang_in_db(self) -> str:
 
 
 def fetch_link_head(content: str, lang, locale: dict) -> str:
-    """Return the head in the link if content has link"""
+    """Return the head in the link if content has links"""
     if not re.findall(
         "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
         content,
