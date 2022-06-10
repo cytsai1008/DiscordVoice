@@ -993,6 +993,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         ),
                     )
 
+            content = dv_tool_function.fetch_link_head(content, db["lang"], locale)
+
             say_this = (
                 ctx.author.id in (int(config["owner"]), 890234177767755849)
                 or len(content) < 30
@@ -1676,6 +1678,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         ),
                     )
 
+            content = dv_tool_function.fetch_link_head(content, lang, locale)
+
             say_this = (
                 ctx.author.id in (int(config["owner"]), 890234177767755849)
                 or len(content) < 30
@@ -2084,6 +2088,8 @@ async def force_say(
                         ),
                     )
 
+            content = dv_tool_function.fetch_link_head(content, db["lang"], locale)
+
             say_this = (
                 ctx.author.id in (int(config["owner"]), 890234177767755849)
                 or len(content) < 30
@@ -2411,7 +2417,6 @@ async def force_say(
 
 @bot.command(name="setvoice")
 async def setvoice(ctx, platform: str):
-
     if platform.capitalize() not in supported_platform and platform.lower() != "reset":
         await ctx.reply(
             dv_tool_function.convert_msg(

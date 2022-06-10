@@ -1,6 +1,8 @@
 import json
 import os
+import re
 
+import mechanize
 import redis
 
 
@@ -196,3 +198,45 @@ def get_lang_in_db(self) -> str:
         )
         else "en"
     )
+
+
+def fetch_link_head(content: str, lang, locale: dict) -> str:
+    """Return the head in the link if content has link"""
+    if not re.findall(
+        "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
+        content,
+    ):
+        return content
+
+    url = re.findall(
+        "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
+        content,
+    )
+    if len(url) <= 3:
+        for i in url:
+            br = mechanize.Browser()
+            br.set_handle_robots(False)
+            try:
+                br.open(i)
+                title = br.title()
+            except Exception:
+                content = content.replace(i, "")
+            else:
+                convert_text = convert_msg(
+                    locale,
+                    lang,
+                    "variable",
+                    "say",
+                    "link",
+                    [
+                        "data_link",
+                        title,
+                    ],
+                )
+                content = content.replace(i, convert_text)
+
+    else:
+        for i in url:
+            content = content.replace(i, "")
+
+    return content
