@@ -1,7 +1,6 @@
-py-cord>=1.7.3
+py-cord[voice]>=1.7.3
 aiohttp>=3.7.4.post0
 python-dotenv
-PyNaCl
 google-cloud-texttospeech
 azure-cognitiveservices-speech
 requests
