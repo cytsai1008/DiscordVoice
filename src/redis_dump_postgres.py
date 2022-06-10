@@ -32,6 +32,9 @@ else:
     print("Running in production environment")
     print("This should be a scheduled job")
 
+if not os.path.exists("db_dump"):
+    os.mkdir("db_dump")
+
 dv_dump_data = {}
 print("Dumping DV data")
 keys = dv_redis.keys("*")
