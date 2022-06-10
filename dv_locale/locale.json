@@ -276,9 +276,9 @@
           "{{channel_msg}}\n",
           "{{lang_msg}}\n",
           "{{platform_msg}}\n",
-          "使用 `{{prefix}}say` 以在語音頻道說話。(ex. `{{prefix}}say ABCD`)\n",
+          "使用 `{{prefix}}say` 以在語音頻道說話。 (ex. `{{prefix}}say ABCD`)\n",
           "使用 `{{prefix}}say_lang` 以透過指定語言在語音頻道說話。 (ex. `{{prefix}}say_lang en-us ABCD`)\n",
-          "使用 `{{prefix}}stop` 以停止目前撥放內容。\n",
+          "使用 `{{prefix}}stop` 以停止目前播放內容。\n",
           "使用 `{{prefix}}join` 讓機器人加入語音頻道。\n",
           "使用 `{{prefix}}move` 讓機器人移至其他語音頻道。\n",
           "使用 `{{prefix}}leave` 以讓機器人離開語音頻道。\n",
@@ -538,6 +538,273 @@
     }
   },
   "zh-cn": {
+    "command": {
+      "help": {
+        "help": [
+          "使用 `{{prefix}}help` 以取得指令说明。\n",
+          "{{channel_msg}}\n",
+          "{{lang_msg}}\n",
+          "{{platform_msg}}\n",
+          "使用 `{{prefix}}say` 以在语音频道说话。 (ex. `{{prefix}}say ABCD`)\n",
+          "使用 `{{prefix}}say_lang` 以透过指定语言在语音频道说话。 (ex. `{{prefix}}say_lang en-us ABCD`)\n",
+          "使用 `{{prefix}}stop` 以停止目前播放内容。\n",
+          "使用 `{{prefix}}join` 让机器人加入语音频道。\n",
+          "使用 `{{prefix}}move` 让机器人移至其他语音频道。\n",
+          "使用 `{{prefix}}leave` 以让机器人离开语音频道。\n",
+          "使用 `{{prefix}}ping` 以取得机器人的通讯延迟。\n",
+          "使用 `{{prefix}}invite` 以取得机器人的邀请连结。\n"
+        ]
+      },
+      "join": {
+        "join_already_in": [
+          "我已经在<#{{join_vc}}>中了。\n",
+          "请使用 `{{prefix}}move` 以让机器人移至其他语音频道。"
+        ],
+        "join_bad_arg": [
+          "请输入一个符合规定的频道或是直接在加入语音频道后输入 `{{prefix}}join`。\n"
+        ],
+        "join_not_in": [
+          "请先加入语音频道。"
+        ]
+      },
+      "move": {
+        "move_bad_arg": [
+          "请输入一个符合规定的频道或是直接在加入语音频道后输入 `{{prefix}}move`。\n"
+        ],
+        "move_not_in": [
+          "请先加入语音频道。"
+        ]
+      },
+      "setchannel": {
+        "setchannel_success": [
+          "成功设定文字频道为 <#{{data_channel}}>。"
+        ],
+        "setchannel_bad_arg": [
+          "请输入一个符合规定的频道。 (必须是能点击的并且有蓝底， ex. {{prefix}}setchannel <#{{sys_channel}}>)\n"
+        ],
+        "setchannel_no_arg": [
+          "未提供频道，请透过 {{prefix}}setchannel <#{{sys_channel}}> 设定。"
+        ]
+      },
+      "setlang": {
+        "setlang_success": [
+          "成功设定预设语言为 {{data_lang}}。"
+        ],
+        "setlang_lang_list": [
+          "Google支持的语言有：\n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```\n",
+          "Azure支持的语言有：\n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
+        ],
+        "setlang_no_arg": [
+          "未提供语言，请透过 {{prefix}}setlang <{{current_lang}}> 设定。",
+          "Google支持的语言有：\n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```\n",
+          "Azure支持的语言有：\n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
+        ],
+        "setlang_bad_arg": [
+          "{{current_lang}} 不是支持的语言，请输入一个支持的语言。\n",
+          "Google支持的语言有：\n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```\n",
+          "Azure支持的语言有：\n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
+        ]
+      },
+      "setvoice": {
+        "setvoice_arg_not_supported": [
+          "不支持的语音转文字引擎。\n",
+          "目前支持的引擎:\n",
+          "```\n",
+          "{{data_support_platform}}\n",
+          "```",
+          "或使用 `{{prefix}}setvoice reset` 以重置。"
+        ],
+        "setvoice_reset_no_setting": [
+          "未设定语音转文字引擎。"
+        ],
+        "setvoice_reset_success": [
+          "成功重置语音转文字引擎。"
+        ],
+        "setvoice_success": [
+          "成功设定预设语音为 {{data_voice}}。"
+        ],
+        "setvoice_no_arg": [
+          "未提供引擎，请透过 `{{prefix}}setvoice platform-name` 设定，或 `{{prefix}}setvoice reset` 以重置。\n",
+          "目前支持的引擎:\n",
+          "```\n",
+          "{{data_support_platform}}\n",
+          "```"
+        ]
+      },
+      "say": {
+        "say_queue_not_support": [
+          "很抱歉，目前不支持讯息排队功能。"
+        ],
+        "say_too_long": [
+          "话太长了我说不出来。"
+        ],
+        "say_wrong_channel": [
+          "此频道并非用于让我说话。\n",
+          "{{channel_msg}}",
+          "要更改设定至此频道，输入 {{prefix}}setchannel <#{{current_channel}}>。\n",
+          "要禁用此通知，输入 `{{prefix}}wrong_msg off`。"
+        ],
+        "say_no_setting": [
+          "设定档不存在。\n",
+          "请使用 `{{prefix}}setchannel` 设定频道。\n",
+          "请使用 `{{prefix}}setlang` 设定语言。"
+        ],
+        "say_no_arg": [
+          "我能说什么? :("
+        ]
+      },
+      "say_lang": {
+        "say_lang_no_setting": [
+          "设定档不存在。\n",
+          "请使用 `{{prefix}}setchannel` 设定频道。\n",
+          "请使用 `{{prefix}}setlang` 设定语言。(此指令在 `{{prefix}}say_lang` 并非必填)"
+        ],
+        "say_lang_no_arg": [
+          "我能说什么? :(\n",
+          "`{{prefix}}say_lang 某个-语言-代码 说点什么`"
+        ]
+      },
+      "clear": {
+        "clear": [
+          "都清乾净了。"
+        ]
+      },
+      "invite": {
+        "invite": [
+          "使用此链结邀请我至你的伺服器：\n",
+          "{{invite_link}}"
+        ]
+      },
+      "wrong_msg": {
+        "wrong_msg_on": [
+          "已开启错误频道通知。"
+        ],
+        "wrong_msg_off": [
+          "已关闭错误频道通知。"
+        ],
+        "wrong_msg_bad_arg": [
+          "不明指令\n",
+          "请使用 `{{prefix}}wrong_msg on` 或 `{{prefix}}wrong_msg off` 来开启或关闭此功能。"
+        ],
+        "wrong_msg_no_setting": [
+          "你什么都还没开始做。\n"
+        ]
+      },
+      "on_command_error": {
+        "command_not_found": [
+          "指令不存在。\n"
+        ],
+        "command_required_argument": [
+          "指令缺少必要参数。\n"
+        ],
+        "command_on_cooldown": [
+          "你太快了! 请等待 {{cooldown_time}} 秒。\n"
+        ],
+        "no_private_message": [
+          "此指令不支持在私讯中使用。"
+        ],
+        "too_many_arguments": [
+          "指令参数太多。\n"
+        ],
+        "unknown_error": [
+          "发生未知错误，请通知开发者。(<@{{owner_id}}> 或 `{{owner_full_name}}`)\n",
+          "```\n",
+          "Error: {{error_msg}}\n",
+          "Error Type: {{error_type}}\n",
+          "```"
+        ]
+      }
+    },
+    "variable": {
+      "help": {
+        "channel_msg_default": [
+          "使用 `{{prefix}}setchannel` 设定文字频道。 (ex. {{prefix}}setchannel <#{{sys_channel}}>)"
+        ],
+        "channel_msg_current": [
+          "使用 `{{prefix}}setchannel` 设定文字频道。 (目前: <#{{data_channel}}>)"
+        ],
+        "channel_msg_else": [
+          "使用 `{{prefix}}setchannel` 设定文字频道。 (ex. {{prefix}}setchannel #一般)"
+        ],
+        "lang_msg_default": [
+          "使用 `{{prefix}}setlang` 设定语音语言。 (ex. `{{prefix}}setlang en-us`)\n",
+          "使用 `{{prefix}}setlang` 取得支持的语言列表。"
+        ],
+        "lang_msg_current": [
+          "使用 `{{prefix}}setlang` 设定语音语言。 (目前: `{{data_lang}}`)"
+        ],
+        "platform_msg_default": [
+          "使用 `{{prefix}}setvoice` 设定文字转语音引擎提供者。 (ex. `{{prefix}}setvoice Google`)\n",
+          "目前支持的平台: \n",
+          "```\n",
+          "{{data_support_platform}}",
+          "```"
+        ],
+        "platform_msg_current": [
+          "请使用 `{{prefix}}setvoice` 设定文字转语音引擎提供者。 (目前: `{{data_platform}}`)"
+        ]
+      },
+      "say": {
+        "emoji": [
+          " 表情符号: {{data_emoji}} "
+        ],
+        "link": [
+          " 链结: {{data_link}} "
+        ],
+        "inside_said": [
+          "{{user}} 说 {{data_content}}"
+        ],
+        "outside_said": [
+          "{{user}} 从语音外说 {{data_content}}"
+        ],
+        "someone_name": [
+          "某人"
+        ],
+        "wrong_channel": [
+          "请在 <#{{data_channel}}> 中执行此指令。\n"
+        ],
+        "err_not_join": [
+          "请先透过 `{{prefix}}join` 加入语音频道。\n"
+        ],
+        "err_no_channel_set": [
+          "请先透过 `{{prefix}}setchannel` 设定频道。\n"
+        ],
+        "err_no_lang_set": [
+          "请先透过 `{{prefix}}setlang` 设定语言。\n"
+        ]
+      },
+      "say_lang": {
+        "err_lang_not_in_list": [
+          "`{{current_lang}}` 不在支持的语言列表中。\n",
+          "Google 支持的语言: \n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```",
+          "Azure 支持的语言: \n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
+        ]
+      }
+    }
   },
   "lang_list": {
     "en": [
