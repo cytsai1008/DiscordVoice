@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 
@@ -25,6 +26,8 @@ wfnm_redis = redis.Redis(
 
 heroku_postgres = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
 cur = heroku_postgres.cursor()
+
+today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y_%m_%d")
 
 if os.getenv("TEST_ENV"):
     print("Running in test environment")
@@ -64,22 +67,24 @@ with open("db_dump/wfnm_dump_data.json", "w") as f:
     json.dump(wfnm_dump_data, f, indent=2)
 
 # create table if not exists
-cur.execute("CREATE TABLE IF NOT EXISTS dv_dump_data (data TEXT);")
-cur.execute("CREATE TABLE IF NOT EXISTS wfnm_dump_data (data TEXT);")
+cur.execute(f"CREATE TABLE IF NOT EXISTS dv_dump_data_{today} (data TEXT);")
+cur.execute(f"CREATE TABLE IF NOT EXISTS wfnm_dump_data_{today} (data TEXT);")
 heroku_postgres.commit()
 
 print("Dumping DV data to Postgres")
 postgres_dv_data = json.dumps(dv_dump_data)
 # clear old data
-cur.execute("DELETE FROM dv_dump_data;")
-cur.execute("INSERT INTO dv_dump_data (data) VALUES (%s)", (postgres_dv_data,))
+# cur.execute("DELETE FROM dv_dump_data;")
+cur.execute(f"INSERT INTO dv_dump_data_{today} (data) VALUES (%s)", (postgres_dv_data,))
 heroku_postgres.commit()
 
 print("Dumping WFNM data to Postgres")
 postgres_wfnm_data = json.dumps(wfnm_dump_data)
 # clear old data
-cur.execute("DELETE FROM wfnm_dump_data;")
-cur.execute("INSERT INTO wfnm_dump_data (data) VALUES (%s)", (postgres_wfnm_data,))
+# cur.execute("DELETE FROM wfnm_dump_data;")
+cur.execute(
+    f"INSERT INTO wfnm_dump_data_{today} (data) VALUES (%s)", (postgres_wfnm_data,)
+)
 heroku_postgres.commit()
 
 heroku_postgres.close()
