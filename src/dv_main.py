@@ -183,7 +183,11 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     command = ctx.invoked_with.lower()
 
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
-        await ctx.reply("Command not found.")
+        await ctx.reply(
+            dv_tool_function.convert_msg(
+                locale, lang, "command", "on_command_error", "command_not_found", None
+            )
+        )
         await ctx.message.add_reaction("❌")
 
     elif isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
