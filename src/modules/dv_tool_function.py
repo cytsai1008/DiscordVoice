@@ -202,15 +202,28 @@ def get_lang_in_db(self) -> str:
 
 def fetch_link_head(content: str, lang, locale: dict) -> str:
     """Return the head in the link if content has links"""
+
+    # clear localhost 0.0.0.0 127.0.0.1
+    local_list = [
+        re.findall("(https?://127.0.0.1:\d{1,5}/?[^ ]+)", content),
+        re.findall("(https?://localhost:\d{1,5}/?[^ ]+)", content, flags=re.IGNORECASE),
+        re.findall("(https?://0.0.0.0:\d{1,5}/?[^ ]+)", content),
+    ]
+
+    for i in local_list:
+        content = content.replace(i, "")
+
     if not re.findall(
         "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
         content,
+        flags=re.IGNORECASE,
     ):
         return content
 
     url = re.findall(
         "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
         content,
+        flags=re.IGNORECASE,
     )
     if len(url) <= 3:
         for i in url:
