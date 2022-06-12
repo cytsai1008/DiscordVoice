@@ -211,7 +211,8 @@ def fetch_link_head(content: str, lang, locale: dict) -> str:
     ]
 
     for i in local_list:
-        content = content.replace(i, "")
+        for j in i:
+            content = content.replace(j, "")
 
     if not re.findall(
         "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
