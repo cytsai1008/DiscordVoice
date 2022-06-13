@@ -319,7 +319,7 @@
       },
       "setlang": {
         "setlang_success": [
-          "成功設定預設語言為 {{data_lang}}。"
+          "成功設定預設語言為 `{{data_lang}}`。"
         ],
         "setlang_lang_list": [
           "Google支援的語言有：\n",
@@ -343,7 +343,7 @@
           "```"
         ],
         "setlang_bad_arg": [
-          "{{current_lang}} 不是支援的語言，請輸入一個支援的語言。\n",
+          "`{{current_lang}}` 不是支援的語言，請輸入一個支援的語言。\n",
           "Google支援的語言有：\n",
           "```\n",
           "{{google_lang_list}}\n",
@@ -588,7 +588,7 @@
       },
       "setlang": {
         "setlang_success": [
-          "成功设定预设语言为 {{data_lang}}。"
+          "成功设定预设语言为 `{{data_lang}}`。"
         ],
         "setlang_lang_list": [
           "Google支持的语言有：\n",
@@ -612,7 +612,7 @@
           "```"
         ],
         "setlang_bad_arg": [
-          "{{current_lang}} 不是支持的语言，请输入一个支持的语言。\n",
+          "`{{current_lang}}` 不是支持的语言，请输入一个支持的语言。\n",
           "Google支持的语言有：\n",
           "```\n",
           "{{google_lang_list}}\n",
