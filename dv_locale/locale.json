@@ -332,7 +332,7 @@
           "```"
         ],
         "setlang_no_arg": [
-          "未提供語言，請透過 {{prefix}}setlang <{{current_lang}}> 設定。",
+          "未提供語言，請透過 `{{prefix}}setlang 某個-語言-代碼` 設定。",
           "Google支援的語言有：\n",
           "```\n",
           "{{google_lang_list}}\n",
@@ -601,7 +601,7 @@
           "```"
         ],
         "setlang_no_arg": [
-          "未提供语言，请透过 {{prefix}}setlang <{{current_lang}}> 设定。",
+          "未提供语言，请透过 `{{prefix}}setlang 某个-语言-代码` 设定。",
           "Google支持的语言有：\n",
           "```\n",
           "{{google_lang_list}}\n",
