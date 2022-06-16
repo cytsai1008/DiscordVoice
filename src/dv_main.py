@@ -881,7 +881,7 @@ async def setchannel_error(ctx, error):
 
 
 @bot.command(Name="say", aliases=command_alias["say"])
-@commands.cooldown(1, 3, commands.BucketType.user)
+# @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # sourcery skip: low-code-quality
@@ -1572,7 +1572,7 @@ async def move_error(ctx, error):
 
 
 @bot.command(Name="say_lang", aliases=command_alias["say_lang"])
-@commands.cooldown(1, 3, commands.BucketType.user)
+# @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
 async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
     # sourcery skip: low-code-quality
