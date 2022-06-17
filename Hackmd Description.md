@@ -3,6 +3,9 @@
 - description: 這是cytsai1008/DiscordVoice用於學習歷程的文件
 ---
 
+[![hackmd-github-sync-badge](https://hackmd.io/eB5LOf5JQLeDTorrBXcOVg/badge)](https://hackmd.io/eB5LOf5JQLeDTorrBXcOVg)
+
+
 {%hackmd BJrTq20hE %}
 
 # 透過 Python 製作 Discord 機器人  
