@@ -233,7 +233,7 @@ def fetch_link_head(content: str, lang, locale: dict) -> str:
             headers = {'user-agent': "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"}
             try:
                 r = requests.get(i, headers=headers)
-                soup = bs4.BeautifulSoup(r.text, "html.parser")
+                soup = bs4.BeautifulSoup(r.text, "lxml")
                 title = soup.title.text
             except Exception:
                 content = content.replace(i, "")
