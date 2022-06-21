@@ -7,5 +7,5 @@ requests
 redis>=4.1.4
 flask
 gunicorn
-mechanize
+beautifulsoup4
 psycopg2

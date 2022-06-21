@@ -2,8 +2,10 @@ import json
 import os
 import re
 
-import mechanize
+import bs4
+# import mechanize
 import redis
+import requests
 
 
 # import load_command
@@ -228,11 +230,11 @@ def fetch_link_head(content: str, lang, locale: dict) -> str:
     )
     if len(url) <= 3:
         for i in url:
-            br = mechanize.Browser()
-            br.set_handle_robots(False)
+            headers = {'user-agent': "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"}
             try:
-                br.open(i)
-                title = br.title()
+                r = requests.get(i, headers=headers)
+                soup = bs4.BeautifulSoup(r.text, "html.parser")
+                title = soup.title.text
             except Exception:
                 content = content.replace(i, "")
             else:
