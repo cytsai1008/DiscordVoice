@@ -5,6 +5,11 @@ import flask
 app: flask.Flask = flask.Flask("")
 
 
+@app.route("/img/<img>")
+def image(img):
+    return flask.send_file(f"img/{img}")
+
+
 @app.route("/")
 def home():
     return flask.render_template("index.html")
