@@ -43,7 +43,7 @@ command_alias = {
     "force_say": ["fs", "forcesay", "force-say"],
 }
 
-locale = dv_tool_function.read_file_json("dv_locale/locale.json")
+locale = dv_tool_function.read_file_json("locale/dv_locale/locale.json")
 supported_platform = {"Google", "Azure"}
 
 bot = commands.Bot(

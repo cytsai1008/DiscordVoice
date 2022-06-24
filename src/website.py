@@ -1,3 +1,4 @@
+import os
 from threading import Thread
 
 import flask
@@ -7,7 +8,8 @@ app: flask.Flask = flask.Flask("")
 
 @app.route("/img/<img>")
 def image(img):
-    return flask.send_file(f"img/{img}")
+    img_base_path = f"{os.getcwd()}/web_assets/img/"
+    return flask.send_from_directory(img_base_path, img)
 
 
 @app.route("/")
