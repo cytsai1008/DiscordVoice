@@ -9,6 +9,37 @@ import redis
 import requests
 
 
+def postgres_logging(logging_data: str):
+    """Logging to postgres"""
+    heroku_postgres = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
+    cur = heroku_postgres.cursor()
+    today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+    print(f"{today_datetime}: {logging_data}")
+    if os.getenv("TEST_ENV"):
+        return
+
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS dv_log (
+            datetime timestamp,
+            log text
+        );
+        """
+    )
+
+    cur.execute(
+        """
+        INSERT INTO dv_log (datetime, log)
+        VALUES (%s, %s);
+        """,
+        (today_datetime, logging_data),
+    )
+    heroku_postgres.commit()
+    heroku_postgres.close()
+
+
 def redis_client() -> redis.Redis:
     """Returns redis client"""
     return redis.Redis(
@@ -48,7 +79,7 @@ def write_file_json(filename: str, data: dict) -> None:
 def check_dict_data(data: dict, arg) -> bool:
     """Check if arg is in data"""
     try:
-        print(f"data in {arg} is {data[arg]}")
+        postgres_logging(f"data in {arg} is {data[arg]}")
     except KeyError:
         return False
     else:
@@ -97,49 +128,49 @@ def check_guild_or_dm(self) -> bool:
 
 
 def check_platform(
-    user_platform_set: bool,
-    user_id: [str, int],
-    guild_platform_set: bool,
-    guild_id: [str, int],
-    lang: str,
+        user_platform_set: bool,
+        user_id: [str, int],
+        guild_platform_set: bool,
+        guild_id: [str, int],
+        lang: str,
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""
     if (
-        lang in read_file_json("lang_list/languages.json")["Support_Language"]
-        and lang
-        not in read_file_json("lang_list/azure_languages.json")["Support_Language"]
+            lang in read_file_json("lang_list/languages.json")["Support_Language"]
+            and lang
+            not in read_file_json("lang_list/azure_languages.json")["Support_Language"]
     ):
         return "Google"
     if (
-        lang in read_file_json("lang_list/azure_languages.json")["Support_Language"]
-        and lang not in read_file_json("lang_list/languages.json")["Support_Language"]
+            lang in read_file_json("lang_list/azure_languages.json")["Support_Language"]
+            and lang not in read_file_json("lang_list/languages.json")["Support_Language"]
     ):
         return "Azure"
     user_id = f"user_{str(user_id)}"
     if (
-        user_platform_set
-        and read_db_json("user_config")[user_id]["platform"] == "Google"
+            user_platform_set
+            and read_db_json("user_config")[user_id]["platform"] == "Google"
     ):
-        print("Init Google TTS API 1")
+        postgres_logging("Init Google TTS API 1")
         return "Google"
 
     elif (
-        user_platform_set
-        and read_db_json("user_config")[user_id]["platform"] == "Azure"
+            user_platform_set
+            and read_db_json("user_config")[user_id]["platform"] == "Azure"
     ):
-        print("Init Azure TTS API 1")
+        postgres_logging("Init Azure TTS API 1")
         return "Azure"
     elif guild_platform_set and read_db_json(f"{guild_id}")["platform"] == "Google":
-        print("Init Google TTS API 2")
+        postgres_logging("Init Google TTS API 2")
         return "Google"
     elif guild_platform_set and read_db_json(f"{guild_id}")["platform"] == "Azure":
-        print("Init Azure TTS API 2")
+        postgres_logging("Init Azure TTS API 2")
         return "Azure"
     elif not user_platform_set and not guild_platform_set:
-        print("Init Google TTS API 3")
+        postgres_logging("Init Google TTS API 3")
         return "Google"
     else:
-        print(
+        postgres_logging(
             f"You found a bug\n"
             f"User platform: {user_platform_set}\n"
             f"User id: {user_id}\n"
@@ -164,12 +195,12 @@ def get_translate_lang(lang: str, locale_dict: dict) -> str:
 
 
 def convert_msg(
-    locale_dict: dict,
-    lang: str,
-    msg_type: str,
-    command: str,
-    name: str,
-    convert_text: [list, None],
+        locale_dict: dict,
+        lang: str,
+        msg_type: str,
+        command: str,
+        name: str,
+        convert_text: [list, None],
 ) -> str:
     """
     Convert message from locale\n
@@ -192,9 +223,9 @@ def get_lang_in_db(self) -> str:
     return (
         read_db_json(get_id(self))["lang"]
         if (
-            check_guild_or_dm(self)
-            and check_db_file(get_id(self))
-            and check_dict_data(read_db_json(get_id(self)), "lang")
+                check_guild_or_dm(self)
+                and check_db_file(get_id(self))
+                and check_dict_data(read_db_json(get_id(self)), "lang")
         )
         else "en"
     )
@@ -215,9 +246,9 @@ def fetch_link_head(content: str, lang, locale: dict) -> str:
             content = content.replace(j, "")
 
     if not re.findall(
-        "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
-        content,
-        flags=re.IGNORECASE,
+            "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
+            content,
+            flags=re.IGNORECASE,
     ):
         return content
 
@@ -256,34 +287,3 @@ def fetch_link_head(content: str, lang, locale: dict) -> str:
             content = content.replace(i, "")
 
     return content
-
-
-def postgres_logging(logging_data: str):
-    """Logging to postgres"""
-    heroku_postgres = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
-    cur = heroku_postgres.cursor()
-    today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
-    print(f"{today_datetime}: {logging_data}")
-    if os.getenv("TEST_ENV"):
-        return
-
-    cur.execute(
-        """
-        CREATE TABLE IF NOT EXISTS dv_log (
-            datetime timestamp,
-            log text
-        );
-        """
-    )
-
-    cur.execute(
-        """
-        INSERT INTO dv_log (datetime, log)
-        VALUES (%s, %s);
-        """,
-        (today_datetime, logging_data),
-    )
-    heroku_postgres.commit()
-    heroku_postgres.close()
