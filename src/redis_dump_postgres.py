@@ -27,7 +27,7 @@ wfnm_redis = redis.Redis(
 heroku_postgres = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
 cur = heroku_postgres.cursor()
 
-today = datetime.datetime.now().strftime("%Y-%m-%d")
+today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
 time = datetime.datetime.now(datetime.timezone.utc).strftime("%H:%M:%S")
 
 this_datetime = f"{today} {time}"
