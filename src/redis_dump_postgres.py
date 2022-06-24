@@ -71,6 +71,7 @@ with open("db_dump/wfnm_dump_data.json", "w") as f:
 
 # create table if not exists
 # create table name dv_dump_data with datetime and data column
+'''
 cur.execute(
     """
     CREATE TABLE IF NOT EXISTS dv_dump_data (
@@ -90,6 +91,7 @@ cur.execute(
 )
 
 heroku_postgres.commit()
+'''
 
 print("Dumping DV data to Postgres")
 postgres_dv_data = json.dumps(dv_dump_data)

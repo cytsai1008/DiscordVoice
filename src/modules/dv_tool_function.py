@@ -22,15 +22,6 @@ def postgres_logging(logging_data: str):
 
     cur.execute(
         """
-        CREATE TABLE IF NOT EXISTS dv_log (
-            datetime timestamp,
-            log text
-        );
-        """
-    )
-
-    cur.execute(
-        """
         INSERT INTO dv_log (datetime, log)
         VALUES (%s, %s);
         """,
