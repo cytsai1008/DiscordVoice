@@ -86,8 +86,8 @@ def remove_file(file_name):
 
 
 def convert_tts(content: str, lang_code: str, file_name: str):
-    print("init google tts api")
-    print("play mp3")
+    dv_tool_function.postgres_logging("init google tts api")
+    dv_tool_function.postgres_logging("play mp3")
     asyncio.run(tts_func.process_voice(content, lang_code, f"{file_name}.mp3"))
 
 
@@ -112,17 +112,17 @@ async def check_is_not_playing(ctx):
 
 @bot.event
 async def on_ready():
-    print("目前登入身份：", bot.user)
+    dv_tool_function.postgres_logging(f"目前登入身份：{bot.user}")
     game = discord.Game(f"{config['prefix']}help")
     # discord.Status.<狀態>，可以是online,offline,idle,dnd,invisible    # get all guilds
-    print("目前登入的伺服器：")
+    dv_tool_function.postgres_logging("目前登入的伺服器：")
     for guild in bot.guilds:
-        print(guild.name + "\n")
+        dv_tool_function.postgres_logging(guild.name + "\n")
     channel_list = ""
     if dv_tool_function.check_db_file("joined_vc") and os.getenv("TEST_ENV") != "True":
         remove_vc = []
         joined_vc = dv_tool_function.read_db_json("joined_vc")
-        print(f"joined_vc: \n" f"{joined_vc}")
+        dv_tool_function.postgres_logging(f"joined_vc: \n" f"{joined_vc}")
         for i, j in joined_vc.items():
             # join the vc
             try:
@@ -130,10 +130,12 @@ async def on_ready():
                 await bot.get_channel(int(j)).connect()
             except Exception:
                 remove_vc.append(str(i))
-                print(f"Failed to connect to {j} in {i}.\n")
-                print(f"Reason: \n{traceback.format_exc()}")
+                dv_tool_function.postgres_logging(f"Failed to connect to {j} in {i}.\n")
+                dv_tool_function.postgres_logging(f"Reason: \n{traceback.format_exc()}")
             else:
-                print(f"Successfully connected to {j} in {i}.\n")
+                dv_tool_function.postgres_logging(
+                    f"Successfully connected to {j} in {i}.\n"
+                )
         for i in remove_vc:
             del joined_vc[i]
             dv_tool_function.write_db_json("joined_vc", joined_vc)
@@ -1105,7 +1107,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     globals()[list_name] = queue.Queue(maxsize=10)
 
                 if not ctx.voice_client.is_playing():
-                    print("play mp3")
+                    dv_tool_function.postgres_logging("play mp3")
 
                     platform_result = dv_tool_function.check_platform(
                         user_platform_set,
@@ -1116,18 +1118,18 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     )
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
-                        print("Init Google TTS API")
+                        dv_tool_function.postgres_logging("Init Google TTS API")
                         await tts_func.process_voice(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
 
                     elif platform_result == "Azure":
-                        print("Init Azure TTS API")
+                        dv_tool_function.postgres_logging("Init Azure TTS API")
                         await tts_func.azure_tts_converter(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
                     else:
-                        print("Something Wrong")
+                        dv_tool_function.postgres_logging("Something Wrong")
                         # send to owner
                         owner = await bot.fetch_user(int(config["owner"]))
                         await owner.send(
@@ -1790,23 +1792,23 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                     globals()[list_name] = queue.Queue(maxsize=10)
 
                 if not ctx.voice_client.is_playing():
-                    print("play mp3")
+                    dv_tool_function.postgres_logging("play mp3")
 
                     platform_result = dv_tool_function.check_platform(
                         user_platform_set, user_id, guild_platform_set, guild_id, lang
                     )
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
-                        print("Init Google TTS API")
+                        dv_tool_function.postgres_logging("Init Google TTS API")
                         await tts_func.process_voice(content, lang, f"{guild_id}.mp3")
 
                     elif platform_result == "Azure":
-                        print("Init Azure TTS API")
+                        dv_tool_function.postgres_logging("Init Azure TTS API")
                         await tts_func.azure_tts_converter(
                             content, lang, f"{guild_id}.mp3"
                         )
                     else:
-                        print("Something Wrong")
+                        dv_tool_function.postgres_logging("Something Wrong")
                         # send to owner
                         owner = await bot.fetch_user(int(config["owner"]))
                         await owner.send(
@@ -2150,7 +2152,7 @@ async def force_say(
                     globals()[list_name] = queue.Queue(maxsize=10)
 
                 if not ctx.voice_client.is_playing():
-                    print("play mp3")
+                    dv_tool_function.postgres_logging("play mp3")
 
                     platform_result = dv_tool_function.check_platform(
                         user_platform_set,
@@ -2161,18 +2163,18 @@ async def force_say(
                     )
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
-                        print("Init Google TTS API")
+                        dv_tool_function.postgres_logging("Init Google TTS API")
                         await tts_func.process_voice(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
 
                     elif platform_result == "Azure":
-                        print("Init Azure TTS API")
+                        dv_tool_function.postgres_logging("Init Azure TTS API")
                         await tts_func.azure_tts_converter(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
                     else:
-                        print("Something Wrong")
+                        dv_tool_function.postgres_logging("Something Wrong")
                         # send to owner
                         owner = await bot.fetch_user(int(config["owner"]))
                         await owner.send(
@@ -2208,7 +2210,7 @@ async def force_say(
                             asyncio.ensure_future(check_is_not_playing(ctx))
                             playnext(ctx, db["lang"], guild_id, globals()[list_name])
                         else:
-                            print("play mp3")
+                            dv_tool_function.postgres_logging("play mp3")
 
                             platform_result = dv_tool_function.check_platform(
                                 user_platform_set,
@@ -2219,18 +2221,18 @@ async def force_say(
                             )
                             # GCP Cloud Text to Speech Method
                             if platform_result == "Google":
-                                print("Init Google TTS API")
+                                dv_tool_function.postgres_logging("Init Google TTS API")
                                 await tts_func.process_voice(
                                     content, db["lang"], f"{guild_id}.mp3"
                                 )
 
                             elif platform_result == "Azure":
-                                print("Init Azure TTS API")
+                                dv_tool_function.postgres_logging("Init Azure TTS API")
                                 await tts_func.azure_tts_converter(
                                     content, db["lang"], f"{guild_id}.mp3"
                                 )
                             else:
-                                print("Something Wrong")
+                                dv_tool_function.postgres_logging("Something Wrong")
                                 # send to owner
                                 owner = await bot.fetch_user(int(config["owner"]))
                                 await owner.send(
@@ -2260,7 +2262,7 @@ async def force_say(
                             )
                             await ctx.message.add_reaction("⁉")
                 else:
-                    print("play mp3")
+                    dv_tool_function.postgres_logging("play mp3")
 
                     platform_result = dv_tool_function.check_platform(
                         user_platform_set,
@@ -2271,18 +2273,18 @@ async def force_say(
                     )
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
-                        print("Init Google TTS API")
+                        dv_tool_function.postgres_logging("Init Google TTS API")
                         await tts_func.process_voice(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
 
                     elif platform_result == "Azure":
-                        print("Init Azure TTS API")
+                        dv_tool_function.postgres_logging("Init Azure TTS API")
                         await tts_func.azure_tts_converter(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
                     else:
-                        print("Something Wrong")
+                        dv_tool_function.postgres_logging("Something Wrong")
                         # send to owner
                         owner = await bot.fetch_user(int(config["owner"]))
                         await owner.send(
@@ -2533,10 +2535,10 @@ async def setvoice(ctx, platform: str):
 
 
 if os.getenv("TEST_ENV"):
-    print("Running on test environment")
+    dv_tool_function.postgres_logging("Running on test environment")
     test_env = True
 else:
-    print("Running on production environment")
+    dv_tool_function.postgres_logging("Running on production environment")
     test_env = False
 
 if test_env:

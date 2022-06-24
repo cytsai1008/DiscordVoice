@@ -1,15 +1,12 @@
+import datetime
 import json
 import os
 import re
 
 import bs4
-
-# import mechanize
+import psycopg2
 import redis
 import requests
-
-
-# import load_command
 
 
 def redis_client() -> redis.Redis:
@@ -259,3 +256,34 @@ def fetch_link_head(content: str, lang, locale: dict) -> str:
             content = content.replace(i, "")
 
     return content
+
+
+def postgres_logging(logging_data: str):
+    """Logging to postgres"""
+    heroku_postgres = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
+    cur = heroku_postgres.cursor()
+    today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+    print(f"{today_datetime}: {logging_data}")
+    if os.getenv("TEST_ENV"):
+        return
+
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS dv_log (
+            datetime timestamp,
+            log text
+        );
+        """
+    )
+
+    cur.execute(
+        """
+        INSERT INTO dv_log (datetime, log)
+        VALUES (%s, %s);
+        """,
+        (today_datetime, logging_data),
+    )
+    heroku_postgres.commit()
+    heroku_postgres.close()
