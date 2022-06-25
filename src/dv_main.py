@@ -1003,7 +1003,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
 
             say_this = (
                 ctx.author.id in (int(config["owner"]), 890234177767755849)
-                or len(content) < 30
+                or len(content) < 50
             )
             try:
                 username = ctx.author.display_name
@@ -1688,7 +1688,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 
             say_this = (
                 ctx.author.id in (int(config["owner"]), 890234177767755849)
-                or len(content) < 30
+                or len(content) < 50
             )
             try:
                 username = ctx.author.display_name
@@ -2098,7 +2098,7 @@ async def force_say(
 
             say_this = (
                 ctx.author.id in (int(config["owner"]), 890234177767755849)
-                or len(content) < 30
+                or len(content) < 50
             )
             try:
                 username = ctx.author.display_name
