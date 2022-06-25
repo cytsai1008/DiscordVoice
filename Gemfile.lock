@@ -42,6 +42,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  ruby (~> 3.1.0)
   i18n (= 1.8.9)
   minitest (= 5.14.4)
   mysql2 (= 0.5.3)
