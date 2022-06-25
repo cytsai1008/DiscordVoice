@@ -428,6 +428,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         pass
 
     else:
+        dv_tool_function.postgres_logging(error)
         not_able_reply = ""
         not_able_send = ""
         try:
