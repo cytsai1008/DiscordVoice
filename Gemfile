@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+ruby '~>3.1.2'
+
 gem 'sinatra', '2.2.0'
 gem 'sinatra-activerecord', '2.0.22'
 gem 'mysql2', '0.5.3'
