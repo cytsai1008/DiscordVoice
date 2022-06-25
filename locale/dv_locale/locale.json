@@ -513,7 +513,7 @@
           "請在 <#{{data_channel}}> 中執行此指令。\n"
         ],
         "err_not_join": [
-          "請先透過 `{{prefix}}join` 加入語音頻道。\n"
+          "請先透過 `{{prefix}}join` 使機器人加入語音頻道。\n"
         ],
         "err_no_channel_set": [
           "請先透過 `{{prefix}}setchannel` 設定頻道。\n"
@@ -782,7 +782,7 @@
           "请在 <#{{data_channel}}> 中执行此指令。\n"
         ],
         "err_not_join": [
-          "请先透过 `{{prefix}}join` 加入语音频道。\n"
+          "请先透过 `{{prefix}}join` 使机器人加入语音频道。\n"
         ],
         "err_no_channel_set": [
           "请先透过 `{{prefix}}setchannel` 设定频道。\n"
