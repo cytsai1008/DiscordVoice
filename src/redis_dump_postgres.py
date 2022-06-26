@@ -115,4 +115,44 @@ cur.execute(
 )
 heroku_postgres.commit()
 
+
+# if `dv_log` table row larger than 3000, truncate it
+cur.execute(
+    """
+    SELECT COUNT(*) FROM dv_log;
+    """
+)
+print("Counting rows in dv_log")
+
+count = cur.fetchone()[0]
+print(f"Count: {count}")
+
+if count > 3000:
+    print("Truncating dv_log")
+    cur.execute(
+        """
+        TRUNCATE TABLE dv_log;
+        """
+    )
+    heroku_postgres.commit()
+
+
+# delete dv_dump_data longer than 1 month
+
+print("Starting to auto delete dump data for longer than 1 month")
+
+cur.execute(
+    """
+    DELETE FROM dv_dump_data WHERE datetime < (NOW() - INTERVAL '1 month');
+    """
+)
+heroku_postgres.commit()
+
+# delete wfnm_dump_data longer than 1 month
+cur.execute(
+    """
+    DELETE FROM wfnm_dump_data WHERE datetime < (NOW() - INTERVAL '1 month');
+    """
+)
+
 heroku_postgres.close()

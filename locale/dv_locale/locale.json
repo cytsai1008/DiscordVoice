@@ -88,10 +88,7 @@
       "setvoice": {
         "setvoice_arg_not_supported": [
           "Not supported platform.\n",
-          "Currently supported platform: \n",
-          "```\n",
-          "{{data_support_platform}}\n",
-          "```",
+          "Currently supported platform: `{{data_support_platform}}` \n",
           "or `{{prefix}}setvoice reset` to reset."
         ],
         "setvoice_reset_no_setting": [
@@ -105,10 +102,7 @@
         ],
         "setvoice_no_arg": [
           "No platform providing, please set by `{{prefix}}setvoice platform-name` or `{{prefix}}setvoice reset` to reset.\n",
-          "Currently supported platform: \n",
-          "```\n",
-          "{{data_support_platform}}\n",
-          "```"
+          "Currently supported platform: `{{data_support_platform}}`"
         ]
       },
       "say": {
@@ -215,10 +209,7 @@
         ],
         "platform_msg_default": [
           "Use `{{prefix}}setvoice` to set a platform. (ex. `{{prefix}}setvoice Google`)\n",
-          "Current supported platforms: \n",
-          "```\n",
-          "{{data_support_platform}}",
-          "```"
+          "Current supported platforms: `{{data_support_platform}}`"
         ],
         "platform_msg_current": [
           "Use `{{prefix}}setvoice` to set a platform. (Current: `{{data_platform}}`)"
@@ -357,10 +348,7 @@
       "setvoice": {
         "setvoice_arg_not_supported": [
           "不支援的語音轉文字引擎。\n",
-          "目前支援的引擎:\n",
-          "```\n",
-          "{{data_support_platform}}\n",
-          "```",
+          "目前支援的引擎: `{{data_support_platform}}` \n",
           "或使用 `{{prefix}}setvoice reset` 以重置。"
         ],
         "setvoice_reset_no_setting": [
@@ -374,10 +362,7 @@
         ],
         "setvoice_no_arg": [
           "未提供引擎，請透過 `{{prefix}}setvoice platform-name` 設定，或 `{{prefix}}setvoice reset` 以重置。\n",
-          "目前支援的引擎:\n",
-          "```\n",
-          "{{data_support_platform}}\n",
-          "```"
+          "目前支援的引擎: `{{data_support_platform}}`"
         ]
       },
       "say": {
@@ -484,10 +469,7 @@
         ],
         "platform_msg_default": [
           "使用 `{{prefix}}setvoice` 設定文字轉語音引擎提供者。 (ex. `{{prefix}}setvoice Google`)\n",
-          "目前支援的平台: \n",
-          "```\n",
-          "{{data_support_platform}}",
-          "```"
+          "目前支援的平台: `{{data_support_platform}}`"
         ],
         "platform_msg_current": [
           "請使用 `{{prefix}}setvoice` 設定文字轉語音引擎提供者。 (目前: `{{data_platform}}`)"
@@ -626,10 +608,7 @@
       "setvoice": {
         "setvoice_arg_not_supported": [
           "不支持的语音转文字引擎。\n",
-          "目前支持的引擎:\n",
-          "```\n",
-          "{{data_support_platform}}\n",
-          "```",
+          "目前支持的引擎: `{{data_support_platform}}` \n",
           "或使用 `{{prefix}}setvoice reset` 以重置。"
         ],
         "setvoice_reset_no_setting": [
@@ -643,10 +622,7 @@
         ],
         "setvoice_no_arg": [
           "未提供引擎，请透过 `{{prefix}}setvoice platform-name` 设定，或 `{{prefix}}setvoice reset` 以重置。\n",
-          "目前支持的引擎:\n",
-          "```\n",
-          "{{data_support_platform}}\n",
-          "```"
+          "目前支持的引擎: `{{data_support_platform}}`"
         ]
       },
       "say": {
@@ -753,10 +729,7 @@
         ],
         "platform_msg_default": [
           "使用 `{{prefix}}setvoice` 设定文字转语音引擎提供者。 (ex. `{{prefix}}setvoice Google`)\n",
-          "目前支持的平台: \n",
-          "```\n",
-          "{{data_support_platform}}",
-          "```"
+          "目前支持的平台: `{{data_support_platform}}` \n"
         ],
         "platform_msg_current": [
           "请使用 `{{prefix}}setvoice` 设定文字转语音引擎提供者。 (目前: `{{data_platform}}`)"
