@@ -1,4 +1,5 @@
 import json
+import multiprocessing
 import os
 
 import dotenv
@@ -16,6 +17,7 @@ def unique_languages_from_voices(voices):
 
 
 def list_languages():
+    print("Updating languages.json...")
     client = tts.TextToSpeechClient()
     response = client.list_voices()
     languages = unique_languages_from_voices(response.voices)
@@ -31,6 +33,7 @@ def list_languages():
 
 
 def list_azure_languages():
+    print("Updating azure_languages.json...")
     # Request module must be installed.
     # Run pip install requests if necessary.
     import requests
@@ -63,8 +66,8 @@ def list_azure_languages():
 
 
 if __name__ == "__main__":
-    print("Updating azure_languages.json...")
-    list_azure_languages()
-    print("Updating languages.json...")
-    list_languages()
+    azure_multi = multiprocessing.Process(target=list_azure_languages)
+    google_multi = multiprocessing.Process(target=list_languages)
+    azure_multi.start()
+    google_multi.start()
     # Why it returns 0xC0000005 error? Reason: google.cloud.texttospeech bug :(
