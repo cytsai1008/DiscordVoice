@@ -48,7 +48,7 @@ def read_db_json(filename) -> dict:
     return client.json().get(filename)
 
 
-def read_file_json(filename) -> dict:
+def read_local_json(filename) -> dict:
     """Returns dictionary from a json file"""
     with open(filename, "r") as f:
         data = json.load(f)
@@ -61,7 +61,7 @@ def write_db_json(filename: str, data: dict) -> None:
     # return False if args is type(None)
 
 
-def write_file_json(filename: str, data: dict) -> None:
+def write_local_json(filename: str, data: dict) -> None:
     """Writes dictionary to json file"""
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
@@ -82,23 +82,12 @@ def check_db_file(filename) -> bool:
     return bool(redis_client().exists(filename))
 
 
-def check_file_file(filename) -> bool:
+def check_local_file(filename) -> bool:
     """Check if filename exist in file"""
     return os.path.isfile(filename)
 
 
-"""
-def lang_command(lang: str, command: str) -> str:
-    try:
-        command_out = load_command.read_description(lang, command)
-    except FileNotFoundError:
-        command_out = load_command.read_description("en", command)
-    finally:
-        return command_out
-"""
-
-
-def get_id(self) -> str:
+def user_id_rename(self) -> str:
     """Return the id of the user or guild (user id start with `user_`)"""
     try:
         server_id = str(self.guild.id)
@@ -127,14 +116,14 @@ def check_platform(
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""
     if (
-            lang in read_file_json("lang_list/languages.json")["Support_Language"]
+            lang in read_local_json("lang_list/languages.json")["Support_Language"]
             and lang
-            not in read_file_json("lang_list/azure_languages.json")["Support_Language"]
+            not in read_local_json("lang_list/azure_languages.json")["Support_Language"]
     ):
         return "Google"
     if (
-            lang in read_file_json("lang_list/azure_languages.json")["Support_Language"]
-            and lang not in read_file_json("lang_list/languages.json")["Support_Language"]
+            lang in read_local_json("lang_list/azure_languages.json")["Support_Language"]
+            and lang not in read_local_json("lang_list/languages.json")["Support_Language"]
     ):
         return "Azure"
     user_id = f"user_{str(user_id)}"
@@ -209,20 +198,20 @@ def convert_msg(
     return a
 
 
-def get_lang_in_db(self) -> str:
+def check_db_lang(self) -> str:
     """Return the language of the user or guild (default: en)"""
     return (
-        read_db_json(get_id(self))["lang"]
+        read_db_json(user_id_rename(self))["lang"]
         if (
                 check_guild_or_dm(self)
-                and check_db_file(get_id(self))
-                and check_dict_data(read_db_json(get_id(self)), "lang")
+                and check_db_file(user_id_rename(self))
+                and check_dict_data(read_db_json(user_id_rename(self)), "lang")
         )
         else "en"
     )
 
 
-def fetch_link_head(content: str, lang, locale: dict) -> str:
+def content_link_replace(content: str, lang, locale: dict) -> str:
     """Return the head in the link if content has links"""
 
     # clear localhost 0.0.0.0 127.0.0.1

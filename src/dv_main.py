@@ -43,7 +43,7 @@ command_alias = {
     "force_say": ["fs", "forcesay", "force-say"],
 }
 
-locale = dv_tool_function.read_file_json("locale/dv_locale/locale.json")
+locale = dv_tool_function.read_local_json("locale/dv_locale/locale.json")
 supported_platform = {"Google", "Azure"}
 
 bot = commands.Bot(
@@ -181,7 +181,7 @@ async def on_guild_join(guild):
 @bot.event
 async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass-elif
     # sourcery skip: low-code-quality, remove-pass-elif
-    lang = dv_tool_function.get_lang_in_db(ctx)
+    lang = dv_tool_function.check_db_lang(ctx)
     command = ctx.invoked_with.lower()
 
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
@@ -214,8 +214,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             )
 
         elif command == "setlang":
-            support_lang = dv_tool_function.read_file_json("lang_list/languages.json")
-            azure_lang = dv_tool_function.read_file_json(
+            support_lang = dv_tool_function.read_local_json("lang_list/languages.json")
+            azure_lang = dv_tool_function.read_local_json(
                 "lang_list/azure_languages.json"
             )
             await ctx.reply(
@@ -536,7 +536,7 @@ async def on_error(event, *args, **kwargs):
 
 @bot.command(Name="help", aliases=command_alias["help"])
 async def help(ctx):  # sourcery skip: low-code-quality
-    locale_lang = dv_tool_function.get_lang_in_db(ctx)
+    locale_lang = dv_tool_function.check_db_lang(ctx)
     try:
         _ = ctx.guild.id
     except Exception:
@@ -555,8 +555,8 @@ async def help(ctx):  # sourcery skip: low-code-quality
                 ["prefix", config["prefix"], "data_lang", data["lang"]],
             )
         else:
-            # support_lang = dv_tool_function.read_file_json("languages.json")
-            # azure_lang = dv_tool_function.read_file_json("azure_languages.json")
+            # support_lang = dv_tool_function.read_local_json("languages.json")
+            # azure_lang = dv_tool_function.read_local_json("azure_languages.json")
             lang_msg = dv_tool_function.convert_msg(
                 locale,
                 locale_lang,
@@ -643,8 +643,8 @@ async def help(ctx):  # sourcery skip: low-code-quality
             "platform",
         )
     ):
-        # support_lang = dv_tool_function.read_file_json("languages.json")
-        # azure_lang = dv_tool_function.read_file_json("azure_languages.json")
+        # support_lang = dv_tool_function.read_local_json("languages.json")
+        # azure_lang = dv_tool_function.read_local_json("azure_languages.json")
         data = dv_tool_function.read_db_json("user_config")[
             f"user_{int(ctx.author.id)}"
         ]
@@ -715,8 +715,8 @@ async def help(ctx):  # sourcery skip: low-code-quality
         )
 
     else:
-        # support_lang = dv_tool_function.read_file_json("languages.json")
-        # azure_lang = dv_tool_function.read_file_json("azure_languages.json")
+        # support_lang = dv_tool_function.read_local_json("languages.json")
+        # azure_lang = dv_tool_function.read_local_json("azure_languages.json")
         await ctx.reply(
             dv_tool_function.convert_msg(
                 locale,
@@ -775,7 +775,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
 # @commands.bot_has_permissions(connect=True, speak=True)
 async def join(ctx, *, channel: discord.VoiceChannel):
     # join
-    locale_lang = dv_tool_function.get_lang_in_db(ctx)
+    locale_lang = dv_tool_function.check_db_lang(ctx)
     user_voice_channel = channel
     try:
         await user_voice_channel.connect()
@@ -807,7 +807,7 @@ async def join_error(ctx, error):
         await ctx.reply(
             dv_tool_function.convert_msg(
                 locale,
-                dv_tool_function.get_lang_in_db(ctx),
+                dv_tool_function.check_db_lang(ctx),
                 "command",
                 "join",
                 "join_bad_arg",
@@ -853,7 +853,7 @@ async def setchannel(ctx, channel: discord.TextChannel):
     await ctx.reply(
         dv_tool_function.convert_msg(
             locale,
-            dv_tool_function.get_lang_in_db(ctx),
+            dv_tool_function.check_db_lang(ctx),
             "command",
             "setchannel",
             "setchannel_success",
@@ -873,7 +873,7 @@ async def setchannel_error(ctx, error):
         await ctx.reply(
             dv_tool_function.convert_msg(
                 locale,
-                dv_tool_function.get_lang_in_db(ctx),
+                dv_tool_function.check_db_lang(ctx),
                 "command",
                 "setchannel",
                 "setchannel_bad_arg",
@@ -889,7 +889,7 @@ async def setchannel_error(ctx, error):
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # sourcery skip: low-code-quality
 
-    locale_lang = dv_tool_function.get_lang_in_db(ctx)
+    locale_lang = dv_tool_function.check_db_lang(ctx)
 
     user_id = ctx.author.id
     user_platform_set = bool(
@@ -966,10 +966,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 fix_channel_mentions=True, use_nicknames=True
             ).convert(ctx, content)
 
-            # Animate Emoji Replace
-            if re.findall("<a:[^:]+:\d+>", content):
-                emoji_id = re.findall("<a:[^:]+:\d+>", content)
-                emoji_text = re.findall("<a:([^:]+):\d+>", content)
+            # Emoji Replace
+            if re.findall("<a?:[^:]+:\d+>", content):
+                emoji_id = re.findall("<a?:[^:]+:\d+>", content)
+                emoji_text = re.findall("<a?:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
                     content = content.replace(
                         emoji_id[i],
@@ -983,24 +983,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         ),
                     )
 
-            # Standard Emoji Replace
-            if re.findall("<:[^:]+:\d+>", content):
-                emoji_id = re.findall("<:[^:]+:\d+>", content)
-                emoji_text = re.findall("<:([^:]+):\d+>", content)
-                for i in range(len(emoji_id)):
-                    content = content.replace(
-                        emoji_id[i],
-                        dv_tool_function.convert_msg(
-                            locale,
-                            db["lang"],
-                            "variable",
-                            "say",
-                            "emoji",
-                            ["data_emoji", emoji_text[i]],
-                        ),
-                    )
-
-            content = dv_tool_function.fetch_link_head(content, db["lang"], locale)
+            content = dv_tool_function.content_link_replace(content, db["lang"], locale)
 
             say_this = (
                 ctx.author.id in (int(config["owner"]), 890234177767755849)
@@ -1015,8 +998,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             send_time = int(
                 time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple())
             )
-            if dv_tool_function.check_file_file(f"msg_temp/{guild_id}.json"):
-                old_msg_temp = dv_tool_function.read_file_json(
+            if dv_tool_function.check_local_file(f"msg_temp/{guild_id}.json"):
+                old_msg_temp = dv_tool_function.read_local_json(
                     f"msg_temp/{guild_id}.json"
                 )
                 if (
@@ -1183,7 +1166,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                             )
                         )
                         msg_tmp = {0: send_time, 1: user_id}
-                        dv_tool_function.write_file_json(
+                        dv_tool_function.write_local_json(
                             f"msg_temp/{guild_id}.json", msg_tmp
                         )
 
@@ -1321,10 +1304,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
 @commands.guild_only()
 async def setlang(ctx, lang: str):
     # get guild id
-    locale_lang = dv_tool_function.get_lang_in_db(ctx)
+    locale_lang = dv_tool_function.check_db_lang(ctx)
     guild_id = ctx.guild.id
-    support_lang = dv_tool_function.read_file_json("lang_list/languages.json")
-    azure_lang = dv_tool_function.read_file_json("lang_list/azure_languages.json")
+    support_lang = dv_tool_function.read_local_json("lang_list/languages.json")
+    azure_lang = dv_tool_function.read_local_json("lang_list/azure_languages.json")
     lang = lang.lower()
     lang = lang.replace("_", "-")
     if (
@@ -1427,7 +1410,7 @@ async def clear(ctx):
         await ctx.reply(
             dv_tool_function.convert_msg(
                 locale,
-                dv_tool_function.get_lang_in_db(ctx),
+                dv_tool_function.check_db_lang(ctx),
                 "command",
                 "clear",
                 "clear",
@@ -1460,7 +1443,7 @@ async def invite(ctx):
     await ctx.reply(
         dv_tool_function.convert_msg(
             locale,
-            dv_tool_function.get_lang_in_db(ctx),
+            dv_tool_function.check_db_lang(ctx),
             "command",
             "invite",
             "invite",
@@ -1483,7 +1466,7 @@ async def wrong_msg(ctx, msg: str):
             if msg == "on":
                 reply_msg = dv_tool_function.convert_msg(
                     locale,
-                    dv_tool_function.get_lang_in_db(ctx),
+                    dv_tool_function.check_db_lang(ctx),
                     "command",
                     "wrong_msg",
                     "wrong_msg_on",
@@ -1492,7 +1475,7 @@ async def wrong_msg(ctx, msg: str):
             elif msg == "off":
                 reply_msg = dv_tool_function.convert_msg(
                     locale,
-                    dv_tool_function.get_lang_in_db(ctx),
+                    dv_tool_function.check_db_lang(ctx),
                     "command",
                     "wrong_msg",
                     "wrong_msg_off",
@@ -1506,7 +1489,7 @@ async def wrong_msg(ctx, msg: str):
             await ctx.reply(
                 dv_tool_function.convert_msg(
                     locale,
-                    dv_tool_function.get_lang_in_db(ctx),
+                    dv_tool_function.check_db_lang(ctx),
                     "command",
                     "wrong_msg",
                     "wrong_msg_bad_arg",
@@ -1521,7 +1504,7 @@ async def wrong_msg(ctx, msg: str):
         await ctx.reply(
             dv_tool_function.convert_msg(
                 locale,
-                dv_tool_function.get_lang_in_db(ctx),
+                dv_tool_function.check_db_lang(ctx),
                 "command",
                 "wrong_msg",
                 "wrong_msg_no_setting",
@@ -1561,7 +1544,7 @@ async def move_error(ctx, error):
         await ctx.reply(
             dv_tool_function.convert_msg(
                 locale,
-                dv_tool_function.get_lang_in_db(ctx),
+                dv_tool_function.check_db_lang(ctx),
                 "command",
                 "move",
                 "move_bad_arg",
@@ -1581,7 +1564,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
     # sourcery skip: low-code-quality
     # get message channel id
 
-    locale_lang = dv_tool_function.get_lang_in_db(ctx)
+    locale_lang = dv_tool_function.check_db_lang(ctx)
 
     user_id = ctx.author.id
     user_platform_set = bool(
@@ -1616,10 +1599,10 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 del joined_vc[str(guild_id)]
             dv_tool_function.write_db_json("joined_vc", joined_vc)
 
-        lang_code_list = dv_tool_function.read_file_json("lang_list/languages.json")[
+        lang_code_list = dv_tool_function.read_local_json("lang_list/languages.json")[
             "Support_Language"
         ]
-        azure_lang_code_list = dv_tool_function.read_file_json(
+        azure_lang_code_list = dv_tool_function.read_local_json(
             "lang_list/azure_languages.json"
         )["Support_Language"]
 
@@ -1651,10 +1634,10 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 fix_channel_mentions=True, use_nicknames=True
             ).convert(ctx, content)
 
-            # Animate Emoji Replace
-            if re.findall("<a:[^:]+:\d+>", content):
-                emoji_id = re.findall("<a:[^:]+:\d+>", content)
-                emoji_text = re.findall("<a:([^:]+):\d+>", content)
+            # Emoji Replace
+            if re.findall("<a?:[^:]+:\d+>", content):
+                emoji_id = re.findall("<a?:[^:]+:\d+>", content)
+                emoji_text = re.findall("<a?:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
                     content = content.replace(
                         emoji_id[i],
@@ -1668,24 +1651,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         ),
                     )
 
-            # Standard Emoji Replace
-            if re.findall("<:[^:]+:\d+>", content):
-                emoji_id = re.findall("<:[^:]+:\d+>", content)
-                emoji_text = re.findall("<:([^:]+):\d+>", content)
-                for i in range(len(emoji_id)):
-                    content = content.replace(
-                        emoji_id[i],
-                        dv_tool_function.convert_msg(
-                            locale,
-                            lang,
-                            "variable",
-                            "say",
-                            "emoji",
-                            ["data_emoji", emoji_text[i]],
-                        ),
-                    )
-
-            content = dv_tool_function.fetch_link_head(content, lang, locale)
+            content = dv_tool_function.content_link_replace(content, lang, locale)
 
             say_this = (
                 ctx.author.id in (int(config["owner"]), 890234177767755849)
@@ -1700,8 +1666,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             send_time = int(
                 time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple())
             )
-            if dv_tool_function.check_file_file(f"msg_temp/{guild_id}.json"):
-                old_msg_temp = dv_tool_function.read_file_json(
+            if dv_tool_function.check_local_file(f"msg_temp/{guild_id}.json"):
+                old_msg_temp = dv_tool_function.read_local_json(
                     f"msg_temp/{guild_id}.json"
                 )
                 if (
@@ -1854,7 +1820,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                             )
                         )
                         msg_tmp = {0: send_time, 1: user_id}
-                        dv_tool_function.write_file_json(
+                        dv_tool_function.write_local_json(
                             f"msg_temp/{guild_id}.json", msg_tmp
                         )
 
@@ -2000,7 +1966,7 @@ async def force_say(
     # sourcery skip: low-code-quality
     # get message channel id
 
-    locale_lang = dv_tool_function.get_lang_in_db(ctx)
+    locale_lang = dv_tool_function.check_db_lang(ctx)
 
     user_id = ctx.author.id
     user_platform_set = bool(
@@ -2061,10 +2027,10 @@ async def force_say(
                 fix_channel_mentions=True, use_nicknames=True
             ).convert(ctx, content)
 
-            # Animate Emoji Replace
-            if re.findall("<a:[^:]+:\d+>", content):
-                emoji_id = re.findall("<a:[^:]+:\d+>", content)
-                emoji_text = re.findall("<a:([^:]+):\d+>", content)
+            # Emoji Replace
+            if re.findall("<a?:[^:]+:\d+>", content):
+                emoji_id = re.findall("<a?:[^:]+:\d+>", content)
+                emoji_text = re.findall("<a?:([^:]+):\d+>", content)
                 for i in range(len(emoji_id)):
                     content = content.replace(
                         emoji_id[i],
@@ -2078,24 +2044,7 @@ async def force_say(
                         ),
                     )
 
-            # Standard Emoji Replace
-            if re.findall("<:[^:]+:\d+>", content):
-                emoji_id = re.findall("<:[^:]+:\d+>", content)
-                emoji_text = re.findall("<:([^:]+):\d+>", content)
-                for i in range(len(emoji_id)):
-                    content = content.replace(
-                        emoji_id[i],
-                        dv_tool_function.convert_msg(
-                            locale,
-                            db["lang"],
-                            "variable",
-                            "say",
-                            "emoji",
-                            ["data_emoji", emoji_text[i]],
-                        ),
-                    )
-
-            content = dv_tool_function.fetch_link_head(content, db["lang"], locale)
+            content = dv_tool_function.content_link_replace(content, db["lang"], locale)
 
             say_this = (
                 ctx.author.id in (int(config["owner"]), 890234177767755849)
@@ -2428,7 +2377,7 @@ async def setvoice(ctx, platform: str):
         await ctx.reply(
             dv_tool_function.convert_msg(
                 locale,
-                dv_tool_function.get_lang_in_db(ctx),
+                dv_tool_function.check_db_lang(ctx),
                 "command",
                 "setvoice",
                 "setvoice_arg_not_supported",
@@ -2442,7 +2391,7 @@ async def setvoice(ctx, platform: str):
         )
         return
     is_guild = dv_tool_function.check_guild_or_dm(ctx)
-    guild_id = dv_tool_function.get_id(ctx)
+    guild_id = dv_tool_function.user_id_rename(ctx)
 
     if platform.lower() == "reset":
         if not is_guild and (
@@ -2456,7 +2405,7 @@ async def setvoice(ctx, platform: str):
             await ctx.reply(
                 dv_tool_function.convert_msg(
                     locale,
-                    dv_tool_function.get_lang_in_db(ctx),
+                    dv_tool_function.check_db_lang(ctx),
                     "command",
                     "setvoice",
                     "setvoice_reset_no_setting",
@@ -2474,7 +2423,7 @@ async def setvoice(ctx, platform: str):
             await ctx.reply(
                 dv_tool_function.convert_msg(
                     locale,
-                    dv_tool_function.get_lang_in_db(ctx),
+                    dv_tool_function.check_db_lang(ctx),
                     "command",
                     "setvoice",
                     "setvoice_reset_no_setting",
@@ -2497,7 +2446,7 @@ async def setvoice(ctx, platform: str):
         await ctx.reply(
             dv_tool_function.convert_msg(
                 locale,
-                dv_tool_function.get_lang_in_db(ctx),
+                dv_tool_function.check_db_lang(ctx),
                 "command",
                 "setvoice",
                 "setvoice_reset_success",
@@ -2523,7 +2472,7 @@ async def setvoice(ctx, platform: str):
     await ctx.reply(
         dv_tool_function.convert_msg(
             locale,
-            dv_tool_function.get_lang_in_db(ctx),
+            dv_tool_function.check_db_lang(ctx),
             "command",
             "setvoice",
             "setvoice_success",
