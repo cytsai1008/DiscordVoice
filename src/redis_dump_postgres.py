@@ -154,5 +154,6 @@ cur.execute(
     DELETE FROM wfnm_dump_data WHERE datetime < (NOW() - INTERVAL '1 month');
     """
 )
+heroku_postgres.commit()
 
 heroku_postgres.close()
