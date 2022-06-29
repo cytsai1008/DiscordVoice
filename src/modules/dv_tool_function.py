@@ -108,35 +108,35 @@ def check_guild_or_dm(self) -> bool:
 
 
 def check_platform(
-        user_platform_set: bool,
-        user_id: [str, int],
-        guild_platform_set: bool,
-        guild_id: [str, int],
-        lang: str,
+    user_platform_set: bool,
+    user_id: [str, int],
+    guild_platform_set: bool,
+    guild_id: [str, int],
+    lang: str,
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""
     if (
-            lang in read_local_json("lang_list/languages.json")["Support_Language"]
-            and lang
-            not in read_local_json("lang_list/azure_languages.json")["Support_Language"]
+        lang in read_local_json("lang_list/languages.json")["Support_Language"]
+        and lang
+        not in read_local_json("lang_list/azure_languages.json")["Support_Language"]
     ):
         return "Google"
     if (
-            lang in read_local_json("lang_list/azure_languages.json")["Support_Language"]
-            and lang not in read_local_json("lang_list/languages.json")["Support_Language"]
+        lang in read_local_json("lang_list/azure_languages.json")["Support_Language"]
+        and lang not in read_local_json("lang_list/languages.json")["Support_Language"]
     ):
         return "Azure"
     user_id = f"user_{str(user_id)}"
     if (
-            user_platform_set
-            and read_db_json("user_config")[user_id]["platform"] == "Google"
+        user_platform_set
+        and read_db_json("user_config")[user_id]["platform"] == "Google"
     ):
         postgres_logging("Init Google TTS API 1")
         return "Google"
 
     elif (
-            user_platform_set
-            and read_db_json("user_config")[user_id]["platform"] == "Azure"
+        user_platform_set
+        and read_db_json("user_config")[user_id]["platform"] == "Azure"
     ):
         postgres_logging("Init Azure TTS API 1")
         return "Azure"
@@ -175,12 +175,12 @@ def get_translate_lang(lang: str, locale_dict: dict) -> str:
 
 
 def convert_msg(
-        locale_dict: dict,
-        lang: str,
-        msg_type: str,
-        command: str,
-        name: str,
-        convert_text: [list, None],
+    locale_dict: dict,
+    lang: str,
+    msg_type: str,
+    command: str,
+    name: str,
+    convert_text: [list, None],
 ) -> str:
     """
     Convert message from locale\n
@@ -203,9 +203,9 @@ def check_db_lang(self) -> str:
     return (
         read_db_json(user_id_rename(self))["lang"]
         if (
-                check_guild_or_dm(self)
-                and check_db_file(user_id_rename(self))
-                and check_dict_data(read_db_json(user_id_rename(self)), "lang")
+            check_guild_or_dm(self)
+            and check_db_file(user_id_rename(self))
+            and check_dict_data(read_db_json(user_id_rename(self)), "lang")
         )
         else "en"
     )
@@ -226,9 +226,9 @@ def content_link_replace(content: str, lang, locale: dict) -> str:
             content = content.replace(j, "")
 
     if not re.findall(
-            "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
-            content,
-            flags=re.IGNORECASE,
+        "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
+        content,
+        flags=re.IGNORECASE,
     ):
         return content
 
