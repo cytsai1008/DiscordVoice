@@ -3,7 +3,6 @@ import contextlib
 import datetime
 import os
 import queue
-import re
 import shutil
 import signal
 import subprocess
@@ -14,6 +13,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
+from src.modules import dv_command_func as command_func
 from src.modules import dv_tool_function as tool_function
 from src.modules import tts_func
 
@@ -115,7 +115,6 @@ async def on_ready():
         for i, j in joined_vc.items():
             # join the vc
             try:
-                # noinspection PyUnresolvedReferences
                 await bot.get_channel(int(j)).connect()
             except Exception:
                 remove_vc.append(str(i))
@@ -919,25 +918,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             and channel_id == db["channel"]
         ):
 
-            # use cld to detect language
-            """
-            _, _, _, language = pycld2.detect(content, returnVector=True, debugScoreAsQuads=True)
-            # separate multiple tuples as list
-            language = list(language)
-            # find unknown language as english in all key
-            for i in range(len(language)):
-                if language[i][4] == "un":
-                    language[i][4] = "en"
-                    language[i][3] = "ENGLISH"
-                # merge if adjacent key are same
-                if i != 0 and language[i][4] == language[i - 1][4]:
-                    language[i - 1][2] += language[i][2]
-
-            # separate text language
-            # TODO: Multiple language split ( I can't split by number )
-            """
-            # export content to mp3 by google tts api
-            # get username
+            # TODO: use cld to detect language
 
             """
             Discord User ID RegExp
@@ -947,28 +928,9 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             <@&[0-9]{18}>
             """
 
-            content = await commands.clean_content(
-                fix_channel_mentions=True, use_nicknames=True
-            ).convert(ctx, content)
-
-            # Emoji Replace
-            if re.findall("<a?:[^:]+:\d+>", content):
-                emoji_id = re.findall("<a?:[^:]+:\d+>", content)
-                emoji_text = re.findall("<a?:([^:]+):\d+>", content)
-                for i in range(len(emoji_id)):
-                    content = content.replace(
-                        emoji_id[i],
-                        tool_function.convert_msg(
-                            locale,
-                            db["lang"],
-                            "variable",
-                            "say",
-                            "emoji",
-                            ["data_emoji", emoji_text[i]],
-                        ),
-                    )
-
-            content = tool_function.content_link_replace(content, db["lang"], locale)
+            content = await command_func.content_convert(
+                ctx, db["lang"], locale, content
+            )
 
             say_this = (
                 ctx.author.id in (int(config["owner"]), 890234177767755849)
@@ -1078,7 +1040,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 if not ctx.voice_client.is_playing():
                     tool_function.postgres_logging("play mp3")
 
-                    platform_result = tool_function.check_platform(
+                    platform_result = command_func.check_platform(
                         user_platform_set,
                         user_id,
                         guild_platform_set,
@@ -1386,6 +1348,16 @@ async def shutdown(ctx):
 @bot.command(Name="clear", aliases=["c"])
 @commands.guild_only()
 async def clear(ctx):
+    with contextlib.suppress(Exception):
+        try:
+            ctx.voice_client.is_connected()
+        except AttributeError:
+            is_connected = False
+        else:
+            is_connected = True
+
+        if is_connected and ctx.voice_client.is_playing():
+            ctx.voice_client.stop()
     list_name = f"list_{ctx.guild.id}"
     if list_name in globals():
         globals()[list_name].queue.clear()
@@ -1612,28 +1584,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             <@&[0-9]{18}>
             """
 
-            content = await commands.clean_content(
-                fix_channel_mentions=True, use_nicknames=True
-            ).convert(ctx, content)
-
-            # Emoji Replace
-            if re.findall("<a?:[^:]+:\d+>", content):
-                emoji_id = re.findall("<a?:[^:]+:\d+>", content)
-                emoji_text = re.findall("<a?:([^:]+):\d+>", content)
-                for i in range(len(emoji_id)):
-                    content = content.replace(
-                        emoji_id[i],
-                        tool_function.convert_msg(
-                            locale,
-                            lang,
-                            "variable",
-                            "say",
-                            "emoji",
-                            ["data_emoji", emoji_text[i]],
-                        ),
-                    )
-
-            content = tool_function.content_link_replace(content, lang, locale)
+            content = await command_func.content_convert(ctx, lang, locale, content)
 
             say_this = (
                 ctx.author.id in (int(config["owner"]), 890234177767755849)
@@ -1743,7 +1694,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 if not ctx.voice_client.is_playing():
                     tool_function.postgres_logging("play mp3")
 
-                    platform_result = tool_function.check_platform(
+                    platform_result = command_func.check_platform(
                         user_platform_set, user_id, guild_platform_set, guild_id, lang
                     )
                     # GCP Cloud Text to Speech Method
@@ -2002,29 +1953,9 @@ async def force_say(
             <@&[0-9]{18}>
             """
 
-            content = await commands.clean_content(
-                fix_channel_mentions=True, use_nicknames=True
-            ).convert(ctx, content)
+            content = command_func.content_convert(ctx, db["lang"], locale, content)
 
-            # Emoji Replace
-            if re.findall("<a?:[^:]+:\d+>", content):
-                emoji_id = re.findall("<a?:[^:]+:\d+>", content)
-                emoji_text = re.findall("<a?:([^:]+):\d+>", content)
-                for i in range(len(emoji_id)):
-                    content = content.replace(
-                        emoji_id[i],
-                        tool_function.convert_msg(
-                            locale,
-                            db["lang"],
-                            "variable",
-                            "say",
-                            "emoji",
-                            ["data_emoji", emoji_text[i]],
-                        ),
-                    )
-
-            content = tool_function.content_link_replace(content, db["lang"], locale)
-
+            # noinspection PyTypeChecker
             say_this = (
                 ctx.author.id in (int(config["owner"]), 890234177767755849)
                 or len(content) < 50
@@ -2083,7 +2014,7 @@ async def force_say(
                 if not ctx.voice_client.is_playing():
                     tool_function.postgres_logging("play mp3")
 
-                    platform_result = tool_function.check_platform(
+                    platform_result = command_func.check_platform(
                         user_platform_set,
                         user_id,
                         guild_platform_set,
@@ -2138,7 +2069,7 @@ async def force_say(
                         else:
                             tool_function.postgres_logging("play mp3")
 
-                            platform_result = tool_function.check_platform(
+                            platform_result = command_func.check_platform(
                                 user_platform_set,
                                 user_id,
                                 guild_platform_set,
@@ -2190,7 +2121,7 @@ async def force_say(
                 else:
                     tool_function.postgres_logging("play mp3")
 
-                    platform_result = tool_function.check_platform(
+                    platform_result = command_func.check_platform(
                         user_platform_set,
                         user_id,
                         guild_platform_set,

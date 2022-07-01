@@ -1,12 +1,9 @@
 import datetime
 import json
 import os
-import re
 
-import bs4
 import psycopg2
 import redis
-import requests
 
 
 def postgres_logging(logging_data: str):
@@ -107,59 +104,6 @@ def check_guild_or_dm(self) -> bool:
         return True
 
 
-def check_platform(
-    user_platform_set: bool,
-    user_id: [str, int],
-    guild_platform_set: bool,
-    guild_id: [str, int],
-    lang: str,
-) -> str:
-    """Return the platform of the user or guild (default: Google)"""
-    if (
-        lang in read_local_json("lang_list/languages.json")["Support_Language"]
-        and lang
-        not in read_local_json("lang_list/azure_languages.json")["Support_Language"]
-    ):
-        return "Google"
-    if (
-        lang in read_local_json("lang_list/azure_languages.json")["Support_Language"]
-        and lang not in read_local_json("lang_list/languages.json")["Support_Language"]
-    ):
-        return "Azure"
-    user_id = f"user_{str(user_id)}"
-    if (
-        user_platform_set
-        and read_db_json("user_config")[user_id]["platform"] == "Google"
-    ):
-        postgres_logging("Init Google TTS API 1")
-        return "Google"
-
-    elif (
-        user_platform_set
-        and read_db_json("user_config")[user_id]["platform"] == "Azure"
-    ):
-        postgres_logging("Init Azure TTS API 1")
-        return "Azure"
-    elif guild_platform_set and read_db_json(f"{guild_id}")["platform"] == "Google":
-        postgres_logging("Init Google TTS API 2")
-        return "Google"
-    elif guild_platform_set and read_db_json(f"{guild_id}")["platform"] == "Azure":
-        postgres_logging("Init Azure TTS API 2")
-        return "Azure"
-    elif not user_platform_set and not guild_platform_set:
-        postgres_logging("Init Google TTS API 3")
-        return "Google"
-    else:
-        postgres_logging(
-            f"You found a bug\n"
-            f"User platform: {user_platform_set}\n"
-            f"User id: {user_id}\n"
-            f"Guild platform: {guild_platform_set}\n"
-            f"Guild id: {guild_id}\n"
-        )
-        return "Something wrong"
-
-
 def del_db_json(filename) -> None:
     """Delete json value from redis (key: filename)"""
     redis_client().delete(filename)
@@ -183,11 +127,7 @@ def convert_msg(
     convert_text: [list, None],
 ) -> str:
     """
-    Convert message from locale\n
-    ex.\n
-    ```
-    convert_msg(locale, 'en','variable', 'help', 'channel_msg_default', ['prefix', config['prefix'], 'sys_channel', guild_system_channel.id])```\n
-    ```convert_msg(locale, 'en', 'command', 'say', 'say_queue_not_support', None)```
+    Convert message from locale
     """
     lang = get_translate_lang(lang, locale_dict)
     a = "".join(locale_dict[lang][msg_type][command][name])
@@ -209,61 +149,3 @@ def check_db_lang(self) -> str:
         )
         else "en"
     )
-
-
-def content_link_replace(content: str, lang, locale: dict) -> str:
-    """Return the head in the link if content has links"""
-
-    # clear localhost 0.0.0.0 127.0.0.1
-    local_list = [
-        re.findall("(https?://127.0.0.1:\d{1,5}/?[^ ]+)", content),
-        re.findall("(https?://localhost:\d{1,5}/?[^ ]+)", content, flags=re.IGNORECASE),
-        re.findall("(https?://0.0.0.0:\d{1,5}/?[^ ]+)", content),
-    ]
-
-    for i in local_list:
-        for j in i:
-            content = content.replace(j, "")
-
-    if not re.findall(
-        "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
-        content,
-        flags=re.IGNORECASE,
-    ):
-        return content
-
-    url = re.findall(
-        "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
-        content,
-        flags=re.IGNORECASE,
-    )
-    if len(url) <= 3:
-        for i in url:
-            headers = {
-                "user-agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
-            }
-            try:
-                r = requests.get(i, headers=headers)
-                soup = bs4.BeautifulSoup(r.text, "lxml")
-                title = soup.title.text
-            except Exception:
-                content = content.replace(i, "")
-            else:
-                convert_text = convert_msg(
-                    locale,
-                    lang,
-                    "variable",
-                    "say",
-                    "link",
-                    [
-                        "data_link",
-                        title,
-                    ],
-                )
-                content = content.replace(i, convert_text)
-
-    else:
-        for i in url:
-            content = content.replace(i, "")
-
-    return content

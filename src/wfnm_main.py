@@ -2,7 +2,6 @@ import logging
 import os
 import random
 import signal
-
 # import subprocess
 from datetime import datetime
 from datetime import timezone
@@ -133,7 +132,6 @@ async def add(ctx, *args):
             if not tool_function.check_dict_data(data, args[0]):
                 data[args[0]] = []
                 # Check Key exists
-            del_list = []
             del_list = tool_function.check_duplicate_data(data[args[0]], meal_list)
             # Add duplicate to del_list to delete
             # print(del_list)
