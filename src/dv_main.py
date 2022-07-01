@@ -377,10 +377,10 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         await ctx.message.add_reaction("⏳")
 
     elif (
-        command in ["setchannel", "join", "move"]
-        or command in command_alias["join"]
-        or command_alias["move"]
-        and isinstance(error, discord.ext.commands.errors.ChannelNotFound)
+            command in ["setchannel", "join", "move"]
+            or command in command_alias["join"]
+            or command_alias["move"]
+            and isinstance(error, discord.ext.commands.errors.ChannelNotFound)
     ):
         pass
 
@@ -427,6 +427,24 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             server_id = ""
         sender_name = ctx.author.name
         command_name = ctx.invoked_with
+
+        owner_data = await bot.fetch_user(config["owner"])
+        owner_name = owner_data.name
+        owner_discriminator = owner_data.discriminator
+        owner_full_id = f"{owner_name}#{owner_discriminator}"
+        await owner_data.send(
+            f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
+            "```"
+            f"Command: {command_name}\n"
+            f"Error: {error}\n"
+            f"Error Type: {type(error)}\n"
+            f"Server Name: {server_name}\n"
+            f"Server ID: {server_id}\n"
+            f"Sender: {sender_name}#{ctx.author.discriminator}\n"
+            "```"
+        )
+        await owner_data.send(ctx.message.content)
+
         try:
             # get owner name
             owner_data = await bot.fetch_user(config["owner"])
@@ -452,7 +470,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                     ],
                 )
             )
-        except Exception:
+        except:
             not_able_reply = traceback.format_exc()
             owner_data = await bot.fetch_user(config["owner"])
             owner_name = owner_data.name
@@ -478,26 +496,13 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                         ],
                     )
                 )
-            except Exception:
+            except:
                 not_able_send = traceback.format_exc()
-        owner_data = await bot.fetch_user(config["owner"])
-        owner_name = owner_data.name
-        owner_discriminator = owner_data.discriminator
-        owner_full_id = f"{owner_name}#{owner_discriminator}"
-        await owner_data.send(
-            f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
-            "```"
-            f"Command: {command_name}\n"
-            f"Error: {error}\n"
-            f"Error Type: {type(error)}\n"
-            f"Unable to reply: {not_able_reply}\n"
-            f"Unable to send: {not_able_send}\n"
-            f"Server Name: {server_name}\n"
-            f"Server ID: {server_id}\n"
-            f"Sender: {sender_name}#{ctx.author.discriminator}\n"
-            "```"
-        )
-        await owner_data.send(ctx.message.content)
+
+            await owner_data.send(
+                f"Unable to reply: {not_able_reply}\n"
+                f"Unable to send: {not_able_send}\n"
+            )
 
 
 """
@@ -619,15 +624,15 @@ async def help(ctx):  # sourcery skip: low-code-quality
             )
         )
     elif (
-        not guild_msg
-        and tool_function.check_dict_data(
-            tool_function.read_db_json("user_config"),
-            f"user_{int(ctx.author.id)}",
-        )
-        and tool_function.check_dict_data(
-            tool_function.read_db_json("user_config")[f"user_{int(ctx.author.id)}"],
-            "platform",
-        )
+            not guild_msg
+            and tool_function.check_dict_data(
+        tool_function.read_db_json("user_config"),
+        f"user_{int(ctx.author.id)}",
+    )
+            and tool_function.check_dict_data(
+        tool_function.read_db_json("user_config")[f"user_{int(ctx.author.id)}"],
+        "platform",
+    )
     ):
         # support_lang = tool_function.read_local_json("languages.json")
         # azure_lang = tool_function.read_local_json("azure_languages.json")
@@ -912,10 +917,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
         langissetup = tool_function.check_dict_data(db, "lang")
 
         if (
-            is_connected
-            and channelissetup
-            and langissetup
-            and channel_id == db["channel"]
+                is_connected
+                and channelissetup
+                and langissetup
+                and channel_id == db["channel"]
         ):
 
             # TODO: use cld to detect language
@@ -933,8 +938,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             )
 
             say_this = (
-                ctx.author.id in (int(config["owner"]), 890234177767755849)
-                or len(content) < 50
+                    ctx.author.id in (int(config["owner"]), 890234177767755849)
+                    or len(content) < 50
             )
             try:
                 username = ctx.author.display_name
@@ -950,8 +955,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     f"msg_temp/{guild_id}.json"
                 )
                 if (
-                    old_msg_temp["1"] == user_id
-                    and send_time - int(old_msg_temp["0"]) <= 15
+                        old_msg_temp["1"] == user_id
+                        and send_time - int(old_msg_temp["0"]) <= 15
                 ):
                     no_name = True
             id_too_long = False
@@ -1144,12 +1149,12 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 )
 
         elif (
-            channelissetup
-            and channel_id != db["channel"]
-            and (
-                not tool_function.check_dict_data(db, "not_this_channel_msg")
-                or db["not_this_channel_msg"] != "off"
-            )
+                channelissetup
+                and channel_id != db["channel"]
+                and (
+                        not tool_function.check_dict_data(db, "not_this_channel_msg")
+                        or db["not_this_channel_msg"] != "off"
+                )
         ):
             channel_msg = tool_function.convert_msg(
                 locale,
@@ -1182,8 +1187,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             await ctx.message.add_reaction("🤔")
 
         elif (
-            tool_function.check_dict_data(db, "not_this_channel_msg")
-            and db["not_this_channel_msg"] == "off"
+                tool_function.check_dict_data(db, "not_this_channel_msg")
+                and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
@@ -1255,8 +1260,8 @@ async def setlang(ctx, lang: str):
     lang = lang.lower()
     lang = lang.replace("_", "-")
     if (
-        lang in support_lang["Support_Language"]
-        or lang in azure_lang["Support_Language"]
+            lang in support_lang["Support_Language"]
+            or lang in azure_lang["Support_Language"]
     ):
         if tool_function.check_db_file(f"{guild_id}"):
             # read db file
@@ -1567,10 +1572,10 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         channelissetup = tool_function.check_dict_data(db, "channel")
 
         if (
-            is_connected
-            and channelissetup
-            and lang_code_is_right
-            and channel_id == db["channel"]
+                is_connected
+                and channelissetup
+                and lang_code_is_right
+                and channel_id == db["channel"]
         ):
 
             # export content to mp3 by google tts api
@@ -1587,8 +1592,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             content = await command_func.content_convert(ctx, lang, locale, content)
 
             say_this = (
-                ctx.author.id in (int(config["owner"]), 890234177767755849)
-                or len(content) < 50
+                    ctx.author.id in (int(config["owner"]), 890234177767755849)
+                    or len(content) < 50
             )
             try:
                 username = ctx.author.display_name
@@ -1604,8 +1609,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                     f"msg_temp/{guild_id}.json"
                 )
                 if (
-                    old_msg_temp["1"] == user_id
-                    and send_time - int(old_msg_temp["0"]) <= 15
+                        old_msg_temp["1"] == user_id
+                        and send_time - int(old_msg_temp["0"]) <= 15
                 ):
                     no_name = True
             id_too_long = False
@@ -1784,12 +1789,12 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 )
 
         elif (
-            channelissetup
-            and channel_id != db["channel"]
-            and (
-                not tool_function.check_dict_data(db, "not_this_channel_msg")
-                or db["not_this_channel_msg"] != "off"
-            )
+                channelissetup
+                and channel_id != db["channel"]
+                and (
+                        not tool_function.check_dict_data(db, "not_this_channel_msg")
+                        or db["not_this_channel_msg"] != "off"
+                )
         ):
             channel_msg = tool_function.convert_msg(
                 locale,
@@ -1822,8 +1827,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             await ctx.message.add_reaction("🤔")
 
         elif (
-            tool_function.check_dict_data(db, "not_this_channel_msg")
-            and db["not_this_channel_msg"] == "off"
+                tool_function.check_dict_data(db, "not_this_channel_msg")
+                and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
@@ -1891,7 +1896,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 @commands.guild_only()
 @commands.is_owner()
 async def force_say(
-    ctx, *, content: str
+        ctx, *, content: str
 ):  # sourcery no-metrics skip: for-index-replacement
     # sourcery skip: low-code-quality
     # get message channel id
@@ -1935,10 +1940,10 @@ async def force_say(
         langissetup = tool_function.check_dict_data(db, "lang")
 
         if (
-            is_connected
-            and channelissetup
-            and langissetup
-            and channel_id == db["channel"]
+                is_connected
+                and channelissetup
+                and langissetup
+                and channel_id == db["channel"]
         ):
 
             # use cld to detect language
@@ -1957,8 +1962,8 @@ async def force_say(
 
             # noinspection PyTypeChecker
             say_this = (
-                ctx.author.id in (int(config["owner"]), 890234177767755849)
-                or len(content) < 50
+                    ctx.author.id in (int(config["owner"]), 890234177767755849)
+                    or len(content) < 50
             )
             try:
                 username = ctx.author.display_name
@@ -2179,12 +2184,12 @@ async def force_say(
                 )
 
         elif (
-            channelissetup
-            and channel_id != db["channel"]
-            and (
-                not tool_function.check_dict_data(db, "not_this_channel_msg")
-                or db["not_this_channel_msg"] != "off"
-            )
+                channelissetup
+                and channel_id != db["channel"]
+                and (
+                        not tool_function.check_dict_data(db, "not_this_channel_msg")
+                        or db["not_this_channel_msg"] != "off"
+                )
         ):
             channel_msg = tool_function.convert_msg(
                 locale,
@@ -2217,8 +2222,8 @@ async def force_say(
             await ctx.message.add_reaction("🤔")
 
         elif (
-            tool_function.check_dict_data(db, "not_this_channel_msg")
-            and db["not_this_channel_msg"] == "off"
+                tool_function.check_dict_data(db, "not_this_channel_msg")
+                and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
@@ -2302,12 +2307,12 @@ async def setvoice(ctx, platform: str):
 
     if platform.lower() == "reset":
         if not is_guild and (
-            not tool_function.check_dict_data(
-                tool_function.read_db_json("user_config"), guild_id
-            )
-            or not tool_function.check_dict_data(
-                tool_function.read_db_json("user_config")[guild_id], "platform"
-            )
+                not tool_function.check_dict_data(
+                    tool_function.read_db_json("user_config"), guild_id
+                )
+                or not tool_function.check_dict_data(
+            tool_function.read_db_json("user_config")[guild_id], "platform"
+        )
         ):
             await ctx.reply(
                 tool_function.convert_msg(
@@ -2322,10 +2327,10 @@ async def setvoice(ctx, platform: str):
             return
 
         if is_guild and (
-            not tool_function.check_db_file(guild_id)
-            or not tool_function.check_dict_data(
-                tool_function.read_db_json(guild_id), "platform"
-            )
+                not tool_function.check_db_file(guild_id)
+                or not tool_function.check_dict_data(
+            tool_function.read_db_json(guild_id), "platform"
+        )
         ):
             await ctx.reply(
                 tool_function.convert_msg(
