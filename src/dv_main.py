@@ -146,6 +146,10 @@ async def on_ready():
 async def on_guild_join(guild):
     general = guild.system_channel
     if general and general.permissions_for(guild.me).send_messages:
+        owner_data = await bot.fetch_user(config["owner"])
+        owner_name = owner_data.name
+        owner_discriminator = owner_data.discriminator
+        owner_full_id = f"{owner_name}#{owner_discriminator}"
         await general.send(
             "Thanks for adding me!\n"
             f"Please set a channel by `{config['prefix']}setchannel`. (ex. {config['prefix']}setchannel <#{general.id}>)\n"
@@ -155,6 +159,7 @@ async def on_guild_join(guild):
             f"To leave a voice channel, please use `{config['prefix']}leave`.\n"
             f"For more information, please type `{config['prefix']}help`.\n"
             f"Warning: Current not support text channel in voice channel.\n"
+            f"If you face any problem, please contact `{owner_full_id}`."
         )
     # get guild name
     guild_name = guild.name
