@@ -80,11 +80,11 @@ $invite : Get a link to invite this bot into your server.
 ### WFNM
  * Code rewrite
 ### DV
- * Queue
- * Auto disconnect
- * Translate
- * Rewrite some codeblocks into function
- * Update to `py-cord` 2.0
- * Command typo auto fix (ex. `$sayABCD` -> `$say ABCD`)
- * Slash command
- * Embed message
+ - [ ] Queue
+ - [ ] Auto disconnect
+ - [x] Translate
+ - [ ] Rewrite some codeblocks into function
+ - [ ] Update to `py-cord` 2.0
+ - [ ] Command typo auto fix (ex. `$sayABCD` -> `$say ABCD`)
+ - [ ] Slash command
+ - [ ] Embed message
