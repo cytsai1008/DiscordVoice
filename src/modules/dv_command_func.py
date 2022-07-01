@@ -1,4 +1,6 @@
+import datetime
 import re
+import time
 
 import bs4
 import requests
@@ -103,7 +105,9 @@ def check_platform(
     """Return the platform of the user or guild (default: Google)"""
     if (
         lang
-        in tool_function.read_local_json("lang_list/languages.json")["Support_Language"]
+        in tool_function.read_local_json("lang_list/google_languages.json")[
+            "Support_Language"
+        ]
         and lang
         not in tool_function.read_local_json("lang_list/azure_languages.json")[
             "Support_Language"
@@ -116,7 +120,7 @@ def check_platform(
             "Support_Language"
         ]
         and lang
-        not in tool_function.read_local_json("lang_list/languages.json")[
+        not in tool_function.read_local_json("lang_list/google_languages.json")[
             "Support_Language"
         ]
     ):
@@ -159,3 +163,99 @@ def check_platform(
             f"Guild id: {guild_id}\n"
         )
         return "Something wrong"
+
+
+def name_convert(ctx, lang: str, locale: dict, content: str) -> str:
+    user_id = ctx.author.id
+    guild_id = ctx.guild.id
+
+    try:
+        username = ctx.author.display_name
+    except AttributeError:
+        username = ctx.author.name
+    # get username length
+    no_name = False
+    send_time = int(
+        time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple())
+    )
+    if tool_function.check_local_file(f"msg_temp/{guild_id}.json"):
+        old_msg_temp = tool_function.read_local_json(f"msg_temp/{guild_id}.json")
+        if old_msg_temp["1"] == user_id and send_time - int(old_msg_temp["0"]) <= 15:
+            no_name = True
+    id_too_long = False
+    if len(username) > 20:
+        if len(ctx.author.name) > 20:
+            id_too_long = True
+        else:
+            username = ctx.author.name
+
+    if id_too_long:
+        username = tool_function.convert_msg(
+            locale,
+            lang,
+            "variable",
+            "say",
+            "someone_name",
+            None,
+        )
+        if ctx.author.voice is not None:
+            content = tool_function.convert_msg(
+                locale,
+                lang,
+                "variable",
+                "say",
+                "inside_said",
+                [
+                    "user",
+                    username,
+                    "data_content",
+                    content,
+                ],
+            )
+        else:
+            content = tool_function.convert_msg(
+                locale,
+                lang,
+                "variable",
+                "say",
+                "outside_said",
+                [
+                    "user",
+                    username,
+                    "data_content",
+                    content,
+                ],
+            )
+    elif not no_name:
+        content = (
+            tool_function.convert_msg(
+                locale,
+                lang,
+                "variable",
+                "say",
+                "inside_said",
+                [
+                    "user",
+                    username,
+                    "data_content",
+                    content,
+                ],
+            )
+            if ctx.author.voice is not None
+            else tool_function.convert_msg(
+                locale,
+                lang,
+                "variable",
+                "say",
+                "outside_said",
+                [
+                    "user",
+                    username,
+                    "data_content",
+                    content,
+                ],
+            )
+        )
+    else:
+        content = content
+    return content

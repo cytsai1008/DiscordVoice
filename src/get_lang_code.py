@@ -17,7 +17,7 @@ def unique_languages_from_voices(voices):
 
 
 def list_languages():
-    print("Updating languages.json...")
+    print("Updating google_languages.json...")
     client = tts.TextToSpeechClient()
     response = client.list_voices()
     languages = unique_languages_from_voices(response.voices)
@@ -28,7 +28,7 @@ def list_languages():
     languages = list(languages.split(", "))
     languages = sorted(languages)
     json_lang = {"Support_Language": languages}
-    with open("lang_list/languages.json", "w") as f:
+    with open("lang_list/google_languages.json", "w") as f:
         json.dump(json_lang, f)
 
 

@@ -2,7 +2,6 @@ import asyncio
 import contextlib
 import datetime
 import os
-import queue
 import shutil
 import signal
 import subprocess
@@ -70,25 +69,9 @@ for filename in os.listdir(folder):
         print(f"Failed to delete {file_path}. Reason: {e}")
 
 
-def remove_file(file_name):
-    os.remove(f"tts_temp/{file_name}")
-
-
-def convert_tts(content: str, lang_code: str, file_name: str):
-    tool_function.postgres_logging("init google tts api")
-    tool_function.postgres_logging("play mp3")
-    asyncio.run(tts_func.process_voice(content, lang_code, f"{file_name}.mp3"))
-
-
-def playnext(ctx, lang_id: str, guild_id, list_id: queue.Queue):
-    if list_id.empty():
-        with contextlib.suppress(Exception):
-            if os.path.exists(f"tts_temp/{guild_id}.mp3"):
-                os.remove("tts_temp/{guild_id}.mp3")
-    elif ctx.voice_client is not None and not ctx.voice_client.is_playing():
-        convert_tts(list_id.get(), lang_id, guild_id)
-        song = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
-        ctx.voice_client.play(song, after=playnext(ctx, lang_id, guild_id, list_id))
+def playnext(ctx, lang: str, content: str, platform: str):
+    # TODO: Queue todo
+    pass
 
 
 async def check_is_not_playing(ctx):
@@ -159,7 +142,7 @@ async def on_guild_join(guild):
             f"To leave a voice channel, please use `{config['prefix']}leave`.\n"
             f"For more information, please type `{config['prefix']}help`.\n"
             f"Warning: Current not support text channel in voice channel.\n"
-            f"If you face any problem, please contact `{owner_full_id}`."
+            f"If you're facing any problem, please contact `{owner_full_id}`."
         )
     # get guild name
     guild_name = guild.name
@@ -207,7 +190,9 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             )
 
         elif command == "setlang":
-            support_lang = tool_function.read_local_json("lang_list/languages.json")
+            support_lang = tool_function.read_local_json(
+                "lang_list/google_languages.json"
+            )
             azure_lang = tool_function.read_local_json("lang_list/azure_languages.json")
             await ctx.reply(
                 tool_function.convert_msg(
@@ -382,10 +367,10 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         await ctx.message.add_reaction("⏳")
 
     elif (
-            command in ["setchannel", "join", "move"]
-            or command in command_alias["join"]
-            or command_alias["move"]
-            and isinstance(error, discord.ext.commands.errors.ChannelNotFound)
+        command in ["setchannel", "join", "move"]
+        or command in command_alias["join"]
+        or command_alias["move"]
+        and isinstance(error, discord.ext.commands.errors.ChannelNotFound)
     ):
         pass
 
@@ -551,7 +536,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
                 ["prefix", config["prefix"], "data_lang", data["lang"]],
             )
         else:
-            # support_lang = tool_function.read_local_json("languages.json")
+            # support_lang = tool_function.read_local_json("google_languages.json")
             # azure_lang = tool_function.read_local_json("azure_languages.json")
             lang_msg = tool_function.convert_msg(
                 locale,
@@ -629,17 +614,17 @@ async def help(ctx):  # sourcery skip: low-code-quality
             )
         )
     elif (
-            not guild_msg
-            and tool_function.check_dict_data(
-        tool_function.read_db_json("user_config"),
-        f"user_{int(ctx.author.id)}",
-    )
-            and tool_function.check_dict_data(
-        tool_function.read_db_json("user_config")[f"user_{int(ctx.author.id)}"],
-        "platform",
-    )
+        not guild_msg
+        and tool_function.check_dict_data(
+            tool_function.read_db_json("user_config"),
+            f"user_{int(ctx.author.id)}",
+        )
+        and tool_function.check_dict_data(
+            tool_function.read_db_json("user_config")[f"user_{int(ctx.author.id)}"],
+            "platform",
+        )
     ):
-        # support_lang = tool_function.read_local_json("languages.json")
+        # support_lang = tool_function.read_local_json("google_languages.json")
         # azure_lang = tool_function.read_local_json("azure_languages.json")
         data = tool_function.read_db_json("user_config")[f"user_{int(ctx.author.id)}"]
 
@@ -709,7 +694,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         )
 
     else:
-        # support_lang = tool_function.read_local_json("languages.json")
+        # support_lang = tool_function.read_local_json("google_languages.json")
         # azure_lang = tool_function.read_local_json("azure_languages.json")
         await ctx.reply(
             tool_function.convert_msg(
@@ -922,10 +907,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
         langissetup = tool_function.check_dict_data(db, "lang")
 
         if (
-                is_connected
-                and channelissetup
-                and langissetup
-                and channel_id == db["channel"]
+            is_connected
+            and channelissetup
+            and langissetup
+            and channel_id == db["channel"]
         ):
 
             # TODO: use cld to detect language
@@ -943,112 +928,20 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             )
 
             say_this = (
-                    ctx.author.id in (int(config["owner"]), 890234177767755849)
-                    or len(content) < 50
+                ctx.author.id in (int(config["owner"]), 890234177767755849)
+                or len(content) < 50
             )
-            try:
-                username = ctx.author.display_name
-            except AttributeError:
-                username = ctx.author.name
-            # get username length
-            no_name = False
-            send_time = int(
-                time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple())
-            )
-            if tool_function.check_local_file(f"msg_temp/{guild_id}.json"):
-                old_msg_temp = tool_function.read_local_json(
-                    f"msg_temp/{guild_id}.json"
-                )
-                if (
-                        old_msg_temp["1"] == user_id
-                        and send_time - int(old_msg_temp["0"]) <= 15
-                ):
-                    no_name = True
-            id_too_long = False
-            if len(username) > 20:
-                if len(ctx.author.name) > 20:
-                    id_too_long = True
-                else:
-                    username = ctx.author.name
 
-            if id_too_long:
-                username = tool_function.convert_msg(
-                    locale,
-                    db["lang"],
-                    "variable",
-                    "say",
-                    "someone_name",
-                    None,
-                )
-                if ctx.author.voice is not None:
-                    content = tool_function.convert_msg(
-                        locale,
-                        db["lang"],
-                        "variable",
-                        "say",
-                        "inside_said",
-                        [
-                            "user",
-                            username,
-                            "data_content",
-                            content,
-                        ],
-                    )
-                else:
-                    content = tool_function.convert_msg(
-                        locale,
-                        db["lang"],
-                        "variable",
-                        "say",
-                        "outside_said",
-                        [
-                            "user",
-                            username,
-                            "data_content",
-                            content,
-                        ],
-                    )
-            elif not no_name:
-                content = (
-                    tool_function.convert_msg(
-                        locale,
-                        db["lang"],
-                        "variable",
-                        "say",
-                        "inside_said",
-                        [
-                            "user",
-                            username,
-                            "data_content",
-                            content,
-                        ],
-                    )
-                    if ctx.author.voice is not None
-                    else tool_function.convert_msg(
-                        locale,
-                        db["lang"],
-                        "variable",
-                        "say",
-                        "outside_said",
-                        [
-                            "user",
-                            username,
-                            "data_content",
-                            content,
-                        ],
-                    )
-                )
-            else:
-                content = content
+            content = command_func.name_convert(ctx, db["lang"], locale, content)
 
             if say_this:
-
-                list_name = f"list_{str(guild_id)}"
-                if list_name not in globals():
-                    globals()[list_name] = queue.Queue(maxsize=10)
-
                 if not ctx.voice_client.is_playing():
-                    tool_function.postgres_logging("play mp3")
+                    tool_function.postgres_logging(
+                        f"Playing content: \n"
+                        f"{content}\n"
+                        f"From {ctx.author.name}\n"
+                        f"In {ctx.guild.name}"
+                    )
 
                     platform_result = command_func.check_platform(
                         user_platform_set,
@@ -1060,7 +953,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
                         tool_function.postgres_logging("Init Google TTS API")
-                        await tts_func.process_voice(
+                        await tts_func.google_tts_converter(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
 
@@ -1082,26 +975,24 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
-                        await tts_func.process_voice(
+                        await tts_func.google_tts_converter(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
 
-                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                    voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
                     try:
                         ctx.voice_client.play(
                             voice_file,
-                            after=playnext(
-                                ctx, db["lang"], guild_id, globals()[list_name]
-                            ),
+                            after=playnext(ctx, db["lang"], content, platform_result),
                         )
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
                         if tool_function.check_dict_data(db, "queue") and db["queue"]:
-                            globals()[list_name].put(content)
+                            # TODO: Write json
                             # add reaction
                             await ctx.message.add_reaction("⏯")
                             asyncio.ensure_future(check_is_not_playing(ctx))
-                            playnext(ctx, db["lang"], guild_id, globals()[list_name])
+                            playnext(ctx, db["lang"], content, platform_result)
                         else:
                             await ctx.reply(
                                 tool_function.convert_msg(
@@ -1125,11 +1016,22 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         )
 
                 elif tool_function.check_dict_data(db, "queue") and db["queue"]:
-                    globals()[list_name].put(content)
+                    # TODO: Write json
                     # add reaction
                     await ctx.message.add_reaction("⏯")
                     asyncio.ensure_future(check_is_not_playing(ctx))
-                    playnext(ctx, db["lang"], guild_id, globals()[list_name])
+                    playnext(
+                        ctx,
+                        db["lang"],
+                        content,
+                        command_func.check_platform(
+                            user_platform_set,
+                            user_id,
+                            guild_platform_set,
+                            guild_id,
+                            db["lang"],
+                        ),
+                    )
                 else:
                     await ctx.reply(
                         tool_function.convert_msg(
@@ -1154,12 +1056,12 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 )
 
         elif (
-                channelissetup
-                and channel_id != db["channel"]
-                and (
-                        not tool_function.check_dict_data(db, "not_this_channel_msg")
-                        or db["not_this_channel_msg"] != "off"
-                )
+            channelissetup
+            and channel_id != db["channel"]
+            and (
+                not tool_function.check_dict_data(db, "not_this_channel_msg")
+                or db["not_this_channel_msg"] != "off"
+            )
         ):
             channel_msg = tool_function.convert_msg(
                 locale,
@@ -1192,8 +1094,8 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             await ctx.message.add_reaction("🤔")
 
         elif (
-                tool_function.check_dict_data(db, "not_this_channel_msg")
-                and db["not_this_channel_msg"] == "off"
+            tool_function.check_dict_data(db, "not_this_channel_msg")
+            and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
@@ -1260,13 +1162,13 @@ async def setlang(ctx, lang: str):
     # get guild id
     locale_lang = tool_function.check_db_lang(ctx)
     guild_id = ctx.guild.id
-    support_lang = tool_function.read_local_json("lang_list/languages.json")
+    support_lang = tool_function.read_local_json("lang_list/google_languages.json")
     azure_lang = tool_function.read_local_json("lang_list/azure_languages.json")
     lang = lang.lower()
     lang = lang.replace("_", "-")
     if (
-            lang in support_lang["Support_Language"]
-            or lang in azure_lang["Support_Language"]
+        lang in support_lang["Support_Language"]
+        or lang in azure_lang["Support_Language"]
     ):
         if tool_function.check_db_file(f"{guild_id}"):
             # read db file
@@ -1563,9 +1465,9 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 del joined_vc[str(guild_id)]
             tool_function.write_db_json("joined_vc", joined_vc)
 
-        lang_code_list = tool_function.read_local_json("lang_list/languages.json")[
-            "Support_Language"
-        ]
+        google_lang_code_list = tool_function.read_local_json(
+            "lang_list/google_languages.json"
+        )["Support_Language"]
         azure_lang_code_list = tool_function.read_local_json(
             "lang_list/azure_languages.json"
         )["Support_Language"]
@@ -1573,14 +1475,16 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
         lang = lang.lower()
         lang = lang.replace("_", "-")
 
-        lang_code_is_right = lang in lang_code_list or lang in azure_lang_code_list
+        lang_code_is_right = (
+            lang in google_lang_code_list or lang in azure_lang_code_list
+        )
         channelissetup = tool_function.check_dict_data(db, "channel")
 
         if (
-                is_connected
-                and channelissetup
-                and lang_code_is_right
-                and channel_id == db["channel"]
+            is_connected
+            and channelissetup
+            and lang_code_is_right
+            and channel_id == db["channel"]
         ):
 
             # export content to mp3 by google tts api
@@ -1597,112 +1501,20 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             content = await command_func.content_convert(ctx, lang, locale, content)
 
             say_this = (
-                    ctx.author.id in (int(config["owner"]), 890234177767755849)
-                    or len(content) < 50
+                ctx.author.id in (int(config["owner"]), 890234177767755849)
+                or len(content) < 50
             )
-            try:
-                username = ctx.author.display_name
-            except AttributeError:
-                username = ctx.author.name
-            # get username length
-            no_name = False
-            send_time = int(
-                time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple())
-            )
-            if tool_function.check_local_file(f"msg_temp/{guild_id}.json"):
-                old_msg_temp = tool_function.read_local_json(
-                    f"msg_temp/{guild_id}.json"
-                )
-                if (
-                        old_msg_temp["1"] == user_id
-                        and send_time - int(old_msg_temp["0"]) <= 15
-                ):
-                    no_name = True
-            id_too_long = False
-            if len(username) > 20:
-                if len(ctx.author.name) > 20:
-                    id_too_long = True
-                else:
-                    username = ctx.author.name
 
-            if id_too_long:
-                username = tool_function.convert_msg(
-                    locale,
-                    lang,
-                    "variable",
-                    "say",
-                    "someone_name",
-                    None,
-                )
-                if ctx.author.voice is not None:
-                    content = tool_function.convert_msg(
-                        locale,
-                        lang,
-                        "variable",
-                        "say",
-                        "inside_said",
-                        [
-                            "user",
-                            username,
-                            "data_content",
-                            content,
-                        ],
-                    )
-                else:
-                    content = tool_function.convert_msg(
-                        locale,
-                        lang,
-                        "variable",
-                        "say",
-                        "outside_said",
-                        [
-                            "user",
-                            username,
-                            "data_content",
-                            content,
-                        ],
-                    )
-            elif not no_name:
-                content = (
-                    tool_function.convert_msg(
-                        locale,
-                        lang,
-                        "variable",
-                        "say",
-                        "inside_said",
-                        [
-                            "user",
-                            username,
-                            "data_content",
-                            content,
-                        ],
-                    )
-                    if ctx.author.voice is not None
-                    else tool_function.convert_msg(
-                        locale,
-                        lang,
-                        "variable",
-                        "say",
-                        "outside_said",
-                        [
-                            "user",
-                            username,
-                            "data_content",
-                            content,
-                        ],
-                    )
-                )
-            else:
-                content = content
+            content = command_func.name_convert(ctx, lang, locale, content)
 
             if say_this:
-
-                list_name = f"list_{str(guild_id)}"
-                if list_name not in globals():
-                    globals()[list_name] = queue.Queue(maxsize=10)
-
                 if not ctx.voice_client.is_playing():
-                    tool_function.postgres_logging("play mp3")
+                    tool_function.postgres_logging(
+                        f"Playing content: \n"
+                        f"{content}\n"
+                        f"From {ctx.author.name}\n"
+                        f"In {ctx.guild.name}"
+                    )
 
                     platform_result = command_func.check_platform(
                         user_platform_set, user_id, guild_platform_set, guild_id, lang
@@ -1710,7 +1522,9 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
                         tool_function.postgres_logging("Init Google TTS API")
-                        await tts_func.process_voice(content, lang, f"{guild_id}.mp3")
+                        await tts_func.google_tts_converter(
+                            content, lang, f"{guild_id}.mp3"
+                        )
 
                     elif platform_result == "Azure":
                         tool_function.postgres_logging("Init Azure TTS API")
@@ -1730,29 +1544,35 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
-                        await tts_func.process_voice(content, lang, f"{guild_id}.mp3")
+                        await tts_func.google_tts_converter(
+                            content, lang, f"{guild_id}.mp3"
+                        )
 
-                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                    voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
                     try:
                         ctx.voice_client.play(
                             voice_file,
-                            after=playnext(
-                                ctx, db["lang"], guild_id, globals()[list_name]
-                            ),
-                        )
+                            after=playnext(ctx, lang, content, platform_result),
+                            )
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
                         if tool_function.check_dict_data(db, "queue") and db["queue"]:
-                            globals()[list_name].put(content)
+                            # TODO: Write json
                             # add reaction
                             await ctx.message.add_reaction("⏯")
                             asyncio.ensure_future(check_is_not_playing(ctx))
-                            playnext(ctx, db["lang"], guild_id, globals()[list_name])
+                            playnext(ctx, lang, content, platform_result)
                         else:
                             await ctx.reply(
-                                "Sorry, queue function is under development and current not supported."
+                                tool_function.convert_msg(
+                                    locale,
+                                    lang,
+                                    "command",
+                                    "say",
+                                    "say_queue_not_support",
+                                    None,
+                                )
                             )
-
                     else:
                         send_time = int(
                             time.mktime(
@@ -1765,11 +1585,22 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         )
 
                 elif tool_function.check_dict_data(db, "queue") and db["queue"]:
-                    globals()[list_name].put(content)
+                    # TODO: Write json
                     # add reaction
                     await ctx.message.add_reaction("⏯")
                     asyncio.ensure_future(check_is_not_playing(ctx))
-                    playnext(ctx, db["lang"], guild_id, globals()[list_name])
+                    playnext(
+                        ctx,
+                        lang,
+                        content,
+                        command_func.check_platform(
+                            user_platform_set,
+                            user_id,
+                            guild_platform_set,
+                            guild_id,
+                            lang,
+                        ),
+                    )
                 else:
                     await ctx.reply(
                         tool_function.convert_msg(
@@ -1781,6 +1612,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                             None,
                         )
                     )
+
             else:
                 await ctx.reply(
                     tool_function.convert_msg(
@@ -1794,12 +1626,12 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 )
 
         elif (
-                channelissetup
-                and channel_id != db["channel"]
-                and (
-                        not tool_function.check_dict_data(db, "not_this_channel_msg")
-                        or db["not_this_channel_msg"] != "off"
-                )
+            channelissetup
+            and channel_id != db["channel"]
+            and (
+                not tool_function.check_dict_data(db, "not_this_channel_msg")
+                or db["not_this_channel_msg"] != "off"
+            )
         ):
             channel_msg = tool_function.convert_msg(
                 locale,
@@ -1832,8 +1664,8 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             await ctx.message.add_reaction("🤔")
 
         elif (
-                tool_function.check_dict_data(db, "not_this_channel_msg")
-                and db["not_this_channel_msg"] == "off"
+            tool_function.check_dict_data(db, "not_this_channel_msg")
+            and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
@@ -1874,7 +1706,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         "current_lang",
                         lang,
                         "google_lang_list",
-                        ", ".join(lang_code_list),
+                        ", ".join(google_lang_code_list),
                         "azure_lang_list",
                         ", ".join(azure_lang_code_list),
                     ],
@@ -1901,7 +1733,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 @commands.guild_only()
 @commands.is_owner()
 async def force_say(
-        ctx, *, content: str
+    ctx, *, content: str
 ):  # sourcery no-metrics skip: for-index-replacement
     # sourcery skip: low-code-quality
     # get message channel id
@@ -1945,10 +1777,10 @@ async def force_say(
         langissetup = tool_function.check_dict_data(db, "lang")
 
         if (
-                is_connected
-                and channelissetup
-                and langissetup
-                and channel_id == db["channel"]
+            is_connected
+            and channelissetup
+            and langissetup
+            and channel_id == db["channel"]
         ):
 
             # use cld to detect language
@@ -1963,66 +1795,26 @@ async def force_say(
             <@&[0-9]{18}>
             """
 
-            content = command_func.content_convert(ctx, db["lang"], locale, content)
+            content = await command_func.content_convert(
+                ctx, db["lang"], locale, content
+            )
 
             # noinspection PyTypeChecker
             say_this = (
-                    ctx.author.id in (int(config["owner"]), 890234177767755849)
-                    or len(content) < 50
+                ctx.author.id in (int(config["owner"]), 890234177767755849)
+                or len(content) < 50
             )
-            try:
-                username = ctx.author.display_name
-            except AttributeError:
-                username = ctx.author.name
-            # get username length
-            if len(username) > 20:
-                username = (
-                    tool_function.convert_msg(
-                        locale,
-                        db["lang"],
-                        "variable",
-                        "say",
-                        "someone_name",
-                        None,
-                    )
-                    if len(ctx.author.name) > 20
-                    else ctx.author.name
-                )
-            if ctx.author.voice is not None:
-                content = tool_function.convert_msg(
-                    locale,
-                    db["lang"],
-                    "variable",
-                    "say",
-                    "inside_said",
-                    [
-                        "user",
-                        username,
-                        "data_content",
-                        content,
-                    ],
-                )
-            else:
-                content = tool_function.convert_msg(
-                    locale,
-                    db["lang"],
-                    "variable",
-                    "say",
-                    "outside_said",
-                    [
-                        "user",
-                        username,
-                        "data_content",
-                        content,
-                    ],
-                )
-            if say_this:
-                list_name = f"list_{str(guild_id)}"
-                if list_name not in globals():
-                    globals()[list_name] = queue.Queue(maxsize=10)
 
+            content = command_func.name_convert(ctx, db["lang"], locale, content)
+
+            if say_this:
                 if not ctx.voice_client.is_playing():
-                    tool_function.postgres_logging("play mp3")
+                    tool_function.postgres_logging(
+                        f"Playing content: \n"
+                        f"{content}\n"
+                        f"From {ctx.author.name}\n"
+                        f"In {ctx.guild.name}"
+                    )
 
                     platform_result = command_func.check_platform(
                         user_platform_set,
@@ -2034,7 +1826,7 @@ async def force_say(
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
                         tool_function.postgres_logging("Init Google TTS API")
-                        await tts_func.process_voice(
+                        await tts_func.google_tts_converter(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
 
@@ -2056,28 +1848,31 @@ async def force_say(
                         )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
-                        await tts_func.process_voice(
+                        await tts_func.google_tts_converter(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
 
-                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                    voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
                     try:
                         ctx.voice_client.play(
                             voice_file,
-                            after=playnext(
-                                ctx, db["lang"], guild_id, globals()[list_name]
-                            ),
+                            after=playnext(ctx, db["lang"], content, platform_result),
                         )
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
                         if tool_function.check_dict_data(db, "queue") and db["queue"]:
-                            globals()[list_name].put(content)
+                            # TODO: Write json
                             # add reaction
                             await ctx.message.add_reaction("⏯")
                             asyncio.ensure_future(check_is_not_playing(ctx))
-                            playnext(ctx, db["lang"], guild_id, globals()[list_name])
+                            playnext(ctx, db["lang"], content, platform_result)
                         else:
-                            tool_function.postgres_logging("play mp3")
+                            tool_function.postgres_logging(
+                                f"Playing content: \n"
+                                f"{content}\n"
+                                f"From {ctx.author.name}\n"
+                                f"In {ctx.guild.name}"
+                            )
 
                             platform_result = command_func.check_platform(
                                 user_platform_set,
@@ -2089,7 +1884,7 @@ async def force_say(
                             # GCP Cloud Text to Speech Method
                             if platform_result == "Google":
                                 tool_function.postgres_logging("Init Google TTS API")
-                                await tts_func.process_voice(
+                                await tts_func.google_tts_converter(
                                     content, db["lang"], f"{guild_id}.mp3"
                                 )
 
@@ -2111,11 +1906,11 @@ async def force_say(
                                 )
                                 # add bug emoji reaction
                                 await ctx.message.add_reaction("🐛")
-                                await tts_func.process_voice(
+                                await tts_func.google_tts_converter(
                                     content, db["lang"], f"{guild_id}.mp3"
                                 )
 
-                            voice_file = discord.FFmpegPCMAudio(
+                            voice_file = discord.FFmpegOpusAudio(
                                 f"tts_temp/{guild_id}.mp3"
                             )
                             # stop current audio
@@ -2123,13 +1918,16 @@ async def force_say(
                             await asyncio.sleep(0.5)
                             ctx.voice_client.play(
                                 voice_file,
-                                after=playnext(
-                                    ctx, db["lang"], guild_id, globals()[list_name]
-                                ),
+                                after=playnext(ctx, db["lang"], content, platform_result),
                             )
                             await ctx.message.add_reaction("⁉")
                 else:
-                    tool_function.postgres_logging("play mp3")
+                    tool_function.postgres_logging(
+                        f"Playing content: \n"
+                        f"{content}\n"
+                        f"From {ctx.author.name}\n"
+                        f"In {ctx.guild.name}"
+                    )
 
                     platform_result = command_func.check_platform(
                         user_platform_set,
@@ -2141,7 +1939,7 @@ async def force_say(
                     # GCP Cloud Text to Speech Method
                     if platform_result == "Google":
                         tool_function.postgres_logging("Init Google TTS API")
-                        await tts_func.process_voice(
+                        await tts_func.google_tts_converter(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
 
@@ -2163,17 +1961,17 @@ async def force_say(
                         )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
-                        await tts_func.process_voice(
+                        await tts_func.google_tts_converter(
                             content, db["lang"], f"{guild_id}.mp3"
                         )
 
-                    voice_file = discord.FFmpegPCMAudio(f"tts_temp/{guild_id}.mp3")
+                    voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
                     # stop current audio
                     ctx.voice_client.stop()
                     await asyncio.sleep(0.5)
                     ctx.voice_client.play(
                         voice_file,
-                        after=playnext(ctx, db["lang"], guild_id, globals()[list_name]),
+                        after=playnext(ctx, db["lang"], content, platform_result),
                     )
                     await ctx.message.add_reaction("⁉")
             else:
@@ -2189,12 +1987,12 @@ async def force_say(
                 )
 
         elif (
-                channelissetup
-                and channel_id != db["channel"]
-                and (
-                        not tool_function.check_dict_data(db, "not_this_channel_msg")
-                        or db["not_this_channel_msg"] != "off"
-                )
+            channelissetup
+            and channel_id != db["channel"]
+            and (
+                not tool_function.check_dict_data(db, "not_this_channel_msg")
+                or db["not_this_channel_msg"] != "off"
+            )
         ):
             channel_msg = tool_function.convert_msg(
                 locale,
@@ -2227,8 +2025,8 @@ async def force_say(
             await ctx.message.add_reaction("🤔")
 
         elif (
-                tool_function.check_dict_data(db, "not_this_channel_msg")
-                and db["not_this_channel_msg"] == "off"
+            tool_function.check_dict_data(db, "not_this_channel_msg")
+            and db["not_this_channel_msg"] == "off"
         ):
             return
             # reply to sender
@@ -2312,12 +2110,12 @@ async def setvoice(ctx, platform: str):
 
     if platform.lower() == "reset":
         if not is_guild and (
-                not tool_function.check_dict_data(
-                    tool_function.read_db_json("user_config"), guild_id
-                )
-                or not tool_function.check_dict_data(
-            tool_function.read_db_json("user_config")[guild_id], "platform"
-        )
+            not tool_function.check_dict_data(
+                tool_function.read_db_json("user_config"), guild_id
+            )
+            or not tool_function.check_dict_data(
+                tool_function.read_db_json("user_config")[guild_id], "platform"
+            )
         ):
             await ctx.reply(
                 tool_function.convert_msg(
@@ -2332,10 +2130,10 @@ async def setvoice(ctx, platform: str):
             return
 
         if is_guild and (
-                not tool_function.check_db_file(guild_id)
-                or not tool_function.check_dict_data(
-            tool_function.read_db_json(guild_id), "platform"
-        )
+            not tool_function.check_db_file(guild_id)
+            or not tool_function.check_dict_data(
+                tool_function.read_db_json(guild_id), "platform"
+            )
         ):
             await ctx.reply(
                 tool_function.convert_msg(
