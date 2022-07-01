@@ -79,7 +79,7 @@ $invite : Get a link to invite this bot into your server.
 ## Todo (Contribute Welcome)
 ### WFNM
  - [ ] Code rewrite
-### DV
+### LGFSY
  - [ ] Queue
  - [ ] Auto disconnect
  - [x] Translate
