@@ -24,7 +24,7 @@ nm!random <meal type (optional)> : Choose random food (Meal type base on time wh
 nm!time <Timezone from UTC> : Setup timezone (Number needs to be between ±12 hours)
 ```
 
-## Let-Google-Speak-For-You
+## Be-Your-Mouth
 
 [Invite Link](https://discord.com/oauth2/authorize?client_id=960004225713201172&scope=bot+applications.commands&permissions=139690626112)
 
@@ -79,7 +79,7 @@ $invite : Get a link to invite this bot into your server.
 ## Todo (Contribute Welcome)
 ### WFNM
  - [ ] Code rewrite
-### LGFSY
+### BYM
  - [ ] Queue
  - [ ] Auto disconnect
  - [x] Translate
