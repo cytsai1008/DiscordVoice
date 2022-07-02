@@ -980,40 +980,20 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         )
 
                     voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
-                    try:
-                        ctx.voice_client.play(
-                            voice_file,
-                            after=playnext(ctx, db["lang"], content, platform_result),
+                    ctx.voice_client.play(
+                        voice_file,
+                        after=playnext(ctx, db["lang"], content, platform_result),
+                    )
+                    await ctx.message.add_reaction("🔊")
+                    send_time = int(
+                        time.mktime(
+                            datetime.datetime.now(datetime.timezone.utc).timetuple()
                         )
-                        await ctx.message.add_reaction("🔊")
-                    except discord.errors.ClientException:
-                        if tool_function.check_dict_data(db, "queue") and db["queue"]:
-                            # TODO: Write json
-                            # add reaction
-                            await ctx.message.add_reaction("⏯")
-                            asyncio.ensure_future(check_is_not_playing(ctx))
-                            playnext(ctx, db["lang"], content, platform_result)
-                        else:
-                            await ctx.reply(
-                                tool_function.convert_msg(
-                                    locale,
-                                    db["lang"],
-                                    "command",
-                                    "say",
-                                    "say_queue_not_support",
-                                    None,
-                                )
-                            )
-                    else:
-                        send_time = int(
-                            time.mktime(
-                                datetime.datetime.now(datetime.timezone.utc).timetuple()
-                            )
-                        )
-                        msg_tmp = {0: send_time, 1: user_id}
-                        tool_function.write_local_json(
-                            f"msg_temp/{guild_id}.json", msg_tmp
-                        )
+                    )
+                    msg_tmp = {0: send_time, 1: user_id}
+                    tool_function.write_local_json(
+                        f"msg_temp/{guild_id}.json", msg_tmp
+                    )
 
                 elif tool_function.check_dict_data(db, "queue") and db["queue"]:
                     # TODO: Write json
@@ -1549,40 +1529,20 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         )
 
                     voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
-                    try:
-                        ctx.voice_client.play(
-                            voice_file,
-                            after=playnext(ctx, lang, content, platform_result),
-                            )
-                        await ctx.message.add_reaction("🔊")
-                    except discord.errors.ClientException:
-                        if tool_function.check_dict_data(db, "queue") and db["queue"]:
-                            # TODO: Write json
-                            # add reaction
-                            await ctx.message.add_reaction("⏯")
-                            asyncio.ensure_future(check_is_not_playing(ctx))
-                            playnext(ctx, lang, content, platform_result)
-                        else:
-                            await ctx.reply(
-                                tool_function.convert_msg(
-                                    locale,
-                                    lang,
-                                    "command",
-                                    "say",
-                                    "say_queue_not_support",
-                                    None,
-                                )
-                            )
-                    else:
-                        send_time = int(
-                            time.mktime(
-                                datetime.datetime.now(datetime.timezone.utc).timetuple()
-                            )
+                    ctx.voice_client.play(
+                        voice_file,
+                        after=playnext(ctx, lang, content, platform_result),
                         )
-                        msg_tmp = {0: send_time, 1: user_id}
-                        tool_function.write_local_json(
-                            f"msg_temp/{guild_id}.json", msg_tmp
+                    await ctx.message.add_reaction("🔊")
+                    send_time = int(
+                        time.mktime(
+                            datetime.datetime.now(datetime.timezone.utc).timetuple()
                         )
+                    )
+                    msg_tmp = {0: send_time, 1: user_id}
+                    tool_function.write_local_json(
+                        f"msg_temp/{guild_id}.json", msg_tmp
+                    )
 
                 elif tool_function.check_dict_data(db, "queue") and db["queue"]:
                     # TODO: Write json
