@@ -14,19 +14,25 @@ from dotenv import load_dotenv
 
 from src.modules import dv_command_func as command_func
 from src.modules import dv_tool_function as tool_function
-from src.modules import tts_func
 
+# avoid wrong work dir
 if "src" in os.getcwd():
     os.chdir("../")
 
+# create temporary directory
 if not os.path.exists("tts_temp"):
     os.mkdir("tts_temp")
 
 if not os.path.exists("msg_temp"):
     os.mkdir("msg_temp")
 
+if not os.path.exists("queue_temp"):
+    os.mkdir("queue_temp")
+
+# loading env from testenv
 load_dotenv()
-# check file
+
+# setup variables
 config = {
     "prefix": f"{os.getenv('DISCORD_DV_PREFIX')}",
     "owner": int(os.getenv("DISCORD_OWNER")),
@@ -46,6 +52,7 @@ command_alias = {
 locale = tool_function.read_local_json("locale/dv_locale/locale.json")
 supported_platform = {"Google", "Azure"}
 
+# initialize bot
 bot = commands.Bot(
     command_prefix=config["prefix"],
     help_command=None,
@@ -53,44 +60,75 @@ bot = commands.Bot(
     owner_ids=[config["owner"], 890234177767755849],
 )
 
-# initialize some variable
 bot.remove_command("help")
 bot.Intent = discord.Intents.default()
 
-folder = "tts_temp"
-for filename in os.listdir(folder):
-    file_path = os.path.join(folder, filename)
-    try:
-        if os.path.isfile(file_path) or os.path.islink(file_path):
-            os.unlink(file_path)
-        elif os.path.isdir(file_path):
-            shutil.rmtree(file_path)
-    except Exception as e:
-        print(f"Failed to delete {file_path}. Reason: {e}")
+
+# clear old file for tts
+def clear_old_file():
+    folder = "tts_temp"
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print(f"Failed to delete {file_path}. Reason: {e}")
 
 
-def playnext(ctx, lang: str, content: str, platform: str):
+clear_old_file()
+
+
+async def queue_job(ctx, lang: str, content: str, platform: str):
     # TODO: Queue todo
-    pass
+    # read queue file
+    """
+    guild_id = ctx.guild.id
+    if tool_function.check_local_file(f"queue_temp/{guild_id}.json"):
+        queue: list = tool_function.read_local_json(f"queue_temp/{guild_id}.json")
+    else:
+        queue = []
+    queue.append({"lang": lang, "content": content, "platform": platform})
+    tool_function.write_local_json(f"queue_temp/{guild_id}.json", queue)
+
+    # get voice_client from ctx
+    voice_client = ctx.voice_client
+    if voice_client is None:
+        os.remove(f"queue_temp/{guild_id}.json")
+        return
+    # check if voice_client is playing
+    if voice_client.is_playing():
+        # wait until voice_client is not playing by asyncio
+        wait_task = asyncio.create_task(check_is_not_playing(ctx))
+        await wait_task
+    # reload queue file
+    # todo: WIP
+    """
+    return
 
 
 async def check_is_not_playing(ctx):
     while True:
         if ctx.voice_client is not None and ctx.voice_client.is_playing():
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.2)
         else:
             break
 
 
 @bot.event
+# setup jobs on ready
 async def on_ready():
     tool_function.postgres_logging(f"目前登入身份：{bot.user}")
     game = discord.Game(f"{config['prefix']}help")
-    # discord.Status.<狀態>，可以是online,offline,idle,dnd,invisible    # get all guilds
+    # print joined servers
     tool_function.postgres_logging("目前登入的伺服器：")
     for guild in bot.guilds:
         tool_function.postgres_logging(guild.name + "\n")
     channel_list = ""
+
+    # reconnect vc if not TEST_ENV
     if tool_function.check_db_file("joined_vc") and os.getenv("TEST_ENV") != "True":
         remove_vc = []
         joined_vc = tool_function.read_db_json("joined_vc")
@@ -100,13 +138,17 @@ async def on_ready():
             try:
                 await bot.get_channel(int(j)).connect()
             except Exception:
+                # append to `remove_vc` if failed to join
                 remove_vc.append(str(i))
                 tool_function.postgres_logging(f"Failed to connect to {j} in {i}.\n")
                 tool_function.postgres_logging(f"Reason: \n{traceback.format_exc()}")
             else:
+                # print if success to join
                 tool_function.postgres_logging(
                     f"Successfully connected to {j} in {i}.\n"
                 )
+
+        # remove vc from `joined_vc` if failed to join and written into db
         for i in remove_vc:
             del joined_vc[i]
             tool_function.write_db_json("joined_vc", joined_vc)
@@ -121,11 +163,14 @@ async def on_ready():
                 f"```"
             )
     await bot.change_presence(status=discord.Status.online, activity=game)
+
+    # send result to owner
     owner = await bot.fetch_user(int(config["owner"]))
     await owner.send("bot online.\n" "Connect to:\n" f"{channel_list}")
 
 
 @bot.event
+# send server join welcome message
 async def on_guild_join(guild):
     general = guild.system_channel
     if general and general.permissions_for(guild.me).send_messages:
@@ -147,7 +192,7 @@ async def on_guild_join(guild):
     # get guild name
     guild_name = guild.name
     guild_id = guild.id
-    # send to owner dm
+    # send to owner by dm
     owner = await bot.fetch_user(int(config["owner"]))
     await owner.send(
         f"New server joined!\n" f"Guild Name: {guild_name}\n" f"Guild ID: {guild_id}\n"
@@ -460,7 +505,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                     ],
                 )
             )
-        except:
+        except Exception:
             not_able_reply = traceback.format_exc()
             owner_data = await bot.fetch_user(config["owner"])
             owner_name = owner_data.name
@@ -486,7 +531,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                         ],
                     )
                 )
-            except:
+            except Exception:
                 not_able_send = traceback.format_exc()
 
             await owner_data.send(
@@ -515,6 +560,7 @@ async def on_error(event, *args, **kwargs):
 """
 
 
+# noinspection PyShadowingBuiltins
 @bot.command(Name="help", aliases=command_alias["help"])
 async def help(ctx):  # sourcery skip: low-code-quality
     locale_lang = tool_function.check_db_lang(ctx)
@@ -950,21 +996,11 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         guild_id,
                         db["lang"],
                     )
-                    # GCP Cloud Text to Speech Method
-                    if platform_result == "Google":
-                        tool_function.postgres_logging("Init Google TTS API")
-                        await tts_func.google_tts_converter(
-                            content, db["lang"], f"{guild_id}.mp3"
-                        )
 
-                    elif platform_result == "Azure":
-                        tool_function.postgres_logging("Init Azure TTS API")
-                        await tts_func.azure_tts_converter(
-                            content, db["lang"], f"{guild_id}.mp3"
-                        )
-                    else:
-                        tool_function.postgres_logging("Something Wrong")
-                        # send to owner
+                    # process tts file (false if went wrong)
+                    if not await command_func.tts_convert(
+                        ctx, db["lang"], content, platform_result
+                    ):
                         owner = await bot.fetch_user(int(config["owner"]))
                         await owner.send(
                             f"Something went wrong return triggered!\n"
@@ -975,14 +1011,13 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
-                        await tts_func.google_tts_converter(
-                            content, db["lang"], f"{guild_id}.mp3"
-                        )
 
                     voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
                     ctx.voice_client.play(
                         voice_file,
-                        after=playnext(ctx, db["lang"], content, platform_result),
+                        after=await queue_job(
+                            ctx, db["lang"], content, platform_result
+                        ),
                     )
                     await ctx.message.add_reaction("🔊")
                     send_time = int(
@@ -991,16 +1026,13 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         )
                     )
                     msg_tmp = {0: send_time, 1: user_id}
-                    tool_function.write_local_json(
-                        f"msg_temp/{guild_id}.json", msg_tmp
-                    )
+                    tool_function.write_local_json(f"msg_temp/{guild_id}.json", msg_tmp)
 
                 elif tool_function.check_dict_data(db, "queue") and db["queue"]:
                     # TODO: Write json
                     # add reaction
                     await ctx.message.add_reaction("⏯")
-                    asyncio.ensure_future(check_is_not_playing(ctx))
-                    playnext(
+                    await queue_job(
                         ctx,
                         db["lang"],
                         content,
@@ -1240,37 +1272,23 @@ async def shutdown(ctx):
 @bot.command(Name="clear", aliases=["c"])
 @commands.guild_only()
 async def clear(ctx):
-    with contextlib.suppress(Exception):
-        try:
-            ctx.voice_client.is_connected()
-        except AttributeError:
-            is_connected = False
-        else:
-            is_connected = True
-
-        if is_connected and ctx.voice_client.is_playing():
-            ctx.voice_client.stop()
-    list_name = f"list_{ctx.guild.id}"
-    if list_name in globals():
-        globals()[list_name].queue.clear()
-        await ctx.reply(
-            tool_function.convert_msg(
-                locale,
-                tool_function.check_db_lang(ctx),
-                "command",
-                "clear",
-                "clear",
-                None,
-            )
+    # TODO: Json Remove
+    await ctx.reply(
+        tool_function.convert_msg(
+            locale,
+            tool_function.check_db_lang(ctx),
+            "command",
+            "clear",
+            "clear",
+            None,
         )
+    )
 
 
 @bot.command(Name="stop")
 @commands.guild_only()
 async def stop(ctx):
-    list_name = f"list_{ctx.guild.id}"
-    if list_name in globals():
-        globals()[list_name].queue.clear()
+    # TODO: Json Remove
     # stop playing from voice channel
     try:
         ctx.voice_client.is_connected()
@@ -1499,21 +1517,11 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                     platform_result = command_func.check_platform(
                         user_platform_set, user_id, guild_platform_set, guild_id, lang
                     )
-                    # GCP Cloud Text to Speech Method
-                    if platform_result == "Google":
-                        tool_function.postgres_logging("Init Google TTS API")
-                        await tts_func.google_tts_converter(
-                            content, lang, f"{guild_id}.mp3"
-                        )
 
-                    elif platform_result == "Azure":
-                        tool_function.postgres_logging("Init Azure TTS API")
-                        await tts_func.azure_tts_converter(
-                            content, lang, f"{guild_id}.mp3"
-                        )
-                    else:
-                        tool_function.postgres_logging("Something Wrong")
-                        # send to owner
+                    # process tts file (false if went wrong)
+                    if not await command_func.tts_convert(
+                        ctx, lang, content, platform_result
+                    ):
                         owner = await bot.fetch_user(int(config["owner"]))
                         await owner.send(
                             f"Something went wrong return triggered!\n"
@@ -1524,15 +1532,12 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
-                        await tts_func.google_tts_converter(
-                            content, lang, f"{guild_id}.mp3"
-                        )
 
                     voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
                     ctx.voice_client.play(
                         voice_file,
-                        after=playnext(ctx, lang, content, platform_result),
-                        )
+                        after=await queue_job(ctx, lang, content, platform_result),
+                    )
                     await ctx.message.add_reaction("🔊")
                     send_time = int(
                         time.mktime(
@@ -1540,16 +1545,13 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         )
                     )
                     msg_tmp = {0: send_time, 1: user_id}
-                    tool_function.write_local_json(
-                        f"msg_temp/{guild_id}.json", msg_tmp
-                    )
+                    tool_function.write_local_json(f"msg_temp/{guild_id}.json", msg_tmp)
 
                 elif tool_function.check_dict_data(db, "queue") and db["queue"]:
                     # TODO: Write json
                     # add reaction
                     await ctx.message.add_reaction("⏯")
-                    asyncio.ensure_future(check_is_not_playing(ctx))
-                    playnext(
+                    await queue_job(
                         ctx,
                         lang,
                         content,
@@ -1783,21 +1785,11 @@ async def force_say(
                         guild_id,
                         db["lang"],
                     )
-                    # GCP Cloud Text to Speech Method
-                    if platform_result == "Google":
-                        tool_function.postgres_logging("Init Google TTS API")
-                        await tts_func.google_tts_converter(
-                            content, db["lang"], f"{guild_id}.mp3"
-                        )
 
-                    elif platform_result == "Azure":
-                        tool_function.postgres_logging("Init Azure TTS API")
-                        await tts_func.azure_tts_converter(
-                            content, db["lang"], f"{guild_id}.mp3"
-                        )
-                    else:
-                        tool_function.postgres_logging("Something Wrong")
-                        # send to owner
+                    # process tts file (false if went wrong)
+                    if not await command_func.tts_convert(
+                        ctx, db["lang"], content, platform_result
+                    ):
                         owner = await bot.fetch_user(int(config["owner"]))
                         await owner.send(
                             f"Something went wrong return triggered!\n"
@@ -1808,15 +1800,14 @@ async def force_say(
                         )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
-                        await tts_func.google_tts_converter(
-                            content, db["lang"], f"{guild_id}.mp3"
-                        )
 
                     voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
                     try:
                         ctx.voice_client.play(
                             voice_file,
-                            after=playnext(ctx, db["lang"], content, platform_result),
+                            after=await queue_job(
+                                ctx, db["lang"], content, platform_result
+                            ),
                         )
                         await ctx.message.add_reaction("🔊")
                     except discord.errors.ClientException:
@@ -1824,8 +1815,7 @@ async def force_say(
                             # TODO: Write json
                             # add reaction
                             await ctx.message.add_reaction("⏯")
-                            asyncio.ensure_future(check_is_not_playing(ctx))
-                            playnext(ctx, db["lang"], content, platform_result)
+                            await queue_job(ctx, db["lang"], content, platform_result)
                         else:
                             tool_function.postgres_logging(
                                 f"Playing content: \n"
@@ -1841,21 +1831,11 @@ async def force_say(
                                 guild_id,
                                 db["lang"],
                             )
-                            # GCP Cloud Text to Speech Method
-                            if platform_result == "Google":
-                                tool_function.postgres_logging("Init Google TTS API")
-                                await tts_func.google_tts_converter(
-                                    content, db["lang"], f"{guild_id}.mp3"
-                                )
 
-                            elif platform_result == "Azure":
-                                tool_function.postgres_logging("Init Azure TTS API")
-                                await tts_func.azure_tts_converter(
-                                    content, db["lang"], f"{guild_id}.mp3"
-                                )
-                            else:
-                                tool_function.postgres_logging("Something Wrong")
-                                # send to owner
+                            # process tts file (false if went wrong)
+                            if not await command_func.tts_convert(
+                                ctx, db["lang"], content, platform_result
+                            ):
                                 owner = await bot.fetch_user(int(config["owner"]))
                                 await owner.send(
                                     f"Something went wrong return triggered!\n"
@@ -1866,9 +1846,6 @@ async def force_say(
                                 )
                                 # add bug emoji reaction
                                 await ctx.message.add_reaction("🐛")
-                                await tts_func.google_tts_converter(
-                                    content, db["lang"], f"{guild_id}.mp3"
-                                )
 
                             voice_file = discord.FFmpegOpusAudio(
                                 f"tts_temp/{guild_id}.mp3"
@@ -1878,7 +1855,9 @@ async def force_say(
                             await asyncio.sleep(0.5)
                             ctx.voice_client.play(
                                 voice_file,
-                                after=playnext(ctx, db["lang"], content, platform_result),
+                                after=await queue_job(
+                                    ctx, db["lang"], content, platform_result
+                                ),
                             )
                             await ctx.message.add_reaction("⁉")
                 else:
@@ -1896,21 +1875,11 @@ async def force_say(
                         guild_id,
                         db["lang"],
                     )
-                    # GCP Cloud Text to Speech Method
-                    if platform_result == "Google":
-                        tool_function.postgres_logging("Init Google TTS API")
-                        await tts_func.google_tts_converter(
-                            content, db["lang"], f"{guild_id}.mp3"
-                        )
 
-                    elif platform_result == "Azure":
-                        tool_function.postgres_logging("Init Azure TTS API")
-                        await tts_func.azure_tts_converter(
-                            content, db["lang"], f"{guild_id}.mp3"
-                        )
-                    else:
-                        tool_function.postgres_logging("Something Wrong")
-                        # send to owner
+                    # process tts file (false if went wrong)
+                    if not await command_func.tts_convert(
+                        ctx, db["lang"], content, platform_result
+                    ):
                         owner = await bot.fetch_user(int(config["owner"]))
                         await owner.send(
                             f"Something went wrong return triggered!\n"
@@ -1921,9 +1890,6 @@ async def force_say(
                         )
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
-                        await tts_func.google_tts_converter(
-                            content, db["lang"], f"{guild_id}.mp3"
-                        )
 
                     voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
                     # stop current audio
@@ -1931,7 +1897,9 @@ async def force_say(
                     await asyncio.sleep(0.5)
                     ctx.voice_client.play(
                         voice_file,
-                        after=playnext(ctx, db["lang"], content, platform_result),
+                        after=await queue_job(
+                            ctx, db["lang"], content, platform_result
+                        ),
                     )
                     await ctx.message.add_reaction("⁉")
             else:

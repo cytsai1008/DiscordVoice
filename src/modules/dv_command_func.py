@@ -7,6 +7,7 @@ import requests
 from discord.ext import commands
 
 import src.modules.dv_tool_function as tool_function
+from src.modules import tts_func
 
 
 async def content_convert(ctx, lang: str, locale: dict, content: str) -> str:
@@ -259,3 +260,22 @@ def name_convert(ctx, lang: str, locale: dict, content: str) -> str:
     else:
         content = content
     return content
+
+
+async def tts_convert(ctx, lang: str, content: str, platform_result: str) -> [bool]:
+    guild_id = ctx.guild.id
+    if platform_result == "Azure":
+        tool_function.postgres_logging("Init Azure TTS API")
+        await tts_func.azure_tts_converter(content, lang, f"{guild_id}.mp3")
+        return True
+
+    elif platform_result == "Google":
+        tool_function.postgres_logging("Init Google TTS API")
+        await tts_func.google_tts_converter(content, lang, f"{guild_id}.mp3")
+        return True
+
+    else:
+        tool_function.postgres_logging("Something Wrong")
+        # send to owner
+        await tts_func.google_tts_converter(content, lang, f"{guild_id}.mp3")
+        return False

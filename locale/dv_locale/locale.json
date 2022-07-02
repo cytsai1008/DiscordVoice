@@ -358,7 +358,7 @@
           "成功重置語音轉文字引擎。"
         ],
         "setvoice_success": [
-          "成功設定預設語音為 {{data_voice}}。"
+          "成功設定預設語音為 `{{data_voice}}`。"
         ],
         "setvoice_no_arg": [
           "未提供引擎，請透過 `{{prefix}}setvoice platform-name` 設定，或 `{{prefix}}setvoice reset` 以重置。\n",
@@ -618,7 +618,7 @@
           "成功重置语音转文字引擎。"
         ],
         "setvoice_success": [
-          "成功设定预设语音为 {{data_voice}}。"
+          "成功设定预设语音为 `{{data_voice}}`。"
         ],
         "setvoice_no_arg": [
           "未提供引擎，请透过 `{{prefix}}setvoice platform-name` 设定，或 `{{prefix}}setvoice reset` 以重置。\n",
