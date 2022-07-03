@@ -84,7 +84,7 @@ $invite : Get a link to invite this bot into your server.
  - [ ] Auto disconnect
  - [x] Translate
  - [ ] Rewrite some codeblocks into function
- - [ ] Update to `py-cord` 2.0
+ - [ ] Update to `py-cord` 2.0 or (`nextcord/nextcord` for more stable 2.0?)
  - [ ] Command typo auto fix (ex. `$sayABCD` -> `$say ABCD`)
  - [ ] Slash command
  - [ ] Embed message
