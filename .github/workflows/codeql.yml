@@ -21,10 +21,6 @@ on:
     - cron: '00 00 * * 3'
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.ref }}"codeql"
-  cancel-in-progress: true
-
 jobs:
   analyze:
     name: Analyze
