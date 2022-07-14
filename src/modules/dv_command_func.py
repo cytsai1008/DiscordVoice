@@ -98,9 +98,9 @@ def content_link_replace(content: str, lang, locale: dict) -> str:
 
 def check_platform(
     user_platform_set: bool,
-    user_id: [str, int],
+    user_id: str | int,
     guild_platform_set: bool,
-    guild_id: [str, int],
+    guild_id: str | int,
     lang: str,
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""

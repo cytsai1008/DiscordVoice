@@ -45,7 +45,7 @@ def read_db_json(filename) -> dict:
     return client.json().get(filename)
 
 
-def read_local_json(filename) -> [dict, list]:
+def read_local_json(filename) -> dict | list:
     """Returns dictionary from a json file"""
     with open(filename, "r") as f:
         data = json.load(f)
@@ -58,7 +58,7 @@ def write_db_json(filename: str, data: dict) -> None:
     # return False if args is type(None)
 
 
-def write_local_json(filename: str, data: [dict, list]) -> None:
+def write_local_json(filename: str, data: dict | list) -> None:
     """Writes dictionary to json file"""
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
@@ -124,7 +124,7 @@ def convert_msg(
     msg_type: str,
     command: str,
     name: str,
-    convert_text: [list, None],
+    convert_text: list | None = None,
 ) -> str:
     """
     Convert message from locale
