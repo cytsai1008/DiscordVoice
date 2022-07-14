@@ -852,8 +852,6 @@ async def join_error(ctx, error):
         )
         await ctx.message.add_reaction("❌")
         return
-    else:
-        raise
 
 
 @bot.command(Name="leave", aliases=command_alias["leave"])
@@ -918,8 +916,6 @@ async def setchannel_error(ctx, error):
         )
         await ctx.message.add_reaction("❌")
         return
-    else:
-        raise error
 
 
 @bot.command(Name="say", aliases=command_alias["say"])
@@ -1436,8 +1432,6 @@ async def move_error(ctx, error):
         )
         await ctx.message.add_reaction("❌")
         return
-    else:
-        raise
 
 
 @bot.command(Name="say_lang", aliases=command_alias["say_lang"])
