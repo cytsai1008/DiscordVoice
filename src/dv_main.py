@@ -835,7 +835,7 @@ async def join(ctx, *, channel: discord.VoiceChannel):
 
 @join.error
 async def join_error(ctx, error):
-    if isinstance(error, commands.BadArgument):
+    if isinstance(error, commands.BadArgument) or isinstance(error, commands.BadUnionArgument):
         # get guild system channel
         await ctx.reply(
             tool_function.convert_msg(
@@ -851,6 +851,9 @@ async def join_error(ctx, error):
             )
         )
         await ctx.message.add_reaction("❌")
+        return
+    else:
+        raise
 
 
 @bot.command(Name="leave", aliases=command_alias["leave"])
@@ -900,7 +903,7 @@ async def setchannel(ctx, channel: discord.TextChannel | discord.VoiceChannel | 
 
 @setchannel.error
 async def setchannel_error(ctx, error):
-    if isinstance(error, commands.BadArgument):
+    if isinstance(error, commands.BadUnionArgument):
         # get guild system channel
         guild_system_channel = ctx.guild.system_channel
         await ctx.reply(
@@ -914,6 +917,9 @@ async def setchannel_error(ctx, error):
             )
         )
         await ctx.message.add_reaction("❌")
+        return
+    else:
+        raise error
 
 
 @bot.command(Name="say", aliases=command_alias["say"])
@@ -1413,7 +1419,7 @@ async def move(ctx, *, channel: discord.VoiceChannel):
 
 @move.error
 async def move_error(ctx, error):
-    if isinstance(error, commands.BadArgument):
+    if isinstance(error, commands.BadArgument) or isinstance(error, commands.BadUnionArgument):
         # get guild system channel
         await ctx.reply(
             tool_function.convert_msg(
@@ -1429,6 +1435,9 @@ async def move_error(ctx, error):
             )
         )
         await ctx.message.add_reaction("❌")
+        return
+    else:
+        raise
 
 
 @bot.command(Name="say_lang", aliases=command_alias["say_lang"])

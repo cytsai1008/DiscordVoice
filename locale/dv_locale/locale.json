@@ -23,7 +23,7 @@
           "To move, please use `{{prefix}}move`."
         ],
         "join_bad_arg": [
-          "Please enter a valid voice channel or join a voice channel and type `{{prefix}}join` directly.\n"
+          "Please enter an exist voice channel or join a voice channel and type `{{prefix}}join` directly.\n"
         ],
         "join_not_in": [
           "Please join a voice channel first."
@@ -31,7 +31,7 @@
       },
       "move": {
         "move_bad_arg": [
-          "Please enter a valid voice channel or join a voice channel and type `{{prefix}}move` directly.\n"
+          "Please enter an exist voice channel or join a voice channel and type `{{prefix}}move` directly.\n"
         ],
         "move_not_in": [
           "Please join a voice channel first."
@@ -42,7 +42,7 @@
           "channel set to <#{{data_channel}}>"
         ],
         "setchannel_bad_arg": [
-          "Please enter a valid channel. (Must have blue background and is clickable, ex. {{prefix}}setchannel <#{{sys_channel}}>)"
+          "Please enter an exist channel."
         ],
         "setchannel_no_arg": [
           "No channel providing, please set by {{prefix}}setchannel <#{{sys_channel}}>"
@@ -283,7 +283,7 @@
           "請使用 `{{prefix}}move` 以讓機器人移至其他語音頻道。"
         ],
         "join_bad_arg": [
-          "請輸入一個符合規定的頻道或是直接在加入語音頻道後輸入 `{{prefix}}join`。\n"
+          "請輸入一個存在的頻道或是直接在加入語音頻道後輸入 `{{prefix}}join`。\n"
         ],
         "join_not_in": [
           "請先加入語音頻道。"
@@ -291,7 +291,7 @@
       },
       "move": {
         "move_bad_arg": [
-          "請輸入一個符合規定的頻道或是直接在加入語音頻道後輸入 `{{prefix}}move`。\n"
+          "請輸入一個存在的頻道或是直接在加入語音頻道後輸入 `{{prefix}}move`。\n"
         ],
         "move_not_in": [
           "請先加入語音頻道。"
@@ -302,7 +302,7 @@
           "成功設定文字頻道為 <#{{data_channel}}>。"
         ],
         "setchannel_bad_arg": [
-          "請輸入一個符合規定的頻道。 (必須是能點擊的並且有藍底， ex. {{prefix}}setchannel <#{{sys_channel}}>)\n"
+          "請輸入一個存在的頻道。\n"
         ],
         "setchannel_no_arg": [
           "未提供頻道，請透過 {{prefix}}setchannel <#{{sys_channel}}> 設定。"
@@ -543,7 +543,7 @@
           "请使用 `{{prefix}}move` 以让机器人移至其他语音频道。"
         ],
         "join_bad_arg": [
-          "请输入一个符合规定的频道或是直接在加入语音频道后输入 `{{prefix}}join`。\n"
+          "请输入一个存在的频道或是直接在加入语音频道后输入 `{{prefix}}join`。\n"
         ],
         "join_not_in": [
           "请先加入语音频道。"
@@ -551,7 +551,7 @@
       },
       "move": {
         "move_bad_arg": [
-          "请输入一个符合规定的频道或是直接在加入语音频道后输入 `{{prefix}}move`。\n"
+          "请输入一个存在的频道或是直接在加入语音频道后输入 `{{prefix}}move`。\n"
         ],
         "move_not_in": [
           "请先加入语音频道。"
@@ -562,7 +562,7 @@
           "成功设定文字频道为 <#{{data_channel}}>。"
         ],
         "setchannel_bad_arg": [
-          "请输入一个符合规定的频道。 (必须是能点击的并且有蓝底， ex. {{prefix}}setchannel <#{{sys_channel}}>)\n"
+          "请输入一个存在的频道。\n"
         ],
         "setchannel_no_arg": [
           "未提供频道，请透过 {{prefix}}setchannel <#{{sys_channel}}> 设定。"
