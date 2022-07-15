@@ -8,9 +8,9 @@ import subprocess
 import time
 import traceback
 
-import discord
-from discord.ext import commands
+import nextcord as discord
 from dotenv import load_dotenv
+from nextcord.ext import commands
 
 from src.modules import dv_command_func as command_func
 from src.modules import dv_tool_function as tool_function
@@ -871,7 +871,7 @@ async def leave(ctx):
 
 @bot.command(Name="setchannel")
 @commands.guild_only()
-async def setchannel(ctx, channel: discord.TextChannel | discord.VoiceChannel | discord.ForumChannel):
+async def setchannel(ctx, channel: discord.TextChannel | discord.VoiceChannel):
     # get channel id
     channel_id = channel.id
     # get guild id
