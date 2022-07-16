@@ -35,7 +35,7 @@ token = {
 }
 
 bot = commands.Bot(
-    command_prefix=token["prefix"], help_command=None, case_insensitive=True
+    command_prefix=token["prefix"], help_command=None, case_insensitive=True, intents=discord.Intents.all()
 )
 
 help_zh_tw = load_command.read_description("help", "zh-tw")
