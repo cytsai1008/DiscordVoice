@@ -14,6 +14,9 @@
 *.ini   text eol=lf
 *.conf  text eol=lf
 *.cfg   text eol=lf
+Aptfile text eol=lf
+Procfile text eol=lf
+Procfile.web text eol=lf
 # Don't diff or textually merge source maps
 *.map   binary
 
