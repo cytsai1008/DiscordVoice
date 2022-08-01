@@ -5,6 +5,7 @@ import time
 
 import bs4
 import httpx
+import metadata_parser
 from discord.ext import commands
 
 import src.modules.dv_tool_function as tool_function
@@ -41,8 +42,15 @@ async def _get_web_title(client, url: str) -> (str, str):
     try:
         tool_function.postgres_logging(f"Fetching web title: {url}")
         resp = await client.get(url)
-        soup = bs4.BeautifulSoup(resp.text, "lxml")
-        title = soup.title.text
+        metadata = metadata_parser.MetadataParser(html=resp.text)
+        title = metadata.get_metadata("title")
+        if title.find("Attention Required!") != -1:
+            resp = httpx.get(url, follow_redirects=True)
+            metadata = metadata_parser.MetadataParser(html=resp.text)
+            title = metadata.get_metadata("title")
+        if title == "":
+            soup = bs4.BeautifulSoup(resp.text, "lxml")
+            title = soup.title.text
         return url, title
     except Exception:
         return url, ""
@@ -82,7 +90,7 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
         headers = {
             "user-agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
         }
-        async with httpx.AsyncClient(headers=headers) as client:
+        async with httpx.AsyncClient(headers=headers, follow_redirects=True) as client:
             tasks = []
             for i in url:
                 tasks.append(_get_web_title(client, i))

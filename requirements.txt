@@ -8,6 +8,7 @@ httpx
 redis>=4.1.4
 flask
 gunicorn
+metadata_parser
 beautifulsoup4
 lxml
 psycopg2
