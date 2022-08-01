@@ -33,11 +33,11 @@ async def content_convert(ctx, lang: str, locale: dict, content: str) -> str:
                 ),
             )
 
-    content = await content_link_replace(content, lang, locale)
+    content = await _content_link_replace(content, lang, locale)
     return content
 
 
-async def get_web_title(client, url: str) -> (str, str):
+async def _get_web_title(client, url: str) -> (str, str):
     try:
         tool_function.postgres_logging(f"Fetching web title: {url}")
         resp = await client.get(url)
@@ -48,7 +48,7 @@ async def get_web_title(client, url: str) -> (str, str):
         return url, ""
 
 
-async def content_link_replace(content: str, lang, locale: dict) -> str:
+async def _content_link_replace(content: str, lang, locale: dict) -> str:
     """Return the head in the link if content has links"""
 
     # clear localhost 0.0.0.0 127.0.0.1
@@ -85,7 +85,7 @@ async def content_link_replace(content: str, lang, locale: dict) -> str:
         async with httpx.AsyncClient(headers=headers) as client:
             tasks = []
             for i in url:
-                tasks.append(get_web_title(client, i))
+                tasks.append(_get_web_title(client, i))
             results = await asyncio.gather(*tasks)
             for i in results:
                 convert_text = tool_function.convert_msg(

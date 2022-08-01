@@ -128,43 +128,12 @@ async def on_ready():
     tool_function.postgres_logging("目前登入的伺服器：")
     for guild in bot.guilds:
         tool_function.postgres_logging(guild.name + "\n")
+    # TODO: Function
     channel_list = ""
 
     # reconnect vc if not TEST_ENV
     if tool_function.check_db_file("joined_vc") and os.getenv("TEST_ENV") != "True":
-        remove_vc = []
-        joined_vc = tool_function.read_db_json("joined_vc")
-        tool_function.postgres_logging(f"joined_vc: \n" f"{joined_vc}")
-        for i, j in joined_vc.items():
-            # join the vc
-            try:
-                # noinspection PyUnresolvedReferences
-                await bot.get_channel(int(j)).connect()
-            except Exception:
-                # append to `remove_vc` if failed to join
-                remove_vc.append(str(i))
-                tool_function.postgres_logging(f"Failed to connect to {j} in {i}.\n")
-                tool_function.postgres_logging(f"Reason: \n{traceback.format_exc()}")
-            else:
-                # print if success to join
-                tool_function.postgres_logging(
-                    f"Successfully connected to {j} in {i}.\n"
-                )
-
-        # remove vc from `joined_vc` if failed to join and written into db
-        for i in remove_vc:
-            del joined_vc[i]
-            tool_function.write_db_json("joined_vc", joined_vc)
-        for i, j in joined_vc.items():
-            channel_list += f"{i}: {j}\n"
-        channel_list = f"```\n" f"{channel_list}\n" f"```"
-        if remove_vc:
-            new_line = "\n"
-            channel_list += (
-                f"Fail to connect to the following channels:\n```\n"
-                f"{new_line.join(remove_vc)}\n"
-                f"```"
-            )
+        channel_list = await tool_function.auto_reconnect_vc(bot)
 
     else:
         # noinspection PyUnresolvedReferences

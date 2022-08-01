@@ -1,6 +1,8 @@
+import asyncio
 import datetime
 import json
 import os
+import traceback
 
 import psycopg2
 import redis
@@ -143,9 +145,53 @@ def check_db_lang(self) -> str:
     return (
         read_db_json(user_id_rename(self))["lang"]
         if (
-            check_guild_or_dm(self)
-            and check_db_file(user_id_rename(self))
-            and check_dict_data(read_db_json(user_id_rename(self)), "lang")
+                check_guild_or_dm(self)
+                and check_db_file(user_id_rename(self))
+                and check_dict_data(read_db_json(user_id_rename(self)), "lang")
         )
         else "en"
     )
+
+
+async def auto_reconnect_vc(bot) -> str:
+    """Reconnect to voice channel"""
+    channel_list = ""
+    remove_vc = []
+    joined_vc = read_db_json("joined_vc")
+    postgres_logging(f"joined_vc: \n" f"{joined_vc}")
+    tasks = []
+    for server_id, channel_id in joined_vc:
+        tasks.append(_connect_vc(bot, server_id, channel_id))
+    results = await asyncio.gather(*tasks)
+    for result in results:
+        if result[0] is False:
+            remove_vc.append(result[1])
+    # remove vc from `joined_vc` if failed to join and written into db
+    for i in remove_vc:
+        del joined_vc[i]
+        write_db_json("joined_vc", joined_vc)
+    for i, j in joined_vc.items():
+        channel_list += f"{i}: {j}\n"
+    channel_list = f"```\n" f"{channel_list}\n" f"```"
+    if remove_vc:
+        new_line = "\n"
+        channel_list += (
+            f"Fail to connect to the following channels:\n```\n"
+            f"{new_line.join(remove_vc)}\n"
+            f"```"
+        )
+    return channel_list
+
+
+async def _connect_vc(bot, channel_id: int, server_id: int, ) -> (bool, int | None):
+    """Connect to voice channel"""
+    try:
+        # noinspection PyUnresolvedReferences
+        await bot.get_channel(channel_id).connect()
+    except Exception:
+        postgres_logging(f"Failed to connect to {channel_id}.\n")
+        postgres_logging(f"Reason: \n{traceback.format_exc()}")
+        return False, server_id
+    else:
+        postgres_logging(f"Successfully connected to {channel_id}.\n")
+        return True, None
