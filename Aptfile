@@ -5,4 +5,4 @@ build-essential
 libssl-dev
 libasound2
 wget
-libssl=1.1
+libssl1.1
