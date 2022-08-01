@@ -4,9 +4,10 @@ python-dotenv
 google-cloud-texttospeech
 azure-cognitiveservices-speech
 requests
+httpx
 redis>=4.1.4
 flask
 gunicorn
 beautifulsoup4
 lxml
-psycopg2-binary
+psycopg2

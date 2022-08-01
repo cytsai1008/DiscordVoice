@@ -835,7 +835,9 @@ async def join(ctx, *, channel: discord.VoiceChannel):
 
 @join.error
 async def join_error(ctx, error):
-    if isinstance(error, commands.BadArgument) or isinstance(error, commands.BadUnionArgument):
+    if isinstance(error, commands.BadArgument) or isinstance(
+            error, commands.BadUnionArgument
+    ):
         # get guild system channel
         await ctx.reply(
             tool_function.convert_msg(
@@ -871,7 +873,9 @@ async def leave(ctx):
 
 @bot.command(Name="setchannel")
 @commands.guild_only()
-async def setchannel(ctx, channel: discord.TextChannel | discord.VoiceChannel | discord.ForumChannel):
+async def setchannel(
+        ctx, channel: discord.TextChannel | discord.VoiceChannel | discord.ForumChannel
+):
     # get channel id
     channel_id = channel.id
     # get guild id
@@ -1415,7 +1419,9 @@ async def move(ctx, *, channel: discord.VoiceChannel):
 
 @move.error
 async def move_error(ctx, error):
-    if isinstance(error, commands.BadArgument) or isinstance(error, commands.BadUnionArgument):
+    if isinstance(error, commands.BadArgument) or isinstance(
+            error, commands.BadUnionArgument
+    ):
         # get guild system channel
         await ctx.reply(
             tool_function.convert_msg(

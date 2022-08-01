@@ -1,9 +1,10 @@
+import asyncio
 import datetime
 import re
 import time
 
 import bs4
-import requests
+import httpx
 from discord.ext import commands
 
 import src.modules.dv_tool_function as tool_function
@@ -32,11 +33,22 @@ async def content_convert(ctx, lang: str, locale: dict, content: str) -> str:
                 ),
             )
 
-    content = content_link_replace(content, lang, locale)
+    content = await content_link_replace(content, lang, locale)
     return content
 
 
-def content_link_replace(content: str, lang, locale: dict) -> str:
+async def get_web_title(client, url: str) -> (str, str):
+    try:
+        tool_function.postgres_logging(f"Fetching web title: {url}")
+        resp = await client.get(url)
+        soup = bs4.BeautifulSoup(resp.text, "lxml")
+        title = soup.title.text
+        return url, title
+    except Exception:
+        return url, ""
+
+
+async def content_link_replace(content: str, lang, locale: dict) -> str:
     """Return the head in the link if content has links"""
 
     # clear localhost 0.0.0.0 127.0.0.1
@@ -53,9 +65,9 @@ def content_link_replace(content: str, lang, locale: dict) -> str:
             content = content.replace(j, "")
 
     if not re.findall(
-        "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
-        content,
-        flags=re.IGNORECASE,
+            "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
+            content,
+            flags=re.IGNORECASE,
     ):
         return content
 
@@ -64,18 +76,18 @@ def content_link_replace(content: str, lang, locale: dict) -> str:
         content,
         flags=re.IGNORECASE,
     )
+    # remove duplicate
+    url = list(set(url))
     if len(url) <= 3:
-        for i in url:
-            headers = {
-                "user-agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
-            }
-            try:
-                r = requests.get(i, headers=headers)
-                soup = bs4.BeautifulSoup(r.text, "lxml")
-                title = soup.title.text
-            except Exception:
-                content = content.replace(i, "")
-            else:
+        headers = {
+            "user-agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+        }
+        async with httpx.AsyncClient(headers=headers) as client:
+            tasks = []
+            for i in url:
+                tasks.append(get_web_title(client, i))
+            results = await asyncio.gather(*tasks)
+            for i in results:
                 convert_text = tool_function.convert_msg(
                     locale,
                     lang,
@@ -84,10 +96,10 @@ def content_link_replace(content: str, lang, locale: dict) -> str:
                     "link",
                     [
                         "data_link",
-                        title,
+                        i[1],
                     ],
                 )
-                content = content.replace(i, convert_text)
+                content = content.replace(i[0], convert_text)
 
     else:
         for i in url:
