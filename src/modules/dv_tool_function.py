@@ -160,7 +160,7 @@ async def auto_reconnect_vc(bot) -> str:
     joined_vc = read_db_json("joined_vc")
     postgres_logging(f"joined_vc: \n" f"{joined_vc}")
     tasks = []
-    for server_id, channel_id in joined_vc:
+    for server_id, channel_id in joined_vc.items():
         tasks.append(_connect_vc(bot, server_id, channel_id))
     results = await asyncio.gather(*tasks)
     for result in results:
