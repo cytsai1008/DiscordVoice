@@ -168,7 +168,10 @@ async def auto_reconnect_vc(bot) -> str:
             remove_vc.append(result[1])
     # remove vc from `joined_vc` if failed to join and written into db
     for i in remove_vc:
-        del joined_vc[i]
+        try:
+            del joined_vc[i]
+        except KeyError:
+            pass
         write_db_json("joined_vc", joined_vc)
     for i, j in joined_vc.items():
         channel_list += f"{i}: {j}\n"
