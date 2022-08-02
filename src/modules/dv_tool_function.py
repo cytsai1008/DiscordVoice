@@ -183,7 +183,7 @@ async def auto_reconnect_vc(bot) -> str:
     return channel_list
 
 
-async def _connect_vc(bot, channel_id: int, server_id: int, ) -> (bool, int | None):
+async def _connect_vc(bot, server_id: int, channel_id: int, ) -> (bool, int | None):
     """Connect to voice channel"""
     try:
         # noinspection PyUnresolvedReferences
