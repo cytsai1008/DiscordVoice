@@ -42,12 +42,16 @@ async def _get_web_title(client, url: str) -> (str, str):
     try:
         tool_function.postgres_logging(f"Fetching web title: {url}")
         resp = await client.get(url)
-        metadata = metadata_parser.MetadataParser(html=resp.text)
-        title = metadata.get_metadata("title")
+        metadata = metadata_parser.MetadataParser(
+            html=resp.text, search_head_only=False
+        )
+        title = metadata.get_metadatas("title")[0]
         if title.find("Attention Required!") != -1:
             resp = httpx.get(url, follow_redirects=True)
-            metadata = metadata_parser.MetadataParser(html=resp.text)
-            title = metadata.get_metadata("title")
+            metadata = metadata_parser.MetadataParser(
+                html=resp.text, search_head_only=False
+            )
+            title = metadata.get_metadatas("title")[0]
         if title == "":
             soup = bs4.BeautifulSoup(resp.text, "lxml")
             title = soup.title.text
