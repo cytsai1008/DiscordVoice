@@ -1,12 +1,16 @@
+import contextlib
 import datetime
 import json
 import os
 
-import dotenv
+with contextlib.suppress(ImportError):
+    import dotenv
+
 import psycopg2
 import redis
 
-dotenv.load_dotenv()
+with contextlib.suppress(NameError):
+    dotenv.load_dotenv()
 
 dv_redis = redis.Redis(
     host=os.environ["REDIS_DV_URL"],

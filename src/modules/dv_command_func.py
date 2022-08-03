@@ -126,12 +126,12 @@ def check_voice_platform(
     if (
             lang
             in tool_function.read_local_json("lang_list/google_languages.json")[
-            "Support_Language"
-        ]
-        and lang
-        not in tool_function.read_local_json("lang_list/azure_languages.json")[
-            "Support_Language"
-        ]
+        "Support_Language"
+    ]
+            and lang
+            not in tool_function.read_local_json("lang_list/azure_languages.json")[
+        "Support_Language"
+    ]
     ):
         return "Google"
     if (

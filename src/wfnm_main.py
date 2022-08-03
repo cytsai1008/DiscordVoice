@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import os
 import random
@@ -7,7 +8,10 @@ from datetime import datetime
 from datetime import timezone
 
 import discord
-import dotenv
+
+with contextlib.suppress(ImportError):
+    import dotenv
+
 from discord.ext import commands
 
 from src.modules import load_command, wfnm_tool_function as tool_function
@@ -26,7 +30,8 @@ handler.setFormatter(
 )
 logger.addHandler(handler)
 
-dotenv.load_dotenv()
+with contextlib.suppress(NameError):
+    dotenv.load_dotenv()
 
 token = {
     "token": os.getenv("DISCORD_WFNM_TOKEN"),

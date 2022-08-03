@@ -1,11 +1,15 @@
+import contextlib
 import json
 import multiprocessing
 import os
 
-import dotenv
+with contextlib.suppress(ImportError):
+    import dotenv
+
 import google.cloud.texttospeech as tts
 
-dotenv.load_dotenv()
+with contextlib.suppress(NameError):
+    dotenv.load_dotenv()
 
 
 def unique_languages_from_voices(voices):

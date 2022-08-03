@@ -1,9 +1,12 @@
+import contextlib
 import json
 import os
 
-import dotenv
+with contextlib.suppress(ImportError):
+    import dotenv
 
-dotenv.load_dotenv()
+with contextlib.suppress(NameError):
+    dotenv.load_dotenv()
 
 GCP_TOKEN = os.environ["GCP_TOKEN"]
 GCP_JSON = json.loads(GCP_TOKEN)

@@ -10,7 +10,9 @@ import traceback
 
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
+
+with contextlib.suppress(ImportError):
+    import dotenv
 
 from src.modules import dv_command_func as command_func
 from src.modules import dv_tool_function as tool_function
@@ -30,7 +32,8 @@ if not os.path.exists("queue_temp"):
     os.mkdir("queue_temp")
 
 # loading env from testenv
-load_dotenv()
+with contextlib.suppress(NameError):
+    dotenv.load_dotenv()
 
 # setup variables
 config = {
