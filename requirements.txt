@@ -1,15 +1,1 @@
-py-cord[voice]>=1.7.3
-aiohttp>=3.7.4.post0
-python-dotenv
-google-cloud-texttospeech
-azure-cognitiveservices-speech
-requests
-httpx
-cloudscraper
-redis>=4.1.4
-flask
-gunicorn
-metadata_parser
-beautifulsoup4
-lxml
-psycopg2
+-r "requirements/prod.txt"

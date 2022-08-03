@@ -1,0 +1,16 @@
+py-cord[voice]
+aiohttp
+python-dotenv
+google-cloud-texttospeech
+azure-cognitiveservices-speech
+requests
+httpx
+cloudscraper
+redis
+flask
+gunicorn
+metadata_parser
+beautifulsoup4
+lxml
+psycopg2-binary
+black
