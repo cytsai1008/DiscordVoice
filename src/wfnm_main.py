@@ -88,7 +88,7 @@ async def on_guild_join(guild):
 @bot.event
 async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass-elif
     # sourcery skip: remove-pass-elif
-    command = ctx.invoked_with.lower()
+    # command = ctx.invoked_with.lower()
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
         await ctx.reply("Command not found.")
         await ctx.message.add_reaction("❌")

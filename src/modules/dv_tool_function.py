@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import datetime
 import json
 import os
@@ -41,10 +42,10 @@ def redis_client() -> redis.Redis:
     )
 
 
-def read_db_json(filename) -> dict:
+def read_db_json(filename, path: str = ".") -> dict:
     """Reads json value from redis (key: filename, value: data)"""
     client = redis_client()
-    return client.json().get(filename)
+    return client.json().get(filename, path)
 
 
 def read_local_json(filename) -> dict | list:
@@ -54,10 +55,9 @@ def read_local_json(filename) -> dict | list:
     return data
 
 
-def write_db_json(filename: str, data: dict) -> None:
+def write_db_json(filename: str, data: dict, path: str = ".", ttl: int = -1) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
-    redis_client().json().set(filename, ".", data)
-    # return False if args is type(None)
+    redis_client().json().set(filename, path, data)
 
 
 def write_local_json(filename: str, data: dict | list) -> None:
@@ -69,7 +69,8 @@ def write_local_json(filename: str, data: dict | list) -> None:
 def check_dict_data(data: dict, arg) -> bool:
     """Check if arg is in data"""
     try:
-        postgres_logging(f"data in {arg} is {data[arg]}")
+        # postgres_logging(f"data in {arg} is {data[arg]}")
+        _ = data[arg]
     except KeyError:
         return False
     else:
@@ -154,27 +155,22 @@ def check_db_lang(self) -> str:
 
 
 async def auto_reconnect_vc(bot) -> str:
-    """Reconnect to voice channel"""
-    channel_list = ""
-    remove_vc = []
+    """Reconnect to voice channel on reboot"""
     joined_vc = read_db_json("joined_vc")
     postgres_logging(f"joined_vc: \n" f"{joined_vc}")
-    tasks = []
-    for server_id, channel_id in joined_vc.items():
-        tasks.append(_connect_vc(bot, server_id, channel_id))
+    tasks = [
+        _connect_vc(bot, server_id, channel_id)
+        for server_id, channel_id in joined_vc.items()
+    ]
+
     results = await asyncio.gather(*tasks)
-    for result in results:
-        if result[0] is False:
-            remove_vc.append(result[1])
+    remove_vc = [result[1] for result in results if result[0] is False]
     # remove vc from `joined_vc` if failed to join and written into db
     for i in remove_vc:
-        try:
+        with contextlib.suppress(KeyError):
             del joined_vc[i]
-        except KeyError:
-            pass
         write_db_json("joined_vc", joined_vc)
-    for i, j in joined_vc.items():
-        channel_list += f"{i}: {j}\n"
+    channel_list = "".join(f"{i}: {j}\n" for i, j in joined_vc.items())
     channel_list = f"```\n" f"{channel_list}\n" f"```"
     if remove_vc:
         new_line = "\n"

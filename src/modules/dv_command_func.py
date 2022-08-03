@@ -4,6 +4,7 @@ import re
 import time
 
 import bs4
+# import cloudscraper
 import httpx
 import metadata_parser
 from discord.ext import commands
@@ -46,6 +47,7 @@ async def _get_web_title(client, url: str) -> (str, str):
             html=resp.text, search_head_only=False
         )
         title = metadata.get_metadatas("title")[0]
+        # resp.headers.get('Server', '').startswith('cloudflare')
         if title.find("Attention Required!") != -1:
             resp = httpx.get(url, follow_redirects=True)
             metadata = metadata_parser.MetadataParser(
@@ -88,29 +90,22 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
         content,
         flags=re.IGNORECASE,
     )
+
     # remove duplicate
     url = list(set(url))
     if len(url) <= 3:
         headers = {
             "user-agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
         }
+
         async with httpx.AsyncClient(headers=headers, follow_redirects=True) as client:
-            tasks = []
-            for i in url:
-                tasks.append(_get_web_title(client, i))
+            tasks = [_get_web_title(client, i) for i in url]
             results = await asyncio.gather(*tasks)
             for i in results:
                 convert_text = tool_function.convert_msg(
-                    locale,
-                    lang,
-                    "variable",
-                    "say",
-                    "link",
-                    [
-                        "data_link",
-                        i[1],
-                    ],
+                    locale, lang, "variable", "say", "link", ["data_link", i[1]]
                 )
+
                 content = content.replace(i[0], convert_text)
 
     else:
@@ -120,17 +115,17 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
     return content
 
 
-def check_platform(
-    user_platform_set: bool,
-    user_id: str | int,
-    guild_platform_set: bool,
-    guild_id: str | int,
-    lang: str,
+def check_voice_platform(
+        user_platform_set: bool,
+        user_id: str | int,
+        guild_platform_set: bool,
+        guild_id: str | int,
+        lang: str,
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""
     if (
-        lang
-        in tool_function.read_local_json("lang_list/google_languages.json")[
+            lang
+            in tool_function.read_local_json("lang_list/google_languages.json")[
             "Support_Language"
         ]
         and lang
@@ -281,8 +276,6 @@ def name_convert(ctx, lang: str, locale: dict, content: str) -> str:
                 ],
             )
         )
-    else:
-        content = content
     return content
 
 

@@ -43,7 +43,7 @@ def check_args_zero(args, arg_list) -> bool:
 def id_check(self) -> str:
     try:
         server_id = str(self.guild.id)
-    except:
+    except Exception:
         server_id = f"user_{str(self.author.id)}"
     return server_id
 

@@ -5,6 +5,7 @@ google-cloud-texttospeech
 azure-cognitiveservices-speech
 requests
 httpx
+cloudscraper
 redis>=4.1.4
 flask
 gunicorn

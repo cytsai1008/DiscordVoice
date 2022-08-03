@@ -45,7 +45,7 @@
           "Please enter an exist channel."
         ],
         "setchannel_no_arg": [
-          "No channel providing, please set by {{prefix}}setchannel <#{{sys_channel}}>"
+          "No channel providing. (ex. {{prefix}}setchannel <#{{sys_channel}}>)"
         ]
       },
       "setlang": {
@@ -186,6 +186,9 @@
           "Error: {{error_msg}}\n",
           "Error Type: {{error_type}}\n",
           "```"
+        ],
+        "bot_missing_permissions": [
+          "Missing the required permissions to execute this command.\n"
         ]
       }
     },
@@ -305,7 +308,7 @@
           "請輸入一個存在的頻道。\n"
         ],
         "setchannel_no_arg": [
-          "未提供頻道，請透過 {{prefix}}setchannel <#{{sys_channel}}> 設定。"
+          "未提供頻道，請透過例如 {{prefix}}setchannel <#{{sys_channel}}> 設定。"
         ]
       },
       "setlang": {
@@ -446,6 +449,9 @@
           "Error: {{error_msg}}\n",
           "Error Type: {{error_type}}\n",
           "```"
+        ],
+        "bot_missing_permissions": [
+          "缺少執行此指令的必要權限。\n"
         ]
       }
     },
@@ -565,7 +571,7 @@
           "请输入一个存在的频道。\n"
         ],
         "setchannel_no_arg": [
-          "未提供频道，请透过 {{prefix}}setchannel <#{{sys_channel}}> 设定。"
+          "未提供频道，请透过例如 {{prefix}}setchannel <#{{sys_channel}}> 设定。"
         ]
       },
       "setlang": {
@@ -706,6 +712,9 @@
           "Error: {{error_msg}}\n",
           "Error Type: {{error_type}}\n",
           "```"
+        ],
+        "bot_missing_permissions": [
+          "缺少执行此指令的必要权限。\n"
         ]
       }
     },
