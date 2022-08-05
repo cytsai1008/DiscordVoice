@@ -3,7 +3,6 @@ aiohttp
 python-dotenv
 google-cloud-texttospeech
 azure-cognitiveservices-speech
-requests
 httpx
 cloudscraper
 redis

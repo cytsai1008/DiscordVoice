@@ -2,9 +2,7 @@ py-cord[voice]
 aiohttp
 google-cloud-texttospeech
 azure-cognitiveservices-speech
-requests
 httpx
-cloudscraper
 redis
 flask
 gunicorn
