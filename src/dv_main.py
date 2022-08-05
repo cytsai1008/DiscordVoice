@@ -73,8 +73,7 @@ bot.remove_command("help")
 
 
 # clear tts folder's old file
-def clear_old_file():
-    folder = "tts_temp"
+def clear_old_file(folder):
     for filename in os.listdir(folder):
         file_path = os.path.join(folder, filename)
         try:
@@ -86,7 +85,7 @@ def clear_old_file():
             print(f"Failed to delete {file_path}. Reason: {e}")
 
 
-clear_old_file()
+clear_old_file("tts_temp")
 
 
 # Queue job function WIP

@@ -55,9 +55,11 @@ def read_local_json(filename) -> dict | list:
     return data
 
 
-def write_db_json(filename: str, data: dict, path: str = ".", ttl: int = -1) -> None:
+def write_db_json(filename: str, data: dict, path: str = ".", ttl: int | None = None) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
     redis_client().json().set(filename, path, data)
+    if ttl:
+        redis_client().expire(filename, ttl)
 
 
 def write_local_json(filename: str, data: dict | list) -> None:
