@@ -301,7 +301,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
 
         elif command == "join" or command in command_alias["join"]:
             # not add question emoji
-            wrong_cmd = False
+            # wrong_cmd = False
 
             # get if user is in vc or not
             try:
@@ -362,7 +362,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
 
         elif command == "move" or command in command_alias["move"]:
             # not to add question emoji
-            wrong_cmd = False
+            # wrong_cmd = False
 
             # read "joined_vc" to del the old vc id
             joined_vc = tool_function.read_db_json("joined_vc")
@@ -396,7 +396,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                     # connect to new vc
                     await user_voice_channel.connect()
                 except discord.errors.ClientException:
-                    connect_failed: bool = True
+                    # connect_failed: bool = True
+                    pass
                 except Exception:
                     tool_function.postgres_logging(
                         f"Move Failed:\n"
@@ -404,7 +405,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                         f"{ctx.message.author.id}\n"
                         f"{traceback.format_exc()}"
                     )
-                    connect_failed: bool = True
+                    # connect_failed: bool = True
                 else:
                     await ctx.message.add_reaction("✅")
                 # get new vc id
@@ -508,8 +509,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     # Auto report unknown command error to owner (Mostly doesn't work actually...)
     else:
         tool_function.postgres_logging(error)
-        not_able_reply = ""
-        not_able_send = ""
+        # not_able_reply = ""
+        # not_able_send = ""
         try:
             server_name = ctx.guild.name
         except AttributeError:
