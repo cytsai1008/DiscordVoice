@@ -1,5 +1,4 @@
 py-cord[voice]
-aiohttp
 python-dotenv
 google-cloud-texttospeech
 azure-cognitiveservices-speech
