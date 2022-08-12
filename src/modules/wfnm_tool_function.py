@@ -32,6 +32,7 @@ def new_read_json(filename) -> dict:
 
 def write_json(filename, data) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
+    data = dict(sorted(data.items()))
     redis_client().json().set(filename, ".", data)
     # return False if args is type(None)
 
