@@ -7,6 +7,7 @@ import traceback
 
 import psycopg2
 import redis
+from natsort import natsorted
 
 
 def postgres_logging(logging_data: str):
@@ -59,7 +60,7 @@ def write_db_json(
         filename: str, data: dict, path: str = ".", ttl: int | None = None
 ) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
-    data = dict(sorted(data.items()))
+    data = dict(natsorted(data.items()))
     redis_client().json().set(filename, path, data)
     if ttl:
         redis_client().expire(filename, ttl)

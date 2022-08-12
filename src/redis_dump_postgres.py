@@ -3,6 +3,8 @@ import datetime
 import json
 import os
 
+from natsort import natsorted
+
 with contextlib.suppress(ImportError):
     import dotenv
 
@@ -56,6 +58,7 @@ for key in keys:
         # append data to dump_data
         dv_dump_data[key] = data
 
+dv_dump_data = dict(natsorted(dv_dump_data.items()))
 with open("db_dump/dv_dump_data.json", "w") as f:
     json.dump(dv_dump_data, f, indent=2)
 
@@ -70,6 +73,7 @@ for key in keys:
         # append data to dump_data
         wfnm_dump_data[key] = data
 
+wfnm_dump_data = dict(natsorted(wfnm_dump_data.items()))
 with open("db_dump/wfnm_dump_data.json", "w") as f:
     json.dump(wfnm_dump_data, f, indent=2)
 

@@ -12,3 +12,4 @@ beautifulsoup4
 lxml
 psycopg2-binary
 black
+natsort

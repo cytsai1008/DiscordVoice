@@ -3,6 +3,7 @@ import json
 import os
 
 import redis
+from natsort import natsorted
 
 
 # import load_command
@@ -32,7 +33,7 @@ def new_read_json(filename) -> dict:
 
 def write_json(filename, data) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
-    data = dict(sorted(data.items()))
+    data = dict(natsorted(data.items()))
     redis_client().json().set(filename, ".", data)
     # return False if args is type(None)
 
