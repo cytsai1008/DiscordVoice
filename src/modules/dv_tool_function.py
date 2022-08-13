@@ -57,7 +57,7 @@ def read_local_json(filename) -> dict | list:
 
 
 def write_db_json(
-        filename: str, data: dict, path: str = ".", ttl: int | None = None
+    filename: str, data: dict, path: str = ".", ttl: int | None = None
 ) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
     with contextlib.suppress(Exception):
@@ -153,9 +153,9 @@ def check_db_lang(self) -> str:
     return (
         read_db_json(user_id_rename(self))["lang"]
         if (
-                check_guild_or_dm(self)
-                and check_db_file(user_id_rename(self))
-                and check_dict_data(read_db_json(user_id_rename(self)), "lang")
+            check_guild_or_dm(self)
+            and check_db_file(user_id_rename(self))
+            and check_dict_data(read_db_json(user_id_rename(self)), "lang")
         )
         else "en"
     )

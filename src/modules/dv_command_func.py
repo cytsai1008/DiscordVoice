@@ -79,9 +79,9 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
             content = content.replace(j, "")
 
     if not re.findall(
-            "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
-            content,
-            flags=re.IGNORECASE,
+        "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
+        content,
+        flags=re.IGNORECASE,
     ):
         return content
 
@@ -116,22 +116,22 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
 
 
 def check_voice_platform(
-        user_platform_set: bool,
-        user_id: str | int,
-        guild_platform_set: bool,
-        guild_id: str | int,
-        lang: str,
+    user_platform_set: bool,
+    user_id: str | int,
+    guild_platform_set: bool,
+    guild_id: str | int,
+    lang: str,
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""
     if (
-            lang
-            in tool_function.read_local_json("lang_list/google_languages.json")[
-        "Support_Language"
-    ]
-            and lang
-            not in tool_function.read_local_json("lang_list/azure_languages.json")[
-        "Support_Language"
-    ]
+        lang
+        in tool_function.read_local_json("lang_list/google_languages.json")[
+            "Support_Language"
+        ]
+        and lang
+        not in tool_function.read_local_json("lang_list/azure_languages.json")[
+            "Support_Language"
+        ]
     ):
         return "Google"
     if (
