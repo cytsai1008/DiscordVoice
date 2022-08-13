@@ -424,7 +424,7 @@
           "請使用 `{{prefix}}wrong_msg on` 或 `{{prefix}}wrong_msg off` 來開啟或關閉此功能。"
         ],
         "wrong_msg_no_setting": [
-          "你甚麼都還沒開始做。\n"
+          "您甚麼都還沒設定。\n"
         ]
       },
       "on_command_error": {
@@ -687,7 +687,7 @@
           "请使用 `{{prefix}}wrong_msg on` 或 `{{prefix}}wrong_msg off` 来开启或关闭此功能。"
         ],
         "wrong_msg_no_setting": [
-          "你什么都还没开始做。\n"
+          "你什么都还没设定。\n"
         ]
       },
       "on_command_error": {

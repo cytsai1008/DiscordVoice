@@ -60,10 +60,8 @@ def write_db_json(
         filename: str, data: dict, path: str = ".", ttl: int | None = None
 ) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
-    try:
+    with contextlib.suppress(Exception):
         data = dict(natsorted(data.items()))
-    except Exception:
-        pass
     redis_client().json().set(filename, path, data)
     if ttl:
         redis_client().expire(filename, ttl)
