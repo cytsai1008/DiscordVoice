@@ -140,7 +140,7 @@ def convert_msg(
     Convert message from locale
     """
     lang = get_translate_lang(lang, locale_dict)
-    a = "".join(locale_dict[lang][msg_type][command][name])
+    a = "".join(locale_dict[msg_type][command][name][lang])
     if convert_text is not None:
         for i in range(0, len(convert_text), 2):
             a = a.replace(f"{{{{{convert_text[i]}}}}}", f"{convert_text[i + 1]}")

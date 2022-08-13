@@ -54,7 +54,7 @@ command_alias = {
 }
 
 # setup global variables
-locale = tool_function.read_local_json("locale/dv_locale/locale.json")
+locale = tool_function.read_local_json("locale/dv_locale/locale_v2.json")
 supported_platform = ("Google", "Azure")
 
 # initialize bot
@@ -940,6 +940,7 @@ async def setchannel(
         ctx, channel: discord.TextChannel | discord.VoiceChannel | discord.ForumChannel
 ):
     # get channel id
+    print(type(channel))
     channel_id = channel.id
     # get guild id
     guild_id = ctx.guild.id
