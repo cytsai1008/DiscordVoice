@@ -14,7 +14,9 @@
           "Use `{{prefix}}move` to let me move to another voice channel.\n",
           "Use `{{prefix}}leave` to let me leave the voice channel.\n",
           "Use `{{prefix}}ping` to check my latency.\n",
-          "Use `{{prefix}}invite` to get the bot's invite link.\n"
+          "Use `{{prefix}}invite` to get the bot's invite link.\n",
+          "Admin only:\n",
+          "Use `{{prefix}}ban @username <seconds>` to temporarily ban someone abusing the bot.\n"
         ],
         "zh-tw": [
           "使用 `{{prefix}}help` 以取得指令說明。\n",
@@ -28,7 +30,9 @@
           "使用 `{{prefix}}move` 讓機器人移至其他語音頻道。\n",
           "使用 `{{prefix}}leave` 以讓機器人離開語音頻道。\n",
           "使用 `{{prefix}}ping` 以取得機器人的通訊延遲。\n",
-          "使用 `{{prefix}}invite` 以取得機器人的邀請連結。\n"
+          "使用 `{{prefix}}invite` 以取得機器人的邀請連結。\n",
+          "管理員指令:\n",
+            "使用 `{{prefix}}ban @username <秒>` 以將使用者暫時封鎖。\n"
         ],
         "zh-cn": [
           "使用 `{{prefix}}help` 以取得指令说明。\n",
@@ -42,7 +46,9 @@
           "使用 `{{prefix}}move` 让机器人移至其他语音频道。\n",
           "使用 `{{prefix}}leave` 以让机器人离开语音频道。\n",
           "使用 `{{prefix}}ping` 以取得机器人的通讯延迟。\n",
-          "使用 `{{prefix}}invite` 以取得机器人的邀请连结。\n"
+          "使用 `{{prefix}}invite` 以取得机器人的邀请连结。\n",
+          "管理员指令:\n",
+          "使用 `{{prefix}}ban @username <秒>` 以将使用者暂时封锁。\n"
         ]
       }
     },
