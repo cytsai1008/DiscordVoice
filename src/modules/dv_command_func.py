@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import datetime
 import re
 import time
@@ -296,3 +297,21 @@ async def tts_convert(ctx, lang: str, content: str, platform_result: str) -> [bo
         # send to owner
         await tts_func.google_tts_converter(content, lang, f"{guild_id}.mp3")
         return False
+
+
+def is_banned(user_id: int | str, guild_id: int | str) -> bool:
+    ban_list = tool_function.read_db_json("ban")
+    if tool_function.check_dict_data(
+        ban_list, f"{user_id}"
+    ) and tool_function.check_dict_data(ban_list[f"{user_id}"], f"{guild_id}"):
+        if int(ban_list[f"{user_id}"][f"{guild_id}"]["expire"]) >= int(
+            time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple())
+        ):
+            return True
+        with contextlib.suppress(Exception):
+            del ban_list[f"{user_id}"][f"{guild_id}"]
+        if not ban_list[f"{user_id}"]:
+            with contextlib.suppress(Exception):
+                del ban_list[f"{user_id}"]
+        tool_function.write_db_json("ban", ban_list)
+    return False

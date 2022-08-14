@@ -119,7 +119,7 @@ def del_db_json(filename) -> None:
     redis_client().delete(filename)
 
 
-def get_translate_lang(lang: str, locale_dict: dict) -> str:
+def _get_translate_lang(lang: str, locale_dict: dict) -> str:
     """Return i if lang is in locale_dict["lang_list"][i]"""
     for i in locale_dict["lang_list"]:
         for j in locale_dict["lang_list"][i]:
@@ -139,7 +139,7 @@ def convert_msg(
     """
     Convert message from locale
     """
-    lang = get_translate_lang(lang, locale_dict)
+    lang = _get_translate_lang(lang, locale_dict)
     a = "".join(locale_dict[msg_type][command][name][lang])
     if convert_text is not None:
         for i in range(0, len(convert_text), 2):

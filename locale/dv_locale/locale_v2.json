@@ -507,6 +507,126 @@
         ]
       }
     },
+    "ban": {
+      "ban_success": {
+        "en": [
+          "Banned for {{ban_time}} seconds."
+        ],
+        "zh-tw": [
+          "已封鎖{{ban_time}}秒。"
+        ],
+        "zh-cn": [
+          "已封禁{{ban_time}}秒。"
+        ]
+      },
+      "ban_unknown_user": {
+        "en": [
+          "Unknown user."
+        ],
+        "zh-tw": [
+          "未知使用者。"
+        ],
+        "zh-cn": [
+          "未知用户。"
+        ]
+      },
+      "ban_no_arg": {
+        "en": [
+          "Who should I ban? :(\n",
+          "`{{prefix}}ban @user <seconds>`"
+        ],
+        "zh-tw": [
+          "我要封鎖誰? :(\n",
+          "`{{prefix}}ban @使用者名稱 <秒>`"
+        ],
+        "zh-cn": [
+          "我要封禁谁? :(\n",
+          "`{{prefix}}ban @用户名 <秒>`"
+        ]
+      },
+      "ban_not_allowed": {
+        "en": [
+          "You are not allowed to ban. (You're still being banned for {{ban_time}} seconds.)"
+        ],
+        "zh-tw": [
+          "您沒有權限封鎖。(您仍有{{ban_time}}秒封鎖中。)"
+        ],
+        "zh-cn": [
+          "您没有权限封禁。(您仍有{{ban_time}}秒封禁中。)"
+        ]
+      },
+      "ban_owner": {
+        "en": [
+          "You can't ban the bot."
+        ],
+        "zh-tw": [
+          "您不能封鎖機器人。"
+        ],
+        "zh-cn": [
+          "您不能封禁机器人。"
+        ]
+      }
+    },
+    "unban": {
+      "unban_not_allowed": {
+        "en": [
+          "You are not allowed to unban. (You're still being banned for {{ban_time}} seconds.)"
+        ],
+        "zh-tw": [
+          "您沒有權限解除封鎖。(您仍有{{ban_time}}秒封鎖中。)"
+        ],
+        "zh-cn": [
+          "您没有权限解除封禁。(您仍有{{ban_time}}秒封禁中。)"
+        ]
+      },
+      "unban_not_banned": {
+        "en": [
+          "User is not in the ban list."
+        ],
+        "zh-tw": [
+          "使用者不在封鎖名單內。"
+        ],
+        "zh-cn": [
+          "用户不在封禁名单内。"
+        ]
+      },
+      "unban_owner": {
+        "en": [
+          "You can't unban the bot."
+        ],
+        "zh-tw": [
+          "您不能解除封鎖機器人。"
+        ],
+        "zh-cn": [
+          "您不能解除封禁机器人。"
+        ]
+      },
+      "unban_success": {
+        "en": [
+          "Unbanned."
+        ],
+        "zh-tw": [
+          "已解除封鎖。"
+        ],
+        "zh-cn": [
+          "已解禁。"
+        ]
+      },
+      "unban_no_arg": {
+        "en": [
+          "Who should I unban? :(\n",
+          "`{{prefix}}unban @user`"
+        ],
+        "zh-tw": [
+          "我要解除封鎖誰? :(\n",
+          "`{{prefix}}unban @使用者名稱`"
+        ],
+        "zh-cn": [
+          "我要解禁谁? :(\n",
+          "`{{prefix}}unban @用户名`"
+        ]
+      }
+    },
     "on_command_error": {
       "command_not_found": {
         "en": [
@@ -595,6 +715,17 @@
         ],
         "zh-cn": [
           "缺少执行此指令的必要权限。\n"
+        ]
+      },
+      "missing_permissions": {
+        "en": [
+          "You are missing the required permissions to execute this command.\n"
+        ],
+        "zh-tw": [
+          "您缺少執行此指令的必要權限。\n"
+        ],
+        "zh-cn": [
+          "您缺少执行此指令的必要权限。\n"
         ]
       }
     }
