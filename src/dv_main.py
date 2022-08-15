@@ -2349,6 +2349,7 @@ async def ban(ctx, member: str | int | discord.Member, expire: int = 300):
     if ban_list[member_id][server_id]["expire"] - now_sec >= 216000:
         ban_list[member_id][server_id]["expire"] = int(now_sec + 216000)
     tool_function.write_db_json("ban", ban_list)
+    user_name = f"{member.name}#{member.discriminator}"
     await ctx.message.add_reaction("🚫")
     await ctx.reply(
         tool_function.convert_msg(
@@ -2360,6 +2361,8 @@ async def ban(ctx, member: str | int | discord.Member, expire: int = 300):
             [
                 "ban_time",
                 str(ban_list[member_id][server_id]["expire"] - now_sec),
+                "username",
+                user_name,
             ],
         )
     )
@@ -2465,6 +2468,7 @@ async def unban(ctx, member: str | int | discord.Member):
         with contextlib.suppress(Exception):
             del ban_list[f"{member_id}"]
     tool_function.write_db_json("ban", ban_list)
+    user_name = f"{member.name}#{member.discriminator}"
     await ctx.message.add_reaction("⭕")
     await ctx.reply(
         tool_function.convert_msg(
@@ -2473,7 +2477,10 @@ async def unban(ctx, member: str | int | discord.Member):
             "command",
             "unban",
             "unban_success",
-            None,
+            [
+                "username",
+                user_name,
+            ],
         )
     )
 

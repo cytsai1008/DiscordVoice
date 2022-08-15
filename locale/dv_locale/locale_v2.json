@@ -516,13 +516,13 @@
     "ban": {
       "ban_success": {
         "en": [
-          "Banned for {{ban_time}} seconds."
+          "Banned `{{username}}` for {{ban_time}} seconds."
         ],
         "zh-tw": [
-          "已封鎖{{ban_time}}秒。"
+          "已封鎖 `{{username}}` {{ban_time}}秒。"
         ],
         "zh-cn": [
-          "已封禁{{ban_time}}秒。"
+          "已封禁 `{{username}}` {{ban_time}}秒。"
         ]
       },
       "ban_unknown_user": {
@@ -609,13 +609,13 @@
       },
       "unban_success": {
         "en": [
-          "Unbanned."
+          "Unbanned `{{username}}` ."
         ],
         "zh-tw": [
-          "已解除封鎖。"
+          "已解除封鎖 `{{username}}` 。"
         ],
         "zh-cn": [
-          "已解禁。"
+          "已解禁 `{{username}}` 。"
         ]
       },
       "unban_no_arg": {
