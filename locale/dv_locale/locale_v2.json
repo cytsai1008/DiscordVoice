@@ -5,6 +5,7 @@
         "en": [
           "Use `{{prefix}}help` to see the help message.\n",
           "{{channel_msg}}\n",
+          "{{nochannel_msg}}\n",
           "{{lang_msg}}\n",
           "{{platform_msg}}\n",
           "Use `{{prefix}}say` to speak in voice channel. (ex. `{{prefix}}say ABCD`)\n",
@@ -21,6 +22,7 @@
         "zh-tw": [
           "使用 `{{prefix}}help` 以取得指令說明。\n",
           "{{channel_msg}}\n",
+          "{{nochannel_msg}}\n",
           "{{lang_msg}}\n",
           "{{platform_msg}}\n",
           "使用 `{{prefix}}say` 以在語音頻道說話。 (ex. `{{prefix}}say ABCD`)\n",
@@ -32,11 +34,12 @@
           "使用 `{{prefix}}ping` 以取得機器人的通訊延遲。\n",
           "使用 `{{prefix}}invite` 以取得機器人的邀請連結。\n",
           "管理員指令:\n",
-            "使用 `{{prefix}}ban @username <秒>` 以將使用者暫時封鎖。\n"
+          "使用 `{{prefix}}ban @username <秒>` 以將使用者暫時封鎖。\n"
         ],
         "zh-cn": [
           "使用 `{{prefix}}help` 以取得指令说明。\n",
           "{{channel_msg}}\n",
+          "{{nochannel_msg}}\n",
           "{{lang_msg}}\n",
           "{{platform_msg}}\n",
           "使用 `{{prefix}}say` 以在语音频道说话。 (ex. `{{prefix}}say ABCD`)\n",
@@ -550,6 +553,20 @@
           "`{{prefix}}ban @用户名 <秒>`"
         ]
       },
+      "ban_bad_arg": {
+        "en": [
+          "Not recognized arguments.\n",
+          "Usage: `{{prefix}}ban @user <seconds>`"
+        ],
+        "zh-tw": [
+          "不明參數\n",
+          "請使用 `{{prefix}}ban @使用者名稱 <秒>`"
+        ],
+        "zh-cn": [
+          "不明参数\n",
+          "请使用 `{{prefix}}ban @用户名 <秒>`"
+        ]
+      },
       "ban_not_allowed": {
         "en": [
           "You are not allowed to ban. (You're still being banned for {{ban_time}} seconds.)"
@@ -630,6 +647,72 @@
         "zh-cn": [
           "我要解禁谁? :(\n",
           "`{{prefix}}unban @用户名`"
+        ]
+      },
+      "unban_bad_arg": {
+        "en": [
+          "Not recognized arguments.\n",
+          "Usage: `{{prefix}}unban @user`"
+        ],
+        "zh-tw": [
+          "不明參數\n",
+          "請使用 `{{prefix}}unban @使用者名稱`"
+        ],
+        "zh-cn": [
+          "不明参数\n",
+          "请使用 `{{prefix}}unban @用户名`"
+        ]
+      }
+    },
+    "set_nochannel": {
+      "set_nochannel_bad_arg": {
+        "en": [
+          "Not recognized arguments.\n",
+          "Usage: `{{prefix}}set_nochannel <on | off>`"
+        ],
+        "zh-tw": [
+          "不明參數\n",
+          "請使用 `{{prefix}}set_nochannel <on | off>`"
+        ],
+        "zh-cn": [
+          "不明参数\n",
+          "请使用 `{{prefix}}set_nochannel <on | off>`"
+        ]
+      },
+      "set_nochannel_success": {
+        "en": [
+          "No force channel mode is `{{status}}`."
+        ],
+        "zh-tw": [
+          "無強制頻道模式為 `{{status}}`。"
+        ],
+        "zh-cn": [
+          "无强制频道模式为 `{{status}}`。"
+        ]
+      },
+      "set_nochannel_no_settings": {
+        "en": [
+          "You should setup other settings first.\n"
+        ],
+        "zh-tw": [
+          "您應該先設定其他設定。\n"
+        ],
+        "zh-cn": [
+          "您应该首先设置其他设定。\n"
+        ]
+      },
+      "set_nochannel_no_arg": {
+        "en": [
+          "Use following command and arguments to let bot not in one channel mode\n",
+          "`{{prefix}}set_nochannel <on | off>`"
+        ],
+        "zh-tw": [
+          "使用以下指令參數讓機器人不在僅限單頻道模式\n",
+          "`{{prefix}}set_nochannel <on | off>`"
+        ],
+        "zh-cn": [
+          "使用以下命令参数让机器人不在仅限单频道模式\n",
+          "`{{prefix}}set_nochannel <on | off>`"
         ]
       }
     },
@@ -740,13 +823,13 @@
     "help": {
       "channel_msg_default": {
         "en": [
-          "Use `{{prefix}}setchannel` to set a channel. (ex. {{prefix}}setchannel <#{{sys_channel}}>)"
+          "Use `{{prefix}}setchannel` to set a channel. (ex. `{{prefix}}setchannel #general`)"
         ],
         "zh-tw": [
-          "使用 `{{prefix}}setchannel` 設定文字頻道。 (ex. {{prefix}}setchannel <#{{sys_channel}}>)"
+          "使用 `{{prefix}}setchannel` 設定文字頻道。 (ex. `{{prefix}}setchannel #一般`)"
         ],
         "zh-cn": [
-          "使用 `{{prefix}}setchannel` 设定文字频道。 (ex. {{prefix}}setchannel <#{{sys_channel}}>)"
+          "使用 `{{prefix}}setchannel` 设定文字频道。 (ex. `{{prefix}}setchannel #一般`)"
         ]
       },
       "channel_msg_current": {
@@ -765,10 +848,10 @@
           "Use `{{prefix}}setchannel` to set a channel. (ex. `{{prefix}}setchannel #general`)"
         ],
         "zh-tw": [
-          "使用 `{{prefix}}setchannel` 設定文字頻道。 (ex. {{prefix}}setchannel #一般)"
+          "使用 `{{prefix}}setchannel` 設定文字頻道。 (ex. `{{prefix}}setchannel #一般`)"
         ],
         "zh-cn": [
-          "使用 `{{prefix}}setchannel` 设定文字频道。 (ex. {{prefix}}setchannel #一般)"
+          "使用 `{{prefix}}setchannel` 设定文字频道。 (ex. `{{prefix}}setchannel #一般`)"
         ]
       },
       "lang_msg_default": {
@@ -819,6 +902,28 @@
         ],
         "zh-cn": [
           "请使用 `{{prefix}}setvoice` 设定文字转语音引擎提供者。 (目前: `{{data_platform}}`)"
+        ]
+      },
+      "nochannel_msg_default": {
+        "en": [
+          "Use `{{prefix}}set_nochannel` disable one channel mode. (ex. `{{prefix}}set_nochannel <on | off>`)"
+        ],
+        "zh-tw": [
+          "使用 `{{prefix}}set_nochannel` 停用單文字頻道模式。 (ex. `{{prefix}}set_nochannel <開啟 | 關閉>`)"
+        ],
+        "zh-cn": [
+          "使用 `{{prefix}}set_nochannel` 停用单文字频道模式。 (ex. `{{prefix}}set_nochannel <开启 | 关闭>`)"
+        ]
+      },
+      "nochannel_msg_current": {
+        "en": [
+          "Use `{{prefix}}set_nochannel` disable one channel mode. (Current: `{{data_nochannel}}`)"
+        ],
+        "zh-tw": [
+          "使用 `{{prefix}}set_nochannel` 停用單文字頻道模式。 (目前: `{{data_nochannel}}`)"
+        ],
+        "zh-cn": [
+          "使用 `{{prefix}}set_nochannel` 停用单文字频道模式。 (目前: `{{data_nochannel}}`)"
         ]
       }
     },

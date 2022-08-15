@@ -454,6 +454,21 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 )
             )
 
+        elif command == "set_nochannel":
+            await ctx.reply(
+                tool_function.convert_msg(
+                    locale,
+                    lang,
+                    "command",
+                    "set_nochannel",
+                    "set_nochannel_no_arg",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
+            )
+
         # other not defined command missing arguments message
         else:
             await ctx.reply(
@@ -733,6 +748,26 @@ async def help(ctx):  # sourcery skip: low-code-quality
                 ],
             )
 
+        if tool_function.check_dict_data(data, "nochannel"):
+            nochannel_status = "on" if data["nochannel"] else "off"
+            nochannel_msg = tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "help",
+                "nochannel_msg_current",
+                ["prefix", config["prefix"], "data_nochannel", nochannel_status],
+            )
+        else:
+            nochannel_msg = tool_function.convert_msg(
+                locale,
+                locale_lang,
+                "variable",
+                "help",
+                "nochannel_msg_default",
+                ["prefix", config["prefix"]],
+            )
+
         # mix all together and send
         await ctx.reply(
             tool_function.convert_msg(
@@ -750,6 +785,8 @@ async def help(ctx):  # sourcery skip: low-code-quality
                     lang_msg,
                     "platform_msg",
                     platform_msg,
+                    "nochannel_msg",
+                    nochannel_msg,
                 ],
             )
         )
@@ -836,6 +873,15 @@ async def help(ctx):  # sourcery skip: low-code-quality
                             config["prefix"],
                         ],
                     ),
+                    "nochannel_msg",
+                    tool_function.convert_msg(
+                        locale,
+                        locale_lang,
+                        "variable",
+                        "help",
+                        "nochannel_msg_default",
+                        ["prefix", config["prefix"]],
+                    ),
                 ],
             )
         )
@@ -892,6 +938,15 @@ async def help(ctx):  # sourcery skip: low-code-quality
                             config["prefix"],
                         ],
                     ),
+                    "nochannel_msg",
+                    tool_function.convert_msg(
+                        locale,
+                        locale_lang,
+                        "variable",
+                        "help",
+                        "nochannel_msg_default",
+                        ["prefix", config["prefix"]],
+                    ),
                 ],
             )
         )
@@ -900,6 +955,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
 # join command
 @bot.command(Name="join", aliases=command_alias["join"])
 @commands.guild_only()
+@commands.cooldown(1, 10, commands.BucketType.user)
 # @commands.bot_has_permissions(connect=True, speak=True)
 async def join(ctx, *, channel: discord.VoiceChannel):
     # define language by db or default
@@ -975,12 +1031,12 @@ async def leave(ctx):
 
 
 @bot.command(Name="setchannel")
+@commands.cooldown(1, 20, commands.BucketType.user)
 @commands.guild_only()
 async def setchannel(
     ctx, channel: discord.TextChannel | discord.VoiceChannel | discord.ForumChannel
 ):
     # get channel id
-    print(type(channel))
     channel_id = channel.id
     # get guild id
     guild_id = ctx.guild.id
@@ -1074,7 +1130,10 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             is_connected
             and channelissetup
             and langissetup
-            and channel_id == db["channel"]
+            and (
+                channel_id == db["channel"]
+                or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"])
+            )
         ):
 
             # TODO: use cld to detect language
@@ -1504,6 +1563,7 @@ async def wrong_msg(ctx, msg: str):
 
 
 @bot.command(Name="move", aliases=command_alias["move"])
+@commands.cooldown(1, 10, commands.BucketType.user)
 @commands.guild_only()
 async def move(ctx, *, channel: discord.VoiceChannel):
     joined_vc = tool_function.read_db_json("joined_vc")
@@ -1614,7 +1674,10 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
             is_connected
             and channelissetup
             and lang_code_is_right
-            and channel_id == db["channel"]
+            and (
+                channel_id == db["channel"]
+                or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"])
+            )
         ):
 
             # export content to mp3 by google tts api
@@ -1879,7 +1942,10 @@ async def force_say(
             is_connected
             and channelissetup
             and langissetup
-            and channel_id == db["channel"]
+            and (
+                channel_id == db["channel"]
+                or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"])
+            )
         ):
 
             # use cld to detect language
@@ -2152,6 +2218,7 @@ async def force_say(
 
 
 @bot.command(name="setvoice")
+@commands.cooldown(1, 20, commands.BucketType.user)
 async def setvoice(ctx, platform: str):
     if platform.capitalize() not in supported_platform and platform.lower() != "reset":
         await ctx.reply(
@@ -2264,12 +2331,78 @@ async def setvoice(ctx, platform: str):
     )
 
 
+@bot.command(name="set_nochannel")
+@commands.guild_only()
+@commands.cooldown(1, 20, commands.BucketType.user)
+async def set_nochannel(ctx, setup: str):
+    """set not locking channel in settings ~~(history problem)~~"""
+    guild_id = ctx.guild.id
+    setup = setup.lower()
+    if setup not in {"on", "off"}:
+        await ctx.message.add_reaction("❌")
+        await ctx.reply(
+            tool_function.convert_msg(
+                locale,
+                tool_function.check_db_lang(ctx),
+                "command",
+                "set_nochannel",
+                "set_nochannel_bad_arg",
+                ["prefix", config["prefix"]],
+            )
+        )
+
+        return
+    if tool_function.check_db_file(guild_id):
+        data = tool_function.read_db_json(guild_id)
+        data["nochannel"] = setup == "on"
+        tool_function.write_db_json(guild_id, data)
+        await ctx.message.add_reaction("✅")
+        await ctx.reply(
+            tool_function.convert_msg(
+                locale,
+                tool_function.check_db_lang(ctx),
+                "command",
+                "set_nochannel",
+                "set_nochannel_success",
+                ["status", setup],
+            )
+        )
+
+    else:
+        await ctx.message.add_reaction("❌")
+        await ctx.reply(
+            locale,
+            tool_function.check_db_lang(ctx),
+            "command",
+            "set_nochannel",
+            "set_nochannel_no_settings",
+        )
+
+    return
+
+
 @bot.command(name="ban")
 @commands.guild_only()
-@commands.cooldown(1, 30, commands.BucketType.user)
+@commands.cooldown(1, 20, commands.BucketType.user)
 @commands.has_permissions(ban_members=True)
 async def ban(ctx, member: str | int | discord.Member, expire: int = 300):
     """temporary block someone's speak permission for this bot"""
+    if type(member) not in {str, int, discord.Member} or type(expire) != int:
+        await ctx.message.add_reaction("❌")
+        await ctx.reply(
+            tool_function.convert_msg(
+                locale,
+                tool_function.check_db_lang(ctx),
+                "command",
+                "ban",
+                "ban_bad_arg",
+                [
+                    "prefix",
+                    config["prefix"],
+                ],
+            )
+        )
+        return
     try:
         if type(member) in {str, int} and type(member) != discord.Member:
             member = await commands.MemberConverter().convert(ctx, member)
@@ -2370,10 +2503,27 @@ async def ban(ctx, member: str | int | discord.Member, expire: int = 300):
 
 @bot.command(name="unban")
 @commands.guild_only()
-@commands.cooldown(1, 30, commands.BucketType.user)
+@commands.cooldown(1, 20, commands.BucketType.user)
 @commands.has_permissions(ban_members=True)
 async def unban(ctx, member: str | int | discord.Member):
     """unblock someone's speak permission for this bot"""
+    if type(member) not in {str, int, discord.Member}:
+        await ctx.message.add_reaction("❌")
+        await ctx.reply(
+            tool_function.convert_msg(
+                locale,
+                tool_function.check_db_lang(ctx),
+                "command",
+                "unban",
+                "unban_bad_arg",
+                [
+                    "prefix",
+                    config["prefix"],
+                ],
+            )
+        )
+        return
+
     try:
         if type(member) in {str, int} and type(member) != discord.Member:
             member = await commands.MemberConverter().convert(ctx, member)
@@ -2437,12 +2587,7 @@ async def unban(ctx, member: str | int | discord.Member):
         or server_id not in ban_list[member_id]
         or ban_list[member_id][server_id]["expire"] < now_sec
     ):
-        # not banned
-        if (
-            member_id in ban_list
-            and server_id in ban_list[member_id]
-            and ban_list[member_id][server_id]["expire"] < now_sec
-        ):
+        if member_id in ban_list and server_id in ban_list[member_id]:
             with contextlib.suppress(Exception):
                 del ban_list[f"{member_id}"][f"{server_id}"]
             if not ban_list[f"{member_id}"]:
@@ -2477,10 +2622,7 @@ async def unban(ctx, member: str | int | discord.Member):
             "command",
             "unban",
             "unban_success",
-            [
-                "username",
-                user_name,
-            ],
+            ["username", user_name],
         )
     )
 
