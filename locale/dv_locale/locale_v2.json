@@ -909,10 +909,10 @@
           "Use `{{prefix}}set_nochannel` disable one channel mode. (ex. `{{prefix}}set_nochannel <on | off>`)"
         ],
         "zh-tw": [
-          "使用 `{{prefix}}set_nochannel` 停用單文字頻道模式。 (ex. `{{prefix}}set_nochannel <開啟 | 關閉>`)"
+          "使用 `{{prefix}}set_nochannel` 停用單文字頻道模式。 (ex. `{{prefix}}set_nochannel <on | off>`)"
         ],
         "zh-cn": [
-          "使用 `{{prefix}}set_nochannel` 停用单文字频道模式。 (ex. `{{prefix}}set_nochannel <开启 | 关闭>`)"
+          "使用 `{{prefix}}set_nochannel` 停用单文字频道模式。 (ex. `{{prefix}}set_nochannel <on | off>`)"
         ]
       },
       "nochannel_msg_current": {
