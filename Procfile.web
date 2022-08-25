@@ -1,3 +1,0 @@
-web: gunicorn src.website:app
-worker1: python src/dv_main.py
-worker2: python src/wfnm_main.py
