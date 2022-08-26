@@ -1,7 +1,0 @@
-build-essential
-libssl-dev
-libasound2
-wget
-
-:repo:deb [trusted=yes arch=amd64] http://security.ubuntu.com/ubuntu bionic-security main
-libssl1.1
