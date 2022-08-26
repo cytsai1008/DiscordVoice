@@ -4,9 +4,9 @@
 gunicorn src.website:app &
 
 # Start the second process
-python src/dv_main.py &
+python3 src/dv_main.py &
 
-python src/wfnm_main.py &
+python3 src/wfnm_main.py &
 
 # Wait for any process to exit
 wait -n
