@@ -10,7 +10,7 @@ RUN add-apt-repository 'deb [trusted=yes arch=amd64] http://security.ubuntu.com/
 RUN add-apt-repository ppa:savoury1/ffmpeg4 -y
 RUN add-apt-repository ppa:savoury1/ffmpeg5 -y
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y build-essential libssl-dev libasound2 wget libssl1.1 ffmpeg opus-tools libpq-dev htop
+RUN apt-get install -y python3-pip build-essential libssl-dev libasound2 wget libssl1.1 ffmpeg opus-tools libpq-dev htop
 RUN apt autoremove -y
 RUN pip3 install -r requirements.txt
 # RUN pip install python-dotenv
