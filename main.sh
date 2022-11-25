@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Start the first process
-gunicorn src.website:app &
+# gunicorn src.website:app &
 
 # Start the second process
 python3 src/dv_main.py &

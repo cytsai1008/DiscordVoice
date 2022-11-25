@@ -1,0 +1,10 @@
+# default docker compose example
+version: '3'
+services:
+
+  discordvoice-bot-01:
+    image: "ghcr.io/cytsai1008/discordvoice:latest"
+    container_name: "discordvoice-bot-01"
+    env_file:
+      - .env
+    restart: always

@@ -5,15 +5,19 @@ import json
 import os
 import traceback
 
-import psycopg2
+# import psycopg2
 import redis
 from natsort import natsorted
 
 
 def postgres_logging(logging_data: str):
     """Logging to postgres"""
+
+    """
     heroku_postgres = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
     cur = heroku_postgres.cursor()
+    """
+
     today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%Y-%m-%d %H:%M:%S"
     )
@@ -21,6 +25,7 @@ def postgres_logging(logging_data: str):
     if os.getenv("TEST_ENV"):
         return
 
+    '''
     cur.execute(
         """
         INSERT INTO dv_log (datetime, log)
@@ -30,6 +35,7 @@ def postgres_logging(logging_data: str):
     )
     heroku_postgres.commit()
     heroku_postgres.close()
+    '''
 
 
 def redis_client() -> redis.Redis:
