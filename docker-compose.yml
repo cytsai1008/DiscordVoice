@@ -3,7 +3,7 @@ version: '3'
 services:
 
   discordvoice-bot-01:
-    image: "ghcr.io/cytsai1008/discordvoice:latest"
+    image: "ghcr.io/cytsai1008/discordvoice:docker"
     container_name: "discordvoice-bot-01"
     env_file:
       - .env
