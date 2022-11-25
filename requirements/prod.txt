@@ -9,5 +9,5 @@ redis==4.3.5
 metadata_parser==0.10.5
 beautifulsoup4==4.11.1
 lxml==4.9.1
-psycopg2==2.9.5
+# psycopg2==2.9.5
 natsort==8.2.0
