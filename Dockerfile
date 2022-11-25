@@ -1,5 +1,4 @@
-# syntax = docker/dockerfile:1.2
-FROM python:3.11.0-bullseye
+FROM ubuntu:latest
 COPY . /app
 WORKDIR /app
 
