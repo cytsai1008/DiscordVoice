@@ -2635,10 +2635,10 @@ if __name__ == "__main__":
         tool_function.postgres_logging("Running on production environment")
         test_env = False
 
+    subprocess.call(["python3", "src/gcp-token-generator.py"])
     if test_env:
         bot.run(os.environ["DISCORD_DV_TEST_TOKEN"])
     else:
-        subprocess.call(["python3", "src/gcp-token-generator.py"])
         subprocess.call(["python3", "src/get_lang_code.py"])
         bot.run(os.environ["DISCORD_DV_TOKEN"])
 

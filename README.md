@@ -94,3 +94,7 @@ $invite : Get a link to invite this bot into your server.
 ## Known Issues
 #### BYM
 * Azure TTS not working
+
+<!--
+https://github.com/Azure-Samples/cognitive-services-speech-sdk/issues/437#issuecomment-622592123
+-->
