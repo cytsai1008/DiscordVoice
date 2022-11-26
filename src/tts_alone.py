@@ -19,7 +19,8 @@ str(content)
 str(lang_code)
 str(filename)
 
-dotenv.load_dotenv()
+with contextlib.suppress(NameError):
+    dotenv.load_dotenv()
 
 
 # noinspection PyTypeChecker
