@@ -1,6 +1,9 @@
 import argparse
 
-import dotenv
+import contextlib
+
+with contextlib.suppress(ImportError):
+    import dotenv
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--content", required=True)
