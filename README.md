@@ -90,3 +90,7 @@ $invite : Get a link to invite this bot into your server.
  - [ ] Slash command
  - [ ] Embed message
  - [ ] No command prefix mode
+
+## Known Issues
+#### BYM
+* Azure TTS not working
