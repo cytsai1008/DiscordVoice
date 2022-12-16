@@ -1,5 +1,5 @@
 py-cord[voice]==2.3.2
-google-cloud-texttospeech==2.12.3
+google-cloud-texttospeech==2.13.0
 azure-cognitiveservices-speech==1.23.0
 httpx==0.23.1
 redis==4.4.0
