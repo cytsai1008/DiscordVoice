@@ -53,6 +53,10 @@ async def azure_tts_converter(content: str, lang_code: str, filename: str) -> No
     # The language of the voice that speaks.
     speech_config.speech_synthesis_language = lang_code
 
+    # special case for Chinese Simplified
+    if lang_code == "zh-cn":
+        speech_config.speech_synthesis_voice_name = 'zh-CN-YunxiNeural'
+
     speech_synthesizer = speechsdk.SpeechSynthesizer(
         speech_config=speech_config, audio_config=audio_config
     )
