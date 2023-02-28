@@ -52,11 +52,10 @@ print("Dumping DV data")
 keys = dv_redis.keys("*")
 for key in keys:
     key_type = dv_redis.type(key)
-    if key_type == "ReJSON-RL":
-        data: dict = dv_redis.json().get(key)
+    data: str = dv_redis.get(key)
 
-        # append data to dump_data
-        dv_dump_data[key] = data
+    # append data to dump_data
+    dv_dump_data[key] = data
 try:
     dv_dump_data = dict(natsorted(dv_dump_data.items()))
 except Exception:
