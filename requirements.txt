@@ -10,3 +10,4 @@ beautifulsoup4==4.11.2
 lxml==4.9.2
 psycopg2==2.9.5
 natsort==8.2.0
+pycryptodome==3.17

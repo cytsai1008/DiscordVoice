@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import contextlib
 import datetime
 import json
@@ -7,7 +8,11 @@ import traceback
 
 import psycopg2
 import redis
+from Crypto.Cipher import PKCS1_v1_5 as PKCS1_cipher
+from Crypto.PublicKey import RSA
 from natsort import natsorted
+
+system_filename = ["ban", "joined_vc", "user_config"]
 
 
 def postgres_logging(logging_data: str):
@@ -46,7 +51,39 @@ def redis_client() -> redis.Redis:
 def read_db_json(filename, path: str = ".") -> dict:
     """Reads json value from redis (key: filename, value: data)"""
     client = redis_client()
-    return client.json().get(filename, path)
+    if cipher := client.get(filename):
+        return _db_data_decrypt(cipher)
+
+
+def _db_data_encrypt(data: dict) -> str:
+    """Encrypt data with rsa2048 and returns encrypted string"""
+    max_length = 200
+    data = json.dumps(data)
+    pub_key = RSA.importKey(str(os.environ["DV_RSA_PUBLIC"]))
+    cipher = PKCS1_cipher.new(pub_key)
+    # rsa_text = base64.b64encode(cipher.encrypt(bytes(data.encode("utf8"))))
+    byte_data = bytes(data.encode("utf8"))
+    sep_data = [
+        cipher.encrypt(byte_data[i: i + max_length])
+        for i in range(0, len(byte_data), max_length)
+    ]
+    rsa_text = base64.b64encode(b"".join(sep_data))
+    return rsa_text.decode('utf-8')
+
+
+def _db_data_decrypt(data: str) -> dict:
+    """Decrypt data with rsa2048 and returns decrypted string"""
+    max_length = 256
+    data = bytes(data.encode("utf8"))
+    data = base64.b64decode(data)
+    pri_key = RSA.importKey(str(os.environ["DV_RSA_PRIVATE"]))
+    cipher = PKCS1_cipher.new(pri_key)
+    sep_data = [
+        cipher.decrypt(data[i: i + max_length], 0)
+        for i in range(0, len(data), max_length)
+    ]
+    back_text = b"".join(sep_data)
+    return json.loads(back_text.decode('utf-8'))
 
 
 def read_local_json(filename) -> dict | list:
@@ -57,12 +94,15 @@ def read_local_json(filename) -> dict | list:
 
 
 def write_db_json(
-    filename: str, data: dict, path: str = ".", ttl: int | None = None
+        filename: str, data: dict, path: str = ".", ttl: int | None = None
 ) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
+    if filename not in system_filename:
+        ttl = 2592000
     with contextlib.suppress(Exception):
         data = dict(natsorted(data.items()))
-    redis_client().json().set(filename, path, data)
+    data = _db_data_encrypt(data)
+    redis_client().set(filename, data)
     if ttl:
         redis_client().expire(filename, ttl)
 
@@ -129,12 +169,12 @@ def _get_translate_lang(lang: str, locale_dict: dict) -> str:
 
 
 def convert_msg(
-    locale_dict: dict,
-    lang: str,
-    msg_type: str,
-    command: str,
-    name: str,
-    convert_text: list | None = None,
+        locale_dict: dict,
+        lang: str,
+        msg_type: str,
+        command: str,
+        name: str,
+        convert_text: list | None = None,
 ) -> str:
     """
     Convert message from locale
@@ -153,9 +193,9 @@ def check_db_lang(self) -> str:
     return (
         read_db_json(user_id_rename(self))["lang"]
         if (
-            check_guild_or_dm(self)
-            and check_db_file(user_id_rename(self))
-            and check_dict_data(read_db_json(user_id_rename(self)), "lang")
+                check_guild_or_dm(self)
+                and check_db_file(user_id_rename(self))
+                and check_dict_data(read_db_json(user_id_rename(self)), "lang")
         )
         else "en"
     )

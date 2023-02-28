@@ -60,6 +60,8 @@ supported_platform = ("Google", "Azure")
 
 # initialize bot
 intents = discord.Intents.all()
+intents.members = False
+intents.presences = False
 
 bot = commands.Bot(
     command_prefix=config["prefix"],

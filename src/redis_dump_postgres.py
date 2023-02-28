@@ -127,7 +127,6 @@ cur.execute(
 )
 heroku_postgres.commit()
 
-
 # if `dv_log` table row larger than 3000, truncate it
 cur.execute(
     """
@@ -147,7 +146,6 @@ if count > 3000:
         """
     )
     heroku_postgres.commit()
-
 
 # delete dv_dump_data longer than 1 month
 

@@ -1,7 +1,7 @@
 py-cord[voice]
 python-dotenv
 google-cloud-texttospeech
-azure-cognitiveservices-speech
+azure-cognitiveservices-speech==1.23.0
 httpx
 cloudscraper
 redis
@@ -10,6 +10,8 @@ gunicorn
 metadata_parser
 beautifulsoup4
 lxml
-psycopg2-binary
+# psycopg2-binary
+psycopg2
 black
 natsort
+pycryptodome
