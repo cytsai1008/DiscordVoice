@@ -9,5 +9,5 @@ metadata_parser==0.10.5
 beautifulsoup4==4.11.2
 lxml==4.9.2
 psycopg2==2.9.5
-natsort==8.3.0
+natsort==8.3.1
 pycryptodome==3.17
