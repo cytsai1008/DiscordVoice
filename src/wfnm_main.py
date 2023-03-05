@@ -1,5 +1,4 @@
 import contextlib
-import logging
 import os
 import random
 import signal
@@ -18,17 +17,6 @@ from src.modules import load_command, wfnm_tool_function as tool_function
 
 # import time
 
-logger = logging.getLogger("discord")
-logger.setLevel(logging.DEBUG)
-if not os.path.exists("wfnm_log"):
-    os.mkdir("wfnm_log")
-handler = logging.FileHandler(
-    filename="wfnm_log/discord_wfnm.log", encoding="utf-8", mode="w"
-)
-handler.setFormatter(
-    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
-)
-logger.addHandler(handler)
 
 with contextlib.suppress(NameError):
     dotenv.load_dotenv()
