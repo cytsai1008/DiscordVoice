@@ -2,11 +2,11 @@ py-cord[voice]==2.4.0
 google-cloud-texttospeech==2.14.1
 azure-cognitiveservices-speech==1.23.0
 httpx==0.23.3
-redis==4.5.1
+redis==4.5.2
 Flask==2.2.3
 gunicorn==20.1.0
 metadata_parser==0.10.5
-beautifulsoup4==4.11.2
+beautifulsoup4==4.12.0
 lxml==4.9.2
 psycopg2==2.9.5
 natsort==8.3.1
