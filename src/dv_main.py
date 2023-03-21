@@ -143,7 +143,10 @@ async def on_ready():
 
     # reconnect vc in "joined_vc" if not TEST_ENV
     if tool_function.check_db_file("joined_vc") and os.getenv("TEST_ENV") != "True":
+        """
+        #TODO: Fix it
         channel_list = await tool_function.auto_reconnect_vc(bot)
+        """
 
     # connect to test server's vc (Internal Debug Usage)
     else:
