@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: if gh pr list --state open --head public --base heroku | grep -q "No pull requests found"; then echo "pr_exists=false" >> $GITHUB_OUTPUT; else echo "pr_exists=true" >> $GITHUB_OUTPUT; fi
+      - id: pr
+        run: if gh pr list --state open --head public --base heroku | grep -q "No pull requests found"; then echo "pr_exists=false" >> $GITHUB_OUTPUT; else echo "pr_exists=true" >> $GITHUB_OUTPUT; fi
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Create Pull Request
