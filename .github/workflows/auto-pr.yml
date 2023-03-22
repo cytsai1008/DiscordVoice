@@ -11,6 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Create Pull Request
-      - run: gh pr create --title "Automatic Pull Request" --body "This pull request was automatically generated when the `public` branch was updated." --base heroku --head public 
+        run: gh pr create --title "Automatic Pull Request" --body "This pull request was automatically generated when the `public` branch was updated." --base heroku --head public 
         env:
           GH_TOKEN: ${{ github.token }}
