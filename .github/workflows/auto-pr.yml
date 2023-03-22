@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: if gh pr list --state open --head feature-branch --base main | grep -q "No pull requests found"; then echo "::set-output name=pr_exists::false"; else echo "::set-output name=pr_exists::true"; fi
+      - run: if gh pr list --state open --head feature-branch --base main | grep -q "No pull requests found"; then echo "pr_exists=false" >> $GITHUB_OUTPUT; else echo "pr_exists=true" >> $GITHUB_OUTPUT; fi
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Create Pull Request
