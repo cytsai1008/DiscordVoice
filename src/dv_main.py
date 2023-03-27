@@ -67,7 +67,7 @@ bot = commands.Bot(
     command_prefix=config["prefix"],
     help_command=None,
     case_insensitive=True,
-    owner_ids=[config["owner"], 890234177767755849],
+    owner_ids=[config["owner"], 890234177767755849, 1089569346516439123, 853578469979848714],
     intents=intents,
 )
 
