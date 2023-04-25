@@ -67,7 +67,12 @@ bot = commands.Bot(
     command_prefix=config["prefix"],
     help_command=None,
     case_insensitive=True,
-    owner_ids=[config["owner"], 890234177767755849],
+    owner_ids=[
+        config["owner"],
+        890234177767755849,
+        1089569346516439123,
+        853578469979848714
+    ],
     intents=intents,
 )
 
@@ -1199,7 +1204,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
 
-                    voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
+                    voice_file = await discord.FFmpegOpusAudio.from_probe(f"tts_temp/{guild_id}.mp3")
                     # TODO: Fix Unexpected Disconnect
                     ctx.voice_client.play(
                         voice_file,
@@ -1738,7 +1743,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
 
-                    voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
+                    voice_file = await discord.FFmpegOpusAudio.from_probe(f"tts_temp/{guild_id}.mp3")
                     ctx.voice_client.play(
                         voice_file,
                         after=await queue_job(ctx, lang, content, platform_result),
@@ -2009,7 +2014,7 @@ async def force_say(
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
 
-                    voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
+                    voice_file = await discord.FFmpegOpusAudio.from_probe(f"tts_temp/{guild_id}.mp3")
                     try:
                         ctx.voice_client.play(
                             voice_file,
@@ -2099,7 +2104,7 @@ async def force_say(
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
 
-                    voice_file = discord.FFmpegOpusAudio(f"tts_temp/{guild_id}.mp3")
+                    voice_file = await discord.FFmpegOpusAudio.from_probe(f"tts_temp/{guild_id}.mp3")
                     # stop current audio
                     ctx.voice_client.stop()
                     await asyncio.sleep(0.5)

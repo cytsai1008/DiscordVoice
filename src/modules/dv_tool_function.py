@@ -84,12 +84,12 @@ def _db_data_decrypt(data: str) -> dict:
         for i in range(0, len(data), max_length)
     ]
     back_text = b"".join(sep_data)
-    return json.loads(back_text.decode('utf-8'))
+    return json.loads(back_text.decode("utf-8"))
 
 
 def read_local_json(filename) -> dict | list:
     """Returns dictionary from a json file"""
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding='UTF-8') as f:
         data = json.load(f)
     return data
 

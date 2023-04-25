@@ -9,12 +9,20 @@ jobs:
   create-pull-request:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - run: if gh pr list --state open --head feature-branch --base main | grep -q "No pull requests found"; then echo "pr_exists=false" >> $GITHUB_OUTPUT; else echo "pr_exists=true" >> $GITHUB_OUTPUT; fi
+      - uses: actions/checkout@v3
+      - id: pr
+        run: |
+          if gh pr list --state open --head public --base heroku | grep -q "No pull requests found"; then 
+            echo "pr_exist=false"; 
+            echo "No existing pull requests found."
+          else 
+            echo "pr_exist=true"; 
+            echo "Existing pull requests found."
+          fi
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Create Pull Request
-        if: steps.pr.outputs.pr_exists == 'false'
-        run: gh pr create --title "Automatic Pull Request" --body "This pull request was automatically generated when the `public` branch was updated." --base heroku --head public 
+        if: steps.pr.outputs.pr_exist == 'false' || steps.pr.outputs.pr_exist == ''
+        run: gh pr create --title "Automatic Pull Request" --body "This pull request was automatically generated when the `public` branch was updated." --base heroku --head public
         env:
           GH_TOKEN: ${{ github.token }}
