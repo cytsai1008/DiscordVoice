@@ -1,7 +1,7 @@
 py-cord[voice]
 python-dotenv
 google-cloud-texttospeech
-azure-cognitiveservices-speech==1.23.0
+azure-cognitiveservices-speech==1.27.0
 httpx
 cloudscraper
 redis
