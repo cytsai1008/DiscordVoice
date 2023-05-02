@@ -65,11 +65,11 @@ def _db_data_encrypt(data: dict) -> str:
     # rsa_text = base64.b64encode(cipher.encrypt(bytes(data.encode("utf8"))))
     byte_data = bytes(data.encode("utf8"))
     sep_data = [
-        cipher.encrypt(byte_data[i: i + max_length])
+        cipher.encrypt(byte_data[i : i + max_length])
         for i in range(0, len(byte_data), max_length)
     ]
     rsa_text = base64.b64encode(b"".join(sep_data))
-    return rsa_text.decode('utf-8')
+    return rsa_text.decode("utf-8")
 
 
 def _db_data_decrypt(data: str) -> dict:
@@ -80,7 +80,7 @@ def _db_data_decrypt(data: str) -> dict:
     pri_key = RSA.importKey(str(os.environ["DV_RSA_PRIVATE"]))
     cipher = PKCS1_cipher.new(pri_key)
     sep_data = [
-        cipher.decrypt(data[i: i + max_length], 0)
+        cipher.decrypt(data[i : i + max_length], 0)
         for i in range(0, len(data), max_length)
     ]
     back_text = b"".join(sep_data)
@@ -95,7 +95,7 @@ def read_local_json(filename) -> dict | list:
 
 
 def write_db_json(
-        filename: str, data: dict, path: str = ".", ttl: int | None = None
+    filename: str, data: dict, path: str = ".", ttl: int | None = None
 ) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
     if filename not in system_filename:
@@ -170,12 +170,12 @@ def _get_translate_lang(lang: str, locale_dict: dict) -> str:
 
 
 def convert_msg(
-        locale_dict: dict,
-        lang: str,
-        msg_type: str,
-        command: str,
-        name: str,
-        convert_text: list | None = None,
+    locale_dict: dict,
+    lang: str,
+    msg_type: str,
+    command: str,
+    name: str,
+    convert_text: list | None = None,
 ) -> str:
     """
     Convert message from locale
@@ -194,9 +194,9 @@ def check_db_lang(self) -> str:
     return (
         read_db_json(user_id_rename(self))["lang"]
         if (
-                check_guild_or_dm(self)
-                and check_db_file(user_id_rename(self))
-                and check_dict_data(read_db_json(user_id_rename(self)), "lang")
+            check_guild_or_dm(self)
+            and check_db_file(user_id_rename(self))
+            and check_dict_data(read_db_json(user_id_rename(self)), "lang")
         )
         else "en"
     )
