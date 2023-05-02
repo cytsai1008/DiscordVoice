@@ -71,7 +71,7 @@ bot = commands.Bot(
         config["owner"],
         890234177767755849,
         1089569346516439123,
-        853578469979848714
+        853578469979848714,
     ],
     intents=intents,
 )
@@ -339,7 +339,6 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 )
                 await ctx.message.add_reaction("❌")
                 return
-
             # trying to connect to vc
             else:
                 try:
@@ -1145,7 +1144,6 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                 or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"])
             )
         ):
-
             # TODO: use cld to detect language
 
             """
@@ -1204,7 +1202,9 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
 
-                    voice_file = await discord.FFmpegOpusAudio.from_probe(f"tts_temp/{guild_id}.mp3")
+                    voice_file = await discord.FFmpegOpusAudio.from_probe(
+                        f"tts_temp/{guild_id}.mp3"
+                    )
                     # TODO: Fix Unexpected Disconnect
                     ctx.voice_client.play(
                         voice_file,
@@ -1689,7 +1689,6 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                 or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"])
             )
         ):
-
             # export content to mp3 by google tts api
             # get username
 
@@ -1743,7 +1742,9 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
 
-                    voice_file = await discord.FFmpegOpusAudio.from_probe(f"tts_temp/{guild_id}.mp3")
+                    voice_file = await discord.FFmpegOpusAudio.from_probe(
+                        f"tts_temp/{guild_id}.mp3"
+                    )
                     ctx.voice_client.play(
                         voice_file,
                         after=await queue_job(ctx, lang, content, platform_result),
@@ -1957,7 +1958,6 @@ async def force_say(
                 or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"])
             )
         ):
-
             # use cld to detect language
             # export content to mp3 by google tts api
             # get username
@@ -2014,7 +2014,9 @@ async def force_say(
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
 
-                    voice_file = await discord.FFmpegOpusAudio.from_probe(f"tts_temp/{guild_id}.mp3")
+                    voice_file = await discord.FFmpegOpusAudio.from_probe(
+                        f"tts_temp/{guild_id}.mp3"
+                    )
                     try:
                         ctx.voice_client.play(
                             voice_file,
@@ -2104,7 +2106,9 @@ async def force_say(
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
 
-                    voice_file = await discord.FFmpegOpusAudio.from_probe(f"tts_temp/{guild_id}.mp3")
+                    voice_file = await discord.FFmpegOpusAudio.from_probe(
+                        f"tts_temp/{guild_id}.mp3"
+                    )
                     # stop current audio
                     ctx.voice_client.stop()
                     await asyncio.sleep(0.5)
