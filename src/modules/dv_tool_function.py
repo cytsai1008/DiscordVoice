@@ -53,6 +53,8 @@ def read_db_json(filename, path: str = ".") -> dict:
     """Reads json value from redis (key: filename, value: data)"""
     client = redis_client()
     if cipher := client.get(filename):
+        if filename not in system_filename:
+            client.expire(filename, 2592000)
         return _db_data_decrypt(cipher)
 
 
@@ -89,7 +91,7 @@ def _db_data_decrypt(data: str) -> dict:
 
 def read_local_json(filename) -> dict | list:
     """Returns dictionary from a json file"""
-    with open(filename, "r", encoding='UTF-8') as f:
+    with open(filename, "r", encoding="UTF-8") as f:
         data = json.load(f)
     return data
 

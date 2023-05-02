@@ -420,7 +420,6 @@ async def choose(ctx, *args):  # sourcery no-metrics
         current_utc = datetime.now(timezone.utc)
         current_utc = current_utc.hour
         if tool_function.check_file(f"{server_id}"):
-
             try:
                 data = tool_function.read_json(f"{server_id}")
                 print(data["timezone"])
