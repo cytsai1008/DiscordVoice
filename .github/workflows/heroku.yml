@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Deploy to heroku
-        uses: akhileshns/heroku-deploy@v3.12.13 # This is the action
+        uses: akhileshns/heroku-deploy@v3.12.14 # This is the action
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "cytsai-discord-bots-1"
