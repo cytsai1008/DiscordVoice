@@ -172,7 +172,10 @@ async def on_guild_join(guild):
         owner_data = await bot.fetch_user(config["owner"])
         owner_name = owner_data.name
         owner_discriminator = owner_data.discriminator
-        owner_full_id = f"{owner_name}#{owner_discriminator}"
+        if str(owner_discriminator) != "0":
+            owner_full_id = f"{owner_name}#{owner_discriminator}"
+        else:
+            owner_full_id = f"@{owner_name}"
         await general.send(
             "Thanks for adding me!\n"
             f"Please set a channel by `{config['prefix']}setchannel`. (ex. {config['prefix']}setchannel <#{general.id}>)\n"
@@ -589,7 +592,10 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         owner_data = await bot.fetch_user(config["owner"])
         owner_name = owner_data.name
         owner_discriminator = owner_data.discriminator
-        owner_full_id = f"{owner_name}#{owner_discriminator}"
+        if str(owner_discriminator) != "0":
+            owner_full_id = f"{owner_name}#{owner_discriminator}"
+        else:
+            owner_full_id = f"@{owner_name}"
         await owner_data.send(
             f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
             "```"
@@ -2496,7 +2502,10 @@ async def ban(ctx, member: str | int | discord.Member, expire: int = 300):
     if ban_list[member_id][server_id]["expire"] - now_sec >= 216000:
         ban_list[member_id][server_id]["expire"] = int(now_sec + 216000)
     tool_function.write_db_json("ban", ban_list)
-    user_name = f"{member.name}#{member.discriminator}"
+    if str(member.discriminator) != "0":
+        user_name = f"{member.name}#{member.discriminator}"
+    else:
+        user_name = f"@{member.name}"
     await ctx.message.add_reaction("🚫")
     await ctx.reply(
         tool_function.convert_msg(
@@ -2627,7 +2636,10 @@ async def unban(ctx, member: str | int | discord.Member):
         with contextlib.suppress(Exception):
             del ban_list[f"{member_id}"]
     tool_function.write_db_json("ban", ban_list)
-    user_name = f"{member.name}#{member.discriminator}"
+    if str(member.discriminator) != "0":
+        user_name = f"{member.name}#{member.discriminator}"
+    else:
+        user_name = f"@{member.name}"
     await ctx.message.add_reaction("⭕")
     await ctx.reply(
         tool_function.convert_msg(
