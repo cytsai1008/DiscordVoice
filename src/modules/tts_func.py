@@ -41,27 +41,32 @@ async def google_tts_converter(content: str, lang_code: str, filename: str) -> N
 
 async def azure_tts_converter(content: str, lang_code: str, filename: str) -> None:
     import os
-    import azure.cognitiveservices.speech as speechsdk
+    from azure.cognitiveservices.speech import (
+        SpeechConfig,
+        SpeechSynthesizer,
+        SpeechSynthesisOutputFormat,
+    )
+    from azure.cognitiveservices.speech.audio import AudioOutputConfig
 
     subscription_key = os.getenv("AZURE_TTS_KEY")
 
-    speech_config = speechsdk.SpeechConfig(
-        subscription=subscription_key, region="eastus"
-    )
-    audio_config = speechsdk.audio.AudioOutputConfig(filename=f"./tts_temp/{filename}")
+    speech_config = SpeechConfig(subscription=subscription_key, region="eastus")
+    audio_config = AudioOutputConfig(filename=f"./tts_temp/{filename}")
 
     # The language of the voice that speaks.
     speech_config.speech_synthesis_language = lang_code
+
+    # Set output format to mp3
+    speech_config.set_speech_synthesis_output_format(
+        SpeechSynthesisOutputFormat["Audio16Khz128KBitRateMonoMp3"]
+    )
 
     # special case for Chinese Simplified
     if lang_code == "zh-cn":
         speech_config.speech_synthesis_voice_name = "zh-CN-YunxiNeural"
 
-    speech_synthesizer = speechsdk.SpeechSynthesizer(
+    synthesizer = SpeechSynthesizer(
         speech_config=speech_config, audio_config=audio_config
-    )
-
-    # Get text from the console and synthesize to the default speaker.
-
-    speech_synthesizer.speak_text_async(content)
+    )  # Get text from the console and synthesize to the default speaker.
+    synthesizer.speak_text(content)
     print(f'Audio content written to file "{filename}"')
