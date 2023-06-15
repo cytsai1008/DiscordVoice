@@ -1,7 +1,7 @@
 py-cord[voice]
 python-dotenv
 google-cloud-texttospeech
-azure-cognitiveservices-speech==1.23.0
+azure-cognitiveservices-speech
 httpx
 cloudscraper
 redis
@@ -15,3 +15,4 @@ psycopg2
 black
 natsort
 pycryptodome
+openai
