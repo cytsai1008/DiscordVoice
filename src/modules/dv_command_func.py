@@ -188,7 +188,7 @@ def check_voice_platform(
         return "Something wrong"
 
 
-def name_convert(ctx, lang: str, locale: dict, content: str, gpt: bool = False) -> str:
+def name_convert(ctx, lang: str, locale: dict, content: str, gpt: None | bool = False) -> str:
     if gpt:
         return tool_function.convert_msg(
             locale,
@@ -333,7 +333,7 @@ def is_banned(user_id: int | str, guild_id: int | str) -> bool:
     return False
 
 
-async def gpt_process(lang, content):
+async def gpt_process(lang: str, content: str) -> str:
     openai.api_key = os.environ["OPENAI_API_KEY"]
     completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
