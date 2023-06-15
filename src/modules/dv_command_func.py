@@ -1,6 +1,7 @@
 import asyncio
 import contextlib
 import datetime
+import os
 import re
 import time
 
@@ -8,6 +9,7 @@ import bs4
 # import cloudscraper
 import httpx
 import metadata_parser
+import openai
 from discord.ext import commands
 
 import src.modules.dv_tool_function as tool_function
@@ -186,7 +188,21 @@ def check_voice_platform(
         return "Something wrong"
 
 
-def name_convert(ctx, lang: str, locale: dict, content: str) -> str:
+def name_convert(ctx, lang: str, locale: dict, content: str, gpt: bool = False) -> str:
+    if gpt:
+        return tool_function.convert_msg(
+            locale,
+            lang,
+            "variable",
+            "say",
+            "inside_said",
+            [
+                "user",
+                "ChatGPT",
+                "data_content",
+                content,
+            ],
+        )
     user_id = ctx.author.id
     guild_id = ctx.guild.id
 
@@ -315,3 +331,18 @@ def is_banned(user_id: int | str, guild_id: int | str) -> bool:
                 del ban_list[f"{user_id}"]
         tool_function.write_db_json("ban", ban_list)
     return False
+
+
+async def gpt_process(lang, content):
+    openai.api_key = os.environ["OPENAI_API_KEY"]
+    completion = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": f"You are a friendly human, use {lang} to answer the question.",
+            },
+            {"role": "user", "content": content},
+        ],
+    )
+    return completion["choices"][0]["message"]["content"]
