@@ -361,19 +361,22 @@
           "This channel is not made for me to speaking.\n",
           "{{channel_msg}}",
           "To change channel, use {{prefix}}setchannel <#{{current_channel}}>.\n",
-          "To disable this message, use `{{prefix}}wrong_msg off`."
+          "To disable this message, use `{{prefix}}wrong_msg off`.\n",
+          "To let bot not specified channel, use `{{prefix}}set_nochannel on`."
         ],
         "zh-tw": [
           "此頻道並非用於讓我說話。\n",
           "{{channel_msg}}",
           "要更改設定至此頻道，輸入 {{prefix}}setchannel <#{{current_channel}}>。\n",
-          "要禁用此通知，輸入 `{{prefix}}wrong_msg off`。"
+          "要禁用此通知，輸入 `{{prefix}}wrong_msg off`。\n",
+          "要讓機器人不指定頻道，輸入 `{{prefix}}set_nochannel on`。"
         ],
         "zh-cn": [
           "此频道并非用于让我说话。\n",
           "{{channel_msg}}",
           "要更改设定至此频道，输入 {{prefix}}setchannel <#{{current_channel}}>。\n",
-          "要禁用此通知，输入 `{{prefix}}wrong_msg off`。"
+          "要禁用此通知，输入 `{{prefix}}wrong_msg off`。\n",
+          "要让机器人不指定频道，输入 `{{prefix}}set_nochannel on`。"
         ]
       },
       "say_no_setting": {
