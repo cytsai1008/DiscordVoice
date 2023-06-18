@@ -1,4 +1,4 @@
-py-cord[voice]
+py-cord[speed,voice]
 python-dotenv
 google-cloud-texttospeech
 azure-cognitiveservices-speech

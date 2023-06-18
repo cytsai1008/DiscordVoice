@@ -1,4 +1,4 @@
-py-cord[voice]==2.4.1
+py-cord[speed,voice]==2.4.1
 google-cloud-texttospeech==2.14.1
 azure-cognitiveservices-speech==1.29.0
 httpx==0.24.1
