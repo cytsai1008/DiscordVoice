@@ -1,0 +1,10 @@
+please input
+`nm!show`
+`nm!show breakfast`
+`nm!show lunch`
+`nm!show dinner`
+or
+`nm!show`
+`nm!lists breakfast`
+`nm!lists lunch`
+`nm!lists dinner`

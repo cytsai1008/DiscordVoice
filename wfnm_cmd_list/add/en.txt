@@ -1,0 +1,5 @@
+Please input
+`nm!add breakfast <food>`
+`nm!add lunch <food>`
+`nm!add afternoon_tea <food>`
+`nm!add dinner <food>`

@@ -1,0 +1,7 @@
+`nm!help` : show this list
+`nm!ping` : get bot's ping
+`nm!add` : add food to the list
+`nm!lists`, `nm!show` or `nm!list` : show food list
+`nm!remove` : remove food from the list
+`nm!choose` or `nm!random` : choose a food from the list randomly
+`nm!time` : set the time (please use ±12 hours format)
