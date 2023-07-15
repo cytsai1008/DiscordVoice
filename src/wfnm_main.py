@@ -71,10 +71,10 @@ async def on_guild_join(guild):
         await general.send(
             "Thanks for adding me into your server!\n"
             f"Please use `{token['prefix']}help` for more information.\n"
-            f"`{token['prefix']}time <hours from London>` to setup the timezone.\n"
+            f"`{token['prefix']}time <hours from UTC>` to setup the timezone.\n"
             "感謝您邀請我進入伺服器\n"
             f"請使用 `{token['prefix']}help` 取得更多資訊\n"
-            f"並透過 `{token['prefix']}time <與倫敦相差小時數>` 設定時區"
+            f"並透過 `{token['prefix']}time <與國際標準時間相差小時數>` 設定時區"
         )
 
 
