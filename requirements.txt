@@ -11,4 +11,5 @@ lxml==4.9.3
 psycopg2==2.9.6
 natsort==8.4.0
 pycryptodome==3.18.0
-openai==0.27.8
+# openai==0.27.8
+openai-async==0.0.3
