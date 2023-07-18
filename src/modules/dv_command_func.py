@@ -337,7 +337,7 @@ def is_banned(user_id: int | str, guild_id: int | str) -> bool:
 """
 async def gpt_process(lang: str, content: str) -> str:
     openai.api_key = os.environ["OPENAI_API_KEY"]
-    completion = openai.ChatCompletion.create(
+    completion = await openai.ChatCompletion.acreate(
         model="gpt-3.5-turbo",
         messages=[
             {

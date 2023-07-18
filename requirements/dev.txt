@@ -15,4 +15,5 @@ psycopg2
 black
 natsort
 pycryptodome
-openai
+# openai
+openai-async
