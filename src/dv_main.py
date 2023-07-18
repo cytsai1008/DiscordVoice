@@ -1452,22 +1452,16 @@ async def ping(ctx):
 @bot.command(Name="reboot")
 @commands.is_owner()
 async def reboot(ctx):
-    sender = int(ctx.message.author.id)
-    owner = int(config["owner"])
-    if sender == owner:
-        await ctx.reply("Rebooting...")
-        await bot.close()
+    await ctx.reply("Rebooting...")
+    await bot.close()
 
 
 @bot.command(Name="shutdown")
 @commands.is_owner()
 async def shutdown(ctx):
-    sender = int(ctx.message.author.id)
-    owner = int(config["owner"])
-    if sender == owner:
-        await ctx.reply("Shutting down...")
-        # send SIGTERM to the bot process
-        os.kill(os.getpid(), signal.SIGTERM)
+    await ctx.reply("Shutting down...")
+    # send SIGTERM to the bot process
+    os.kill(os.getpid(), signal.SIGTERM)
 
 
 @bot.command(Name="clear", aliases=["c"])

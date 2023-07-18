@@ -360,7 +360,7 @@ async def gpt_process(lang: str, content: str) -> str:
             "model": "gpt-3.5-turbo",
             "messages": [{
                 "role": "system",
-                "content": f"You are a friendly human, use {lang} to answer the question."},
+                "content": f"If no specific language is requested, use {lang} as a friendly human to respond. Otherwise, reply in the language requested by the user."},
                 {"role": "user", "content": content}
             ]
         }
