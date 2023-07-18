@@ -345,42 +345,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 return
             # trying to connect to vc
             else:
-                try:
-                    await user_voice_channel.connect()
-                except discord.errors.ClientException:
-                    # failed to connect to vc (mostly because bot is already in a vc)
-                    bot_voice_channel = ctx.guild.voice_client.channel
-                    await ctx.reply(
-                        tool_function.convert_msg(
-                            locale,
-                            lang,
-                            "command",
-                            "join",
-                            "join_already_in",
-                            [
-                                "prefix",
-                                config["prefix"],
-                                "join_vc",
-                                bot_voice_channel.id,
-                            ],
-                        )
-                    )
-                except Exception:
-                    tool_function.postgres_logging(
-                        f"Join Failed:\n"
-                        f"{ctx.guild.id}\n"
-                        f"{ctx.message.author.id}\n"
-                        f"{traceback.format_exc()}"
-                    )
-
-                    await ctx.message.add_reaction("❌")
-                else:
-                    await ctx.message.add_reaction("✅")
-
-                    # add vc id to "joined_vc" to reconnect to vc on restart
-                    joined_vc = tool_function.read_db_json("joined_vc")
-                    joined_vc[ctx.guild.id] = user_voice_channel.id
-                    tool_function.write_db_json("joined_vc", joined_vc)
+                join_cmd = bot.get_command("join")
+                await ctx.invoke(join_cmd, channel=user_voice_channel)
                 return
 
         elif command == "move" or command in command_alias["move"]:
@@ -410,32 +376,9 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 await ctx.message.add_reaction("❌")
                 return
             else:
-                # trying to connect to vc
-                try:
-                    # disconnect from old vc first if bot is in
-                    with contextlib.suppress(AttributeError):
-                        await ctx.voice_client.disconnect()
-                    await asyncio.sleep(1)
-                    # connect to new vc
-                    await user_voice_channel.connect()
-                except discord.errors.ClientException:
-                    # connect_failed: bool = True
-                    pass
-                except Exception:
-                    tool_function.postgres_logging(
-                        f"Move Failed:\n"
-                        f"{ctx.guild.id}\n"
-                        f"{ctx.message.author.id}\n"
-                        f"{traceback.format_exc()}"
-                    )
-                    # connect_failed: bool = True
-                else:
-                    await ctx.message.add_reaction("✅")
-                # get new vc id
-                if user_voice_channel is not None:
-                    joined_vc[ctx.guild.id] = user_voice_channel.id
-            tool_function.write_db_json("joined_vc", joined_vc)
-            return
+                move_cmd = bot.get_command("move")
+                await ctx.invoke(move_cmd, channel=user_voice_channel)
+                return
 
         elif command == "ban":
             await ctx.reply(
@@ -577,8 +520,6 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     # Auto report unknown command error to owner (Mostly doesn't work actually...)
     else:
         tool_function.postgres_logging(error)
-        # not_able_reply = ""
-        # not_able_send = ""
         try:
             server_name = ctx.guild.name
         except AttributeError:
@@ -609,66 +550,6 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             "```"
         )
         await owner_data.send(ctx.message.content)
-        """
-        try:
-            # get owner name
-            owner_data = await bot.fetch_user(config["owner"])
-            owner_name = owner_data.name
-            owner_discriminator = owner_data.discriminator
-            owner_full_id = f"{owner_name}#{owner_discriminator}"
-            await ctx.reply(
-                tool_function.convert_msg(
-                    locale,
-                    lang,
-                    "command",
-                    "on_command_error",
-                    "unknown_error",
-                    [
-                        "owner_id",
-                        config["owner"],
-                        "owner_full_name",
-                        owner_full_id,
-                        "error_msg",
-                        error,
-                        "error_type",
-                        type(error),
-                    ],
-                )
-            )
-        except Exception:
-            not_able_reply = traceback.format_exc()
-            owner_data = await bot.fetch_user(config["owner"])
-            owner_name = owner_data.name
-            owner_discriminator = owner_data.discriminator
-            owner_full_id = f"{owner_name}#{owner_discriminator}"
-            try:
-                await ctx.send(
-                    tool_function.convert_msg(
-                        locale,
-                        lang,
-                        "command",
-                        "on_command_error",
-                        "unknown_error",
-                        [
-                            "owner_id",
-                            config["owner"],
-                            "owner_full_name",
-                            owner_full_id,
-                            "error_msg",
-                            error,
-                            "error_type",
-                            type(error),
-                        ],
-                    )
-                )
-            except Exception:
-                not_able_send = traceback.format_exc()
-
-            await owner_data.send(
-                f"Unable to reply: {not_able_reply}\n"
-                f"Unable to send: {not_able_send}\n"
-            )
-        """
         raise error
 
 
