@@ -9,7 +9,8 @@ import bs4
 # import cloudscraper
 import httpx
 import metadata_parser
-import openai
+# import openai
+import openai_async
 from discord.ext import commands
 
 import src.modules.dv_tool_function as tool_function
@@ -188,7 +189,9 @@ def check_voice_platform(
         return "Something wrong"
 
 
-def name_convert(ctx, lang: str, locale: dict, content: str, gpt: None | bool = False) -> str:
+def name_convert(
+    ctx, lang: str, locale: dict, content: str, gpt: None | bool = False
+) -> str:
     if gpt:
         return tool_function.convert_msg(
             locale,
@@ -333,9 +336,10 @@ def is_banned(user_id: int | str, guild_id: int | str) -> bool:
     return False
 
 
+"""
 async def gpt_process(lang: str, content: str) -> str:
     openai.api_key = os.environ["OPENAI_API_KEY"]
-    completion = openai.ChatCompletion.create(
+    completion = await openai.ChatCompletion.acreate(
         model="gpt-3.5-turbo",
         messages=[
             {
@@ -346,3 +350,22 @@ async def gpt_process(lang: str, content: str) -> str:
         ],
     )
     return completion["choices"][0]["message"]["content"]
+    """
+
+
+async def gpt_process(lang: str, content: str) -> str:
+    response = await openai_async.chat_complete(
+        os.environ["OPENAI_API_KEY"],
+        timeout=20,
+        payload={
+            "model": "gpt-3.5-turbo",
+            "messages": [
+                {
+                    "role": "system",
+                    "content": f"If no specific language is requested, use {lang} as a friendly human to respond. Otherwise, reply in the language requested by the user.",
+                },
+                {"role": "user", "content": content},
+            ],
+        },
+    )
+    return response.json()["choices"][0]["message"]["content"]

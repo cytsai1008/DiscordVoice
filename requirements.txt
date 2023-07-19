@@ -4,11 +4,12 @@ azure-cognitiveservices-speech==1.30.0
 httpx==0.24.1
 redis==4.6.0
 Flask==2.3.2
-gunicorn==20.1.0
+gunicorn==21.2.0
 metadata_parser==0.12.0
 beautifulsoup4==4.12.2
 lxml==4.9.3
 psycopg2==2.9.6
 natsort==8.4.0
 pycryptodome==3.18.0
-openai==0.27.8
+# openai==0.27.8
+openai-async==0.0.3

@@ -429,15 +429,39 @@
       "say_lang_no_arg": {
         "en": [
           "What can I say? :(\n",
-          "`{{prefix}}say_lang some-lang-code say-something`"
+          "`{{prefix}}say_lang some-lang-code say-something`\n",
+          "Google supported languages: \n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```\n",
+          "Azure supported languages: \n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
         ],
         "zh-tw": [
           "我能說甚麼? :(\n",
-          "`{{prefix}}say_lang 某個-語言-代碼 說點甚麼`"
+          "`{{prefix}}say_lang 某個-語言-代碼 說點甚麼`\n",
+          "Google支援的語言有：\n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```\n",
+          "Azure支援的語言有：\n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
         ],
         "zh-cn": [
           "我能说什么? :(\n",
-          "`{{prefix}}say_lang 某个-语言-代码 说点什么`"
+          "`{{prefix}}say_lang 某个-语言-代码 说点什么`\n",
+          "Google支持的语言有：\n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```\n",
+          "Azure支持的语言有：\n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
         ]
       }
     },
