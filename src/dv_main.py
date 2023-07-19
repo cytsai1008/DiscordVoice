@@ -292,6 +292,11 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             )
 
         elif command == "say_lang" or command in command_alias["say_lang"]:
+            support_lang = tool_function.read_local_json(
+                "lang_list/google_languages.json"
+            )
+            azure_lang = tool_function.read_local_json("lang_list/azure_languages.json")
+
             await ctx.reply(
                 tool_function.convert_msg(
                     locale,
@@ -302,6 +307,10 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                     [
                         "prefix",
                         config["prefix"],
+                        "google_lang_list",
+                        ", ".join(support_lang["Support_Language"]),
+                        "azure_lang_list",
+                        ", ".join(azure_lang["Support_Language"]),
                     ],
                 )
             )
@@ -345,42 +354,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 return
             # trying to connect to vc
             else:
-                try:
-                    await user_voice_channel.connect()
-                except discord.errors.ClientException:
-                    # failed to connect to vc (mostly because bot is already in a vc)
-                    bot_voice_channel = ctx.guild.voice_client.channel
-                    await ctx.reply(
-                        tool_function.convert_msg(
-                            locale,
-                            lang,
-                            "command",
-                            "join",
-                            "join_already_in",
-                            [
-                                "prefix",
-                                config["prefix"],
-                                "join_vc",
-                                bot_voice_channel.id,
-                            ],
-                        )
-                    )
-                except Exception:
-                    tool_function.postgres_logging(
-                        f"Join Failed:\n"
-                        f"{ctx.guild.id}\n"
-                        f"{ctx.message.author.id}\n"
-                        f"{traceback.format_exc()}"
-                    )
-
-                    await ctx.message.add_reaction("❌")
-                else:
-                    await ctx.message.add_reaction("✅")
-
-                    # add vc id to "joined_vc" to reconnect to vc on restart
-                    joined_vc = tool_function.read_db_json("joined_vc")
-                    joined_vc[ctx.guild.id] = user_voice_channel.id
-                    tool_function.write_db_json("joined_vc", joined_vc)
+                join_cmd = bot.get_command("join")
+                await ctx.invoke(join_cmd, channel=user_voice_channel)
                 return
 
         elif command == "move" or command in command_alias["move"]:
@@ -410,32 +385,9 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 await ctx.message.add_reaction("❌")
                 return
             else:
-                # trying to connect to vc
-                try:
-                    # disconnect from old vc first if bot is in
-                    with contextlib.suppress(AttributeError):
-                        await ctx.voice_client.disconnect()
-                    await asyncio.sleep(1)
-                    # connect to new vc
-                    await user_voice_channel.connect()
-                except discord.errors.ClientException:
-                    # connect_failed: bool = True
-                    pass
-                except Exception:
-                    tool_function.postgres_logging(
-                        f"Move Failed:\n"
-                        f"{ctx.guild.id}\n"
-                        f"{ctx.message.author.id}\n"
-                        f"{traceback.format_exc()}"
-                    )
-                    # connect_failed: bool = True
-                else:
-                    await ctx.message.add_reaction("✅")
-                # get new vc id
-                if user_voice_channel is not None:
-                    joined_vc[ctx.guild.id] = user_voice_channel.id
-            tool_function.write_db_json("joined_vc", joined_vc)
-            return
+                move_cmd = bot.get_command("move")
+                await ctx.invoke(move_cmd, channel=user_voice_channel)
+                return
 
         elif command == "ban":
             await ctx.reply(
@@ -577,8 +529,6 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     # Auto report unknown command error to owner (Mostly doesn't work actually...)
     else:
         tool_function.postgres_logging(error)
-        # not_able_reply = ""
-        # not_able_send = ""
         try:
             server_name = ctx.guild.name
         except AttributeError:
@@ -609,66 +559,6 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             "```"
         )
         await owner_data.send(ctx.message.content)
-        """
-        try:
-            # get owner name
-            owner_data = await bot.fetch_user(config["owner"])
-            owner_name = owner_data.name
-            owner_discriminator = owner_data.discriminator
-            owner_full_id = f"{owner_name}#{owner_discriminator}"
-            await ctx.reply(
-                tool_function.convert_msg(
-                    locale,
-                    lang,
-                    "command",
-                    "on_command_error",
-                    "unknown_error",
-                    [
-                        "owner_id",
-                        config["owner"],
-                        "owner_full_name",
-                        owner_full_id,
-                        "error_msg",
-                        error,
-                        "error_type",
-                        type(error),
-                    ],
-                )
-            )
-        except Exception:
-            not_able_reply = traceback.format_exc()
-            owner_data = await bot.fetch_user(config["owner"])
-            owner_name = owner_data.name
-            owner_discriminator = owner_data.discriminator
-            owner_full_id = f"{owner_name}#{owner_discriminator}"
-            try:
-                await ctx.send(
-                    tool_function.convert_msg(
-                        locale,
-                        lang,
-                        "command",
-                        "on_command_error",
-                        "unknown_error",
-                        [
-                            "owner_id",
-                            config["owner"],
-                            "owner_full_name",
-                            owner_full_id,
-                            "error_msg",
-                            error,
-                            "error_type",
-                            type(error),
-                        ],
-                    )
-                )
-            except Exception:
-                not_able_send = traceback.format_exc()
-
-            await owner_data.send(
-                f"Unable to reply: {not_able_reply}\n"
-                f"Unable to send: {not_able_send}\n"
-            )
-        """
         raise error
 
 
@@ -1099,246 +989,23 @@ async def setchannel_error(ctx, error):
 
 
 @bot.command(Name="say", aliases=command_alias["say"])
-# @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
 async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # sourcery skip: low-code-quality
 
     locale_lang = tool_function.check_db_lang(ctx)
-
-    user_id = ctx.author.id
-    user_platform_set = bool(
-        tool_function.check_dict_data(
-            tool_function.read_db_json("user_config"), f"user_{user_id}"
-        )
-        and tool_function.check_dict_data(
-            tool_function.read_db_json("user_config")[f"user_{user_id}"], "platform"
-        )
-    )
-
-    channel_id = ctx.channel.id
     # get guild id
     guild_id = ctx.guild.id
     if tool_function.check_db_file(f"{guild_id}"):
         # read db file
         db = tool_function.read_db_json(f"{guild_id}")
-        # check channel id
-        # check if is in voice channel
 
-        guild_platform_set = bool(tool_function.check_dict_data(db, "platform"))
-        try:
-            ctx.voice_client.is_connected()
-        except AttributeError:
-            is_connected = False
-        else:
-            is_connected = True
+        if langissetup := tool_function.check_dict_data(db, "lang"):
+            say_lang_cmd = bot.get_command("say_lang")
+            await ctx.invoke(say_lang_cmd, lang=db["lang"], content=content)
 
-        if not is_connected:
-            joined_vc = tool_function.read_db_json("joined_vc")
-            with contextlib.suppress(KeyError):
-                del joined_vc[str(guild_id)]
-            tool_function.write_db_json("joined_vc", joined_vc)
-
-        channelissetup = tool_function.check_dict_data(db, "channel")
-        langissetup = tool_function.check_dict_data(db, "lang")
-
-        if (
-            is_connected
-            and channelissetup
-            and langissetup
-            and (
-                channel_id == db["channel"]
-                or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"])
-            )
-        ):
-            # TODO: use cld to detect language
-
-            """
-            Discord User ID RegExp
-            <@![0-9]{18}>
-            <@[0-9]{18}>
-            Role ID
-            <@&[0-9]{18}>
-            """
-
-            # check if user is being Banned
-            if command_func.is_banned(user_id, guild_id):
-                await ctx.message.add_reaction("🔇")
-                return
-
-            content = await command_func.content_convert(
-                ctx, db["lang"], locale, content
-            )
-
-            say_this = (
-                ctx.author.id in (int(config["owner"]), 890234177767755849)
-                or len(content) < 50
-            )
-
-            content = command_func.name_convert(ctx, db["lang"], locale, content)
-
-            if say_this:
-                if not ctx.voice_client.is_playing():
-                    tool_function.postgres_logging(
-                        f"Playing content: \n"
-                        f"{content}\n"
-                        f"From {ctx.author.name}\n"
-                        f"In {ctx.guild.name}"
-                    )
-
-                    platform_result = command_func.check_voice_platform(
-                        user_platform_set,
-                        user_id,
-                        guild_platform_set,
-                        guild_id,
-                        db["lang"],
-                    )
-
-                    # process tts file (false if went wrong)
-                    if not await command_func.tts_convert(
-                        ctx, db["lang"], content, platform_result
-                    ):
-                        owner = await bot.fetch_user(int(config["owner"]))
-                        await owner.send(
-                            f"Something went wrong return triggered!\n"
-                            f"Guild ID: {guild_id}\n"
-                            f"User ID: {user_id}\n"
-                            f"User Platform Set: {user_platform_set}\n"
-                            f"Guild Platform Set: {guild_platform_set}\n"
-                        )
-                        # add bug emoji reaction
-                        await ctx.message.add_reaction("🐛")
-
-                    voice_file = await discord.FFmpegOpusAudio.from_probe(
-                        f"tts_temp/{guild_id}.mp3"
-                    )
-                    # TODO: Fix Unexpected Disconnect
-                    ctx.voice_client.play(
-                        voice_file,
-                        after=await queue_job(
-                            ctx, db["lang"], content, platform_result
-                        ),
-                    )
-                    await ctx.message.add_reaction("🔊")
-                    send_time = int(
-                        time.mktime(
-                            datetime.datetime.now(datetime.timezone.utc).timetuple()
-                        )
-                    )
-                    msg_tmp = {0: send_time, 1: user_id}
-                    tool_function.write_local_json(f"msg_temp/{guild_id}.json", msg_tmp)
-                    return
-
-                elif tool_function.check_dict_data(db, "queue") and db["queue"]:
-                    # TODO: Write json
-                    # add reaction
-                    await ctx.message.add_reaction("⏯")
-                    await queue_job(
-                        ctx,
-                        db["lang"],
-                        content,
-                        command_func.check_voice_platform(
-                            user_platform_set,
-                            user_id,
-                            guild_platform_set,
-                            guild_id,
-                            db["lang"],
-                        ),
-                    )
-                else:
-                    await ctx.reply(
-                        tool_function.convert_msg(
-                            locale,
-                            db["lang"],
-                            "command",
-                            "say",
-                            "say_queue_not_support",
-                            None,
-                        )
-                    )
-            else:
-                await ctx.reply(
-                    tool_function.convert_msg(
-                        locale,
-                        db["lang"],
-                        "command",
-                        "say",
-                        "say_too_long",
-                        None,
-                    )
-                )
-
-        elif (
-            channelissetup
-            and channel_id != db["channel"]
-            and (
-                not tool_function.check_dict_data(db, "not_this_channel_msg")
-                or db["not_this_channel_msg"] != "off"
-            )
-        ):
-            channel_msg = tool_function.convert_msg(
-                locale,
-                locale_lang,
-                "variable",
-                "say",
-                "wrong_channel",
-                [
-                    "data_channel",
-                    db["channel"],
-                ],
-            )
-            await ctx.reply(
-                tool_function.convert_msg(
-                    locale,
-                    locale_lang,
-                    "command",
-                    "say",
-                    "say_wrong_channel",
-                    [
-                        "prefix",
-                        config["prefix"],
-                        "channel_msg",
-                        channel_msg,
-                        "current_channel",
-                        channel_id,
-                    ],
-                )
-            )
-            await ctx.message.add_reaction("🤔")
-
-        elif (
-            tool_function.check_dict_data(db, "not_this_channel_msg")
-            and db["not_this_channel_msg"] == "off"
-        ):
-            return
-            # reply to sender
         else:
             errormsg = ""
-            if not is_connected:
-                errormsg += tool_function.convert_msg(
-                    locale,
-                    locale_lang,
-                    "variable",
-                    "say",
-                    "err_not_join",
-                    [
-                        "prefix",
-                        config["prefix"],
-                    ],
-                )
-            if not channelissetup:
-                # guild_system_channel = ctx.guild.system_channel
-                errormsg += tool_function.convert_msg(
-                    locale,
-                    locale_lang,
-                    "variable",
-                    "say",
-                    "err_no_channel_set",
-                    [
-                        "prefix",
-                        config["prefix"],
-                    ],
-                )
             if not langissetup:
                 errormsg += tool_function.convert_msg(
                     locale,
@@ -1452,22 +1119,16 @@ async def ping(ctx):
 @bot.command(Name="reboot")
 @commands.is_owner()
 async def reboot(ctx):
-    sender = int(ctx.message.author.id)
-    owner = int(config["owner"])
-    if sender == owner:
-        await ctx.reply("Rebooting...")
-        await bot.close()
+    await ctx.reply("Rebooting...")
+    await bot.close()
 
 
 @bot.command(Name="shutdown")
 @commands.is_owner()
 async def shutdown(ctx):
-    sender = int(ctx.message.author.id)
-    owner = int(config["owner"])
-    if sender == owner:
-        await ctx.reply("Shutting down...")
-        # send SIGTERM to the bot process
-        os.kill(os.getpid(), signal.SIGTERM)
+    await ctx.reply("Shutting down...")
+    # send SIGTERM to the bot process
+    os.kill(os.getpid(), signal.SIGTERM)
 
 
 @bot.command(Name="clear", aliases=["c"])
@@ -1920,294 +1581,21 @@ async def force_say(
 
     locale_lang = tool_function.check_db_lang(ctx)
 
-    user_id = ctx.author.id
-    user_platform_set = bool(
-        tool_function.check_dict_data(
-            tool_function.read_db_json("user_config"), f"user_{user_id}"
-        )
-        and tool_function.check_dict_data(
-            tool_function.read_db_json("user_config")[f"user_{user_id}"], "platform"
-        )
-    )
-
-    channel_id = ctx.channel.id
     # get guild id
     guild_id = ctx.guild.id
     if tool_function.check_db_file(f"{guild_id}"):
         # read db file
         db = tool_function.read_db_json(f"{guild_id}")
-        # check channel id
-        # check if is in voice channel
 
-        guild_platform_set = bool(tool_function.check_dict_data(db, "platform"))
-        try:
-            ctx.voice_client.is_connected()
-        except AttributeError:
-            is_connected = False
-        else:
-            is_connected = True
+        if langissetup := tool_function.check_dict_data(db, "lang"):
+            stop_cmd = bot.get_command("stop")
+            say_lang_cmd = bot.get_command("say_lang")
+            await ctx.invoke(stop_cmd)
+            await ctx.invoke(say_lang_cmd, lang=db["lang"], content=content)
 
-        if not is_connected:
-            joined_vc = tool_function.read_db_json("joined_vc")
-            with contextlib.suppress(KeyError):
-                del joined_vc[str(guild_id)]
-            tool_function.write_db_json("joined_vc", joined_vc)
 
-        channelissetup = tool_function.check_dict_data(db, "channel")
-        langissetup = tool_function.check_dict_data(db, "lang")
-
-        if (
-            is_connected
-            and channelissetup
-            and langissetup
-            and (
-                channel_id == db["channel"]
-                or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"])
-            )
-        ):
-            # use cld to detect language
-            # export content to mp3 by google tts api
-            # get username
-
-            """
-            Discord User ID RegExp
-            <@![0-9]{18}>
-            <@[0-9]{18}>
-            Role ID
-            <@&[0-9]{18}>
-            """
-
-            content = await command_func.content_convert(
-                ctx, db["lang"], locale, content
-            )
-
-            # noinspection PyTypeChecker
-            say_this = (
-                ctx.author.id in (int(config["owner"]), 890234177767755849)
-                or len(content) < 50
-            )
-
-            content = command_func.name_convert(ctx, db["lang"], locale, content)
-
-            if say_this:
-                if not ctx.voice_client.is_playing():
-                    tool_function.postgres_logging(
-                        f"Playing content: \n"
-                        f"{content}\n"
-                        f"From {ctx.author.name}\n"
-                        f"In {ctx.guild.name}"
-                    )
-
-                    platform_result = command_func.check_voice_platform(
-                        user_platform_set,
-                        user_id,
-                        guild_platform_set,
-                        guild_id,
-                        db["lang"],
-                    )
-
-                    # process tts file (false if went wrong)
-                    if not await command_func.tts_convert(
-                        ctx, db["lang"], content, platform_result
-                    ):
-                        owner = await bot.fetch_user(int(config["owner"]))
-                        await owner.send(
-                            f"Something went wrong return triggered!\n"
-                            f"Guild ID: {guild_id}\n"
-                            f"User ID: {user_id}\n"
-                            f"User Platform Set: {user_platform_set}\n"
-                            f"Guild Platform Set: {guild_platform_set}\n"
-                        )
-                        # add bug emoji reaction
-                        await ctx.message.add_reaction("🐛")
-
-                    voice_file = await discord.FFmpegOpusAudio.from_probe(
-                        f"tts_temp/{guild_id}.mp3"
-                    )
-                    try:
-                        ctx.voice_client.play(
-                            voice_file,
-                            after=await queue_job(
-                                ctx, db["lang"], content, platform_result
-                            ),
-                        )
-                        await ctx.message.add_reaction("🔊")
-                    except discord.errors.ClientException:
-                        if tool_function.check_dict_data(db, "queue") and db["queue"]:
-                            # TODO: Write json
-                            # add reaction
-                            await ctx.message.add_reaction("⏯")
-                            await queue_job(ctx, db["lang"], content, platform_result)
-                        else:
-                            tool_function.postgres_logging(
-                                f"Playing content: \n"
-                                f"{content}\n"
-                                f"From {ctx.author.name}\n"
-                                f"In {ctx.guild.name}"
-                            )
-
-                            platform_result = command_func.check_voice_platform(
-                                user_platform_set,
-                                user_id,
-                                guild_platform_set,
-                                guild_id,
-                                db["lang"],
-                            )
-
-                            # process tts file (false if went wrong)
-                            if not await command_func.tts_convert(
-                                ctx, db["lang"], content, platform_result
-                            ):
-                                owner = await bot.fetch_user(int(config["owner"]))
-                                await owner.send(
-                                    f"Something went wrong return triggered!\n"
-                                    f"Guild ID: {guild_id}\n"
-                                    f"User ID: {user_id}\n"
-                                    f"User Platform Set: {user_platform_set}\n"
-                                    f"Guild Platform Set: {guild_platform_set}\n"
-                                )
-                                # add bug emoji reaction
-                                await ctx.message.add_reaction("🐛")
-
-                            voice_file = discord.FFmpegOpusAudio(
-                                f"tts_temp/{guild_id}.mp3"
-                            )
-                            # stop current audio
-                            ctx.voice_client.stop()
-                            await asyncio.sleep(0.5)
-                            ctx.voice_client.play(
-                                voice_file,
-                                after=await queue_job(
-                                    ctx, db["lang"], content, platform_result
-                                ),
-                            )
-                            await ctx.message.add_reaction("⁉")
-                else:
-                    tool_function.postgres_logging(
-                        f"Playing content: \n"
-                        f"{content}\n"
-                        f"From {ctx.author.name}\n"
-                        f"In {ctx.guild.name}"
-                    )
-
-                    platform_result = command_func.check_voice_platform(
-                        user_platform_set,
-                        user_id,
-                        guild_platform_set,
-                        guild_id,
-                        db["lang"],
-                    )
-
-                    # process tts file (false if went wrong)
-                    if not await command_func.tts_convert(
-                        ctx, db["lang"], content, platform_result
-                    ):
-                        owner = await bot.fetch_user(int(config["owner"]))
-                        await owner.send(
-                            f"Something went wrong return triggered!\n"
-                            f"Guild ID: {guild_id}\n"
-                            f"User ID: {user_id}\n"
-                            f"User Platform Set: {user_platform_set}\n"
-                            f"Guild Platform Set: {guild_platform_set}\n"
-                        )
-                        # add bug emoji reaction
-                        await ctx.message.add_reaction("🐛")
-
-                    voice_file = await discord.FFmpegOpusAudio.from_probe(
-                        f"tts_temp/{guild_id}.mp3"
-                    )
-                    # stop current audio
-                    ctx.voice_client.stop()
-                    await asyncio.sleep(0.5)
-                    ctx.voice_client.play(
-                        voice_file,
-                        after=await queue_job(
-                            ctx, db["lang"], content, platform_result
-                        ),
-                    )
-                    await ctx.message.add_reaction("⁉")
-            else:
-                await ctx.reply(
-                    tool_function.convert_msg(
-                        locale,
-                        db["lang"],
-                        "command",
-                        "say",
-                        "say_too_long",
-                        None,
-                    )
-                )
-
-        elif (
-            channelissetup
-            and channel_id != db["channel"]
-            and (
-                not tool_function.check_dict_data(db, "not_this_channel_msg")
-                or db["not_this_channel_msg"] != "off"
-            )
-        ):
-            channel_msg = tool_function.convert_msg(
-                locale,
-                locale_lang,
-                "variable",
-                "say",
-                "wrong_channel",
-                [
-                    "data_channel",
-                    db["channel"],
-                ],
-            )
-            await ctx.reply(
-                tool_function.convert_msg(
-                    locale,
-                    locale_lang,
-                    "command",
-                    "say",
-                    "say_wrong_channel",
-                    [
-                        "prefix",
-                        config["prefix"],
-                        "channel_msg",
-                        channel_msg,
-                        "current_channel",
-                        channel_id,
-                    ],
-                )
-            )
-            await ctx.message.add_reaction("🤔")
-
-        elif (
-            tool_function.check_dict_data(db, "not_this_channel_msg")
-            and db["not_this_channel_msg"] == "off"
-        ):
-            return
-            # reply to sender
         else:
             errormsg = ""
-            if not is_connected:
-                errormsg += tool_function.convert_msg(
-                    locale,
-                    locale_lang,
-                    "variable",
-                    "say",
-                    "err_not_join",
-                    [
-                        "prefix",
-                        config["prefix"],
-                    ],
-                )
-            if not channelissetup:
-                errormsg += tool_function.convert_msg(
-                    locale,
-                    locale_lang,
-                    "variable",
-                    "say",
-                    "err_no_channel_set",
-                    [
-                        "prefix",
-                        config["prefix"],
-                    ],
-                )
             if not langissetup:
                 errormsg += tool_function.convert_msg(
                     locale,

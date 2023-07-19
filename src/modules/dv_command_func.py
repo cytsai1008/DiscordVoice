@@ -83,9 +83,9 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
             content = content.replace(j, "")
 
     if not re.findall(
-            "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
-            content,
-            flags=re.IGNORECASE,
+        "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
+        content,
+        flags=re.IGNORECASE,
     ):
         return content
 
@@ -120,58 +120,58 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
 
 
 def check_voice_platform(
-        user_platform_set: bool,
-        user_id: str | int,
-        guild_platform_set: bool,
-        guild_id: str | int,
-        lang: str,
+    user_platform_set: bool,
+    user_id: str | int,
+    guild_platform_set: bool,
+    guild_id: str | int,
+    lang: str,
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""
     if (
-            lang
-            in tool_function.read_local_json("lang_list/google_languages.json")[
-        "Support_Language"
-    ]
-            and lang
-            not in tool_function.read_local_json("lang_list/azure_languages.json")[
-        "Support_Language"
-    ]
+        lang
+        in tool_function.read_local_json("lang_list/google_languages.json")[
+            "Support_Language"
+        ]
+        and lang
+        not in tool_function.read_local_json("lang_list/azure_languages.json")[
+            "Support_Language"
+        ]
     ):
         return "Google"
     if (
-            lang
-            in tool_function.read_local_json("lang_list/azure_languages.json")[
-        "Support_Language"
-    ]
-            and lang
-            not in tool_function.read_local_json("lang_list/google_languages.json")[
-        "Support_Language"
-    ]
+        lang
+        in tool_function.read_local_json("lang_list/azure_languages.json")[
+            "Support_Language"
+        ]
+        and lang
+        not in tool_function.read_local_json("lang_list/google_languages.json")[
+            "Support_Language"
+        ]
     ):
         return "Azure"
     user_id = f"user_{str(user_id)}"
     if (
-            user_platform_set
-            and tool_function.read_db_json("user_config")[user_id]["platform"] == "Google"
+        user_platform_set
+        and tool_function.read_db_json("user_config")[user_id]["platform"] == "Google"
     ):
         tool_function.postgres_logging("Init Google TTS API 1")
         return "Google"
 
     elif (
-            user_platform_set
-            and tool_function.read_db_json("user_config")[user_id]["platform"] == "Azure"
+        user_platform_set
+        and tool_function.read_db_json("user_config")[user_id]["platform"] == "Azure"
     ):
         tool_function.postgres_logging("Init Azure TTS API 1")
         return "Azure"
     elif (
-            guild_platform_set
-            and tool_function.read_db_json(f"{guild_id}")["platform"] == "Google"
+        guild_platform_set
+        and tool_function.read_db_json(f"{guild_id}")["platform"] == "Google"
     ):
         tool_function.postgres_logging("Init Google TTS API 2")
         return "Google"
     elif (
-            guild_platform_set
-            and tool_function.read_db_json(f"{guild_id}")["platform"] == "Azure"
+        guild_platform_set
+        and tool_function.read_db_json(f"{guild_id}")["platform"] == "Azure"
     ):
         tool_function.postgres_logging("Init Azure TTS API 2")
         return "Azure"
@@ -189,7 +189,9 @@ def check_voice_platform(
         return "Something wrong"
 
 
-def name_convert(ctx, lang: str, locale: dict, content: str, gpt: None | bool = False) -> str:
+def name_convert(
+    ctx, lang: str, locale: dict, content: str, gpt: None | bool = False
+) -> str:
     if gpt:
         return tool_function.convert_msg(
             locale,
@@ -319,10 +321,10 @@ async def tts_convert(ctx, lang: str, content: str, platform_result: str) -> [bo
 def is_banned(user_id: int | str, guild_id: int | str) -> bool:
     ban_list = tool_function.read_db_json("ban")
     if tool_function.check_dict_data(
-            ban_list, f"{user_id}"
+        ban_list, f"{user_id}"
     ) and tool_function.check_dict_data(ban_list[f"{user_id}"], f"{guild_id}"):
         if int(ban_list[f"{user_id}"][f"{guild_id}"]["expire"]) >= int(
-                time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple())
+            time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple())
         ):
             return True
         with contextlib.suppress(Exception):
@@ -355,14 +357,15 @@ async def gpt_process(lang: str, content: str) -> str:
     response = await openai_async.chat_complete(
         os.environ["OPENAI_API_KEY"],
         timeout=20,
-        payload=
-        {
+        payload={
             "model": "gpt-3.5-turbo",
-            "messages": [{
-                "role": "system",
-                "content": f"You are a friendly human, use {lang} to answer the question."},
-                {"role": "user", "content": content}
-            ]
-        }
+            "messages": [
+                {
+                    "role": "system",
+                    "content": f"If no specific language is requested, use {lang} as a friendly human to respond. Otherwise, reply in the language requested by the user.",
+                },
+                {"role": "user", "content": content},
+            ],
+        },
     )
     return response.json()["choices"][0]["message"]["content"]
