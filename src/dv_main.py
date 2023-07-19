@@ -137,14 +137,8 @@ async def check_is_not_playing(ctx):
 @bot.event
 # setup jobs on ready
 async def on_ready():
-    tool_function.postgres_logging(f"目前登入身份：{bot.user}")
+    tool_function.postgres_logging(f"Login as: {bot.user}")
     game = discord.Game(f"{config['prefix']}help")
-    """
-    # print joined servers
-    tool_function.postgres_logging("目前登入的伺服器：")
-    for guild in bot.guilds:
-        tool_function.postgres_logging(guild.name + "\n")
-    """
     channel_list = ""
 
     # reconnect vc in "joined_vc" if not TEST_ENV

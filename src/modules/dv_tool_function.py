@@ -64,7 +64,6 @@ def _db_data_encrypt(data: dict) -> str:
     data = json.dumps(data)
     pub_key = RSA.importKey(str(os.environ["DV_RSA_PUBLIC"]))
     cipher = PKCS1_cipher.new(pub_key)
-    # rsa_text = base64.b64encode(cipher.encrypt(bytes(data.encode("utf8"))))
     byte_data = bytes(data.encode("utf8"))
     sep_data = [
         cipher.encrypt(byte_data[i : i + max_length])
