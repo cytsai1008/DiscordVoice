@@ -562,13 +562,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
 async def help(ctx):  # sourcery skip: low-code-quality
     # define language by db or default
     locale_lang = tool_function.check_db_lang(ctx)
-    try:
-        _ = ctx.guild.id
-    except Exception:
-        guild_msg = False
-    else:
-        guild_msg = True
-
+    guild_msg = tool_function.check_guild_or_dm(ctx)
     # messages for guilds which already set up settings
     if guild_msg and tool_function.check_db_file(f"{ctx.guild.id}"):
         data = tool_function.read_db_json(f"{ctx.guild.id}")

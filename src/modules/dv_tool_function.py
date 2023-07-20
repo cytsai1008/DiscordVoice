@@ -136,24 +136,14 @@ def check_local_file(filename) -> bool:
     return os.path.isfile(filename)
 
 
-def user_id_rename(self) -> str:
+def user_id_rename(ctx) -> str:
     """Return the id of the user or guild (user id start with `user_`)"""
-    try:
-        server_id = str(self.guild.id)
-    except Exception:
-        server_id = f"user_{str(self.author.id)}"
-    return server_id
+    return str(ctx.guild.id) if ctx.guild else f"user_{str(ctx.author.id)}"
 
 
-def check_guild_or_dm(self) -> bool:
-    """Return if this is a guild or a DM"""
-    try:
-        _ = str(self.guild.id)
-    except Exception:
-        _ = f"user_{str(self.author.id)}"
-        return False
-    else:
-        return True
+def check_guild_or_dm(ctx) -> bool:
+    """Return if this is a guild or a DM (True if guild)"""
+    return bool(ctx.guild)
 
 
 def del_db_json(filename) -> None:
@@ -190,14 +180,14 @@ def convert_msg(
     return a
 
 
-def check_db_lang(self) -> str:
+def check_db_lang(ctx) -> str:
     """Return the language of the user or guild (default: en)"""
     return (
-        read_db_json(user_id_rename(self))["lang"]
+        read_db_json(user_id_rename(ctx))["lang"]
         if (
-            check_guild_or_dm(self)
-            and check_db_file(user_id_rename(self))
-            and check_dict_data(read_db_json(user_id_rename(self)), "lang")
+            check_guild_or_dm(ctx)
+            and check_db_file(user_id_rename(ctx))
+            and check_dict_data(read_db_json(user_id_rename(ctx)), "lang")
         )
         else "en"
     )
