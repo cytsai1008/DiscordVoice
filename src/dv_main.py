@@ -137,7 +137,7 @@ async def check_is_not_playing(ctx):
 @bot.event
 # setup jobs on ready
 async def on_ready():
-    tool_function.postgres_logging(f"Login as: {bot.user}")
+    await tool_function.postgres_logging(f"Login as: {bot.user}")
     game = discord.Game(f"{config['prefix']}help")
     channel_list = ""
 
@@ -522,7 +522,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
 
     # Auto report unknown command error to owner (Mostly doesn't work actually...)
     else:
-        tool_function.postgres_logging(error)
+        await tool_function.postgres_logging(error)
         try:
             server_name = ctx.guild.name
         except AttributeError:
@@ -874,7 +874,7 @@ async def join(ctx, *, channel: discord.VoiceChannel):
             )
         )
     except Exception:
-        tool_function.postgres_logging(
+        await tool_function.postgres_logging(
             f"Join Failed:\n"
             f"{ctx.guild.id}\n"
             f"{ctx.message.author.id}\n"
@@ -1245,7 +1245,7 @@ async def move(ctx, *, channel: discord.VoiceChannel):
     except discord.errors.ClientException:
         connect_failed: bool = True
     except Exception:
-        tool_function.postgres_logging(
+        await tool_function.postgres_logging(
             f"Move Failed:\n"
             f"{ctx.guild.id}\n"
             f"{ctx.message.author.id}\n"
@@ -1372,14 +1372,14 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
 
             if say_this:
                 if not ctx.voice_client.is_playing():
-                    tool_function.postgres_logging(
+                    await tool_function.postgres_logging(
                         f"Playing content: \n"
                         f"{content}\n"
                         f"From {ctx.author.name}\n"
                         f"In {ctx.guild.name}"
                     )
 
-                    platform_result = command_func.check_voice_platform(
+                    platform_result = await command_func.check_voice_platform(
                         user_platform_set, user_id, guild_platform_set, guild_id, lang
                     )
 
@@ -1422,7 +1422,7 @@ async def say_lang(ctx, lang: str, *, content: str):  # sourcery no-metrics
                         ctx,
                         lang,
                         content,
-                        command_func.check_voice_platform(
+                        await command_func.check_voice_platform(
                             user_platform_set,
                             user_id,
                             guild_platform_set,
@@ -1581,7 +1581,6 @@ async def force_say(
             await ctx.invoke(stop_cmd)
             await ctx.invoke(say_lang_cmd, lang=db["lang"], content=content)
 
-
         else:
             errormsg = ""
             if not langissetup:
@@ -1695,14 +1694,14 @@ async def gpt_say(
 
             if say_this:
                 if not ctx.voice_client.is_playing():
-                    tool_function.postgres_logging(
+                    await tool_function.postgres_logging(
                         f"Playing GPT content: \n"
                         f"{content}\n"
                         f"From {ctx.author.name}\n"
                         f"In {ctx.guild.name}"
                     )
 
-                    platform_result = command_func.check_voice_platform(
+                    platform_result = await command_func.check_voice_platform(
                         user_platform_set,
                         user_id,
                         guild_platform_set,
@@ -1753,7 +1752,7 @@ async def gpt_say(
                         ctx,
                         db["lang"],
                         content,
-                        command_func.check_voice_platform(
+                        await command_func.check_voice_platform(
                             user_platform_set,
                             user_id,
                             guild_platform_set,
@@ -2307,10 +2306,10 @@ async def unban(ctx, member: str | int | discord.Member):
 
 if __name__ == "__main__":
     if os.getenv("TEST_ENV"):
-        tool_function.postgres_logging("Running on test environment")
+        print("Running on test environment")
         test_env = True
     else:
-        tool_function.postgres_logging("Running on production environment")
+        print("Running on production environment")
         test_env = False
 
     if test_env:

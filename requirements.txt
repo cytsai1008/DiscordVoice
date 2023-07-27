@@ -1,4 +1,4 @@
-py-cord[speed,voice]==2.4.1
+discord.py==2.3.1
 google-cloud-texttospeech==2.14.1
 azure-cognitiveservices-speech==1.30.0
 httpx==0.24.1
@@ -8,7 +8,7 @@ gunicorn==21.2.0
 metadata_parser==0.12.0
 beautifulsoup4==4.12.2
 lxml==4.9.3
-psycopg2==2.9.6
+psycopg[binary,pool]==3.1.9
 natsort==8.4.0
 pycryptodome==3.18.0
 # openai==0.27.8

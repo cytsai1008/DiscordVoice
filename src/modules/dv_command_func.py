@@ -45,7 +45,7 @@ async def content_convert(ctx, lang: str, locale: dict, content: str) -> str:
 
 async def _get_web_title(client, url: str) -> (str, str):
     try:
-        tool_function.postgres_logging(f"Fetching web title: {url}")
+        await tool_function.postgres_logging(f"Fetching web title: {url}")
         resp = await client.get(url)
         metadata = metadata_parser.MetadataParser(
             html=resp.text, search_head_only=False
@@ -119,7 +119,7 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
     return content
 
 
-def check_voice_platform(
+async def check_voice_platform(
     user_platform_set: bool,
     user_id: str | int,
     guild_platform_set: bool,
@@ -154,32 +154,32 @@ def check_voice_platform(
         user_platform_set
         and tool_function.read_db_json("user_config")[user_id]["platform"] == "Google"
     ):
-        tool_function.postgres_logging("Init Google TTS API 1")
+        await tool_function.postgres_logging("Init Google TTS API 1")
         return "Google"
 
     elif (
         user_platform_set
         and tool_function.read_db_json("user_config")[user_id]["platform"] == "Azure"
     ):
-        tool_function.postgres_logging("Init Azure TTS API 1")
+        await tool_function.postgres_logging("Init Azure TTS API 1")
         return "Azure"
     elif (
         guild_platform_set
         and tool_function.read_db_json(f"{guild_id}")["platform"] == "Google"
     ):
-        tool_function.postgres_logging("Init Google TTS API 2")
+        await tool_function.postgres_logging("Init Google TTS API 2")
         return "Google"
     elif (
         guild_platform_set
         and tool_function.read_db_json(f"{guild_id}")["platform"] == "Azure"
     ):
-        tool_function.postgres_logging("Init Azure TTS API 2")
+        await tool_function.postgres_logging("Init Azure TTS API 2")
         return "Azure"
     elif not user_platform_set and not guild_platform_set:
-        tool_function.postgres_logging("Init Google TTS API 3")
+        await tool_function.postgres_logging("Init Google TTS API 3")
         return "Google"
     else:
-        tool_function.postgres_logging(
+        await tool_function.postgres_logging(
             f"You found a bug\n"
             f"User platform: {user_platform_set}\n"
             f"User id: {user_id}\n"
@@ -302,17 +302,17 @@ def name_convert(
 async def tts_convert(ctx, lang: str, content: str, platform_result: str) -> [bool]:
     guild_id = ctx.guild.id
     if platform_result == "Azure":
-        tool_function.postgres_logging("Init Azure TTS API")
+        await tool_function.postgres_logging("Init Azure TTS API")
         await tts_func.azure_tts_converter(content, lang, f"{guild_id}.mp3")
         return True
 
     elif platform_result == "Google":
-        tool_function.postgres_logging("Init Google TTS API")
+        await tool_function.postgres_logging("Init Google TTS API")
         await tts_func.google_tts_converter(content, lang, f"{guild_id}.mp3")
         return True
 
     else:
-        tool_function.postgres_logging("Something Wrong")
+        await tool_function.postgres_logging("Something Wrong")
         # send to owner
         await tts_func.google_tts_converter(content, lang, f"{guild_id}.mp3")
         return False

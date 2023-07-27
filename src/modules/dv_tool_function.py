@@ -6,7 +6,7 @@ import json
 import os
 import traceback
 
-import psycopg2
+import psycopg
 import redis
 from Crypto.Cipher import PKCS1_v1_5 as PKCS1_cipher
 from Crypto.PublicKey import RSA
@@ -15,9 +15,10 @@ from natsort import natsorted
 system_filename = ["ban", "joined_vc", "user_config"]
 
 
-def postgres_logging(logging_data: str):
+async def postgres_logging(logging_data: str):
     """Logging to postgres"""
-    heroku_postgres = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
+    '''
+     = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
     cur = heroku_postgres.cursor()
     today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%Y-%m-%d %H:%M:%S"
@@ -36,6 +37,27 @@ def postgres_logging(logging_data: str):
     )
     heroku_postgres.commit()
     heroku_postgres.close()
+    '''
+    today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+    logging_data = str(logging_data)
+    print(f"{today_datetime}: {logging_data}")
+    if os.getenv("TEST_ENV"):
+        return
+    async with await psycopg.AsyncConnection.connect(
+        os.environ["DATABASE_URL"], sslmode="require"
+    ) as heroku_postgres:
+        async with heroku_postgres.cursor() as cur:
+            await cur.execute(
+                """
+                INSERT INTO dv_log (datetime, log)
+                VALUES (%s, %s);
+                """,
+                (today_datetime, logging_data),
+            )
+        await heroku_postgres.commit()
+        await heroku_postgres.close()
 
 
 def redis_client() -> redis.Redis:
@@ -196,7 +218,7 @@ def check_db_lang(ctx) -> str:
 async def auto_reconnect_vc(bot) -> str:
     """Reconnect to voice channel on reboot"""
     joined_vc = read_db_json("joined_vc")
-    postgres_logging(f"joined_vc: \n" f"{joined_vc}")
+    await postgres_logging(f"joined_vc: \n" f"{joined_vc}")
     tasks = [
         _connect_vc(bot, server_id, channel_id)
         for server_id, channel_id in joined_vc.items()
@@ -227,9 +249,9 @@ async def _connect_vc(bot, server_id: int, channel_id: int) -> (bool, int | None
         # noinspection PyUnresolvedReferences
         await bot.get_channel(channel_id).connect()
     except Exception:
-        postgres_logging(f"Failed to connect to {channel_id}.\n")
-        postgres_logging(f"Reason: \n{traceback.format_exc()}")
+        await postgres_logging(f"Failed to connect to {channel_id}.\n")
+        await postgres_logging(f"Reason: \n{traceback.format_exc()}")
         return False, server_id
     else:
-        postgres_logging(f"Successfully connected to {channel_id}.\n")
+        await postgres_logging(f"Successfully connected to {channel_id}.\n")
         return True, None
