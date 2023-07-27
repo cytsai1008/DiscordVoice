@@ -1,4 +1,4 @@
-discord.py
+discord.py[speed,voice]
 python-dotenv
 google-cloud-texttospeech
 azure-cognitiveservices-speech
