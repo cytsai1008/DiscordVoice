@@ -1,4 +1,4 @@
-py-cord[speed,voice]
+discord.py
 python-dotenv
 google-cloud-texttospeech
 azure-cognitiveservices-speech
@@ -6,12 +6,12 @@ httpx
 cloudscraper
 redis
 flask
-gunicorn
+gunicorn==21.2.0
 metadata_parser
 beautifulsoup4
 lxml
 # psycopg2-binary
-psycopg2
+psycopg[binary,pool]
 black
 natsort
 pycryptodome

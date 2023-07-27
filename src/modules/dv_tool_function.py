@@ -6,7 +6,7 @@ import json
 import os
 import traceback
 
-import psycopg2
+import psycopg
 import redis
 from Crypto.Cipher import PKCS1_v1_5 as PKCS1_cipher
 from Crypto.PublicKey import RSA
@@ -15,9 +15,10 @@ from natsort import natsorted
 system_filename = ["ban", "joined_vc", "user_config"]
 
 
-def postgres_logging(logging_data: str):
+async def postgres_logging(logging_data: str):
     """Logging to postgres"""
-    heroku_postgres = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
+    '''
+     = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
     cur = heroku_postgres.cursor()
     today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%Y-%m-%d %H:%M:%S"
@@ -36,6 +37,27 @@ def postgres_logging(logging_data: str):
     )
     heroku_postgres.commit()
     heroku_postgres.close()
+    '''
+    today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+    logging_data = str(logging_data)
+    print(f"{today_datetime}: {logging_data}")
+    if os.getenv("TEST_ENV"):
+        return
+    async with await psycopg.AsyncConnection.connect(
+        os.environ["DATABASE_URL"], sslmode="require"
+    ) as heroku_postgres:
+        async with heroku_postgres.cursor() as cur:
+            await cur.execute(
+                """
+                INSERT INTO dv_log (datetime, log)
+                VALUES (%s, %s);
+                """,
+                (today_datetime, logging_data),
+            )
+        await heroku_postgres.commit()
+        await heroku_postgres.close()
 
 
 def redis_client() -> redis.Redis:
@@ -64,7 +86,6 @@ def _db_data_encrypt(data: dict) -> str:
     data = json.dumps(data)
     pub_key = RSA.importKey(str(os.environ["DV_RSA_PUBLIC"]))
     cipher = PKCS1_cipher.new(pub_key)
-    # rsa_text = base64.b64encode(cipher.encrypt(bytes(data.encode("utf8"))))
     byte_data = bytes(data.encode("utf8"))
     sep_data = [
         cipher.encrypt(byte_data[i : i + max_length])
@@ -137,24 +158,14 @@ def check_local_file(filename) -> bool:
     return os.path.isfile(filename)
 
 
-def user_id_rename(self) -> str:
+def user_id_rename(ctx) -> str:
     """Return the id of the user or guild (user id start with `user_`)"""
-    try:
-        server_id = str(self.guild.id)
-    except Exception:
-        server_id = f"user_{str(self.author.id)}"
-    return server_id
+    return str(ctx.guild.id) if ctx.guild else f"user_{str(ctx.author.id)}"
 
 
-def check_guild_or_dm(self) -> bool:
-    """Return if this is a guild or a DM"""
-    try:
-        _ = str(self.guild.id)
-    except Exception:
-        _ = f"user_{str(self.author.id)}"
-        return False
-    else:
-        return True
+def check_guild_or_dm(ctx) -> bool:
+    """Return if this is a guild or a DM (True if guild)"""
+    return bool(ctx.guild)
 
 
 def del_db_json(filename) -> None:
@@ -191,14 +202,14 @@ def convert_msg(
     return a
 
 
-def check_db_lang(self) -> str:
+def check_db_lang(ctx) -> str:
     """Return the language of the user or guild (default: en)"""
     return (
-        read_db_json(user_id_rename(self))["lang"]
+        read_db_json(user_id_rename(ctx))["lang"]
         if (
-            check_guild_or_dm(self)
-            and check_db_file(user_id_rename(self))
-            and check_dict_data(read_db_json(user_id_rename(self)), "lang")
+            check_guild_or_dm(ctx)
+            and check_db_file(user_id_rename(ctx))
+            and check_dict_data(read_db_json(user_id_rename(ctx)), "lang")
         )
         else "en"
     )
@@ -207,7 +218,7 @@ def check_db_lang(self) -> str:
 async def auto_reconnect_vc(bot) -> str:
     """Reconnect to voice channel on reboot"""
     joined_vc = read_db_json("joined_vc")
-    postgres_logging(f"joined_vc: \n" f"{joined_vc}")
+    await postgres_logging(f"joined_vc: \n" f"{joined_vc}")
     tasks = [
         _connect_vc(bot, server_id, channel_id)
         for server_id, channel_id in joined_vc.items()
@@ -238,9 +249,9 @@ async def _connect_vc(bot, server_id: int, channel_id: int) -> (bool, int | None
         # noinspection PyUnresolvedReferences
         await bot.get_channel(channel_id).connect()
     except Exception:
-        postgres_logging(f"Failed to connect to {channel_id}.\n")
-        postgres_logging(f"Reason: \n{traceback.format_exc()}")
+        await postgres_logging(f"Failed to connect to {channel_id}.\n")
+        await postgres_logging(f"Reason: \n{traceback.format_exc()}")
         return False, server_id
     else:
-        postgres_logging(f"Successfully connected to {channel_id}.\n")
+        await postgres_logging(f"Successfully connected to {channel_id}.\n")
         return True, None

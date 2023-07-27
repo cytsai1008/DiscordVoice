@@ -43,16 +43,16 @@ async def azure_get_languages():
 
     subscription_key = os.getenv("AZURE_TTS_KEY")
 
-    def get_token(subscription_key):
+    def get_token(sub_key):
         fetch_token_url = (
             "https://eastus.tts.speech.microsoft.com/cognitiveservices/voices/list"
         )
-        headers = {"Ocp-Apim-Subscription-Key": subscription_key}
+        headers = {"Ocp-Apim-Subscription-Key": sub_key}
         response = httpx.get(fetch_token_url, headers=headers)
         return response.json()
 
     azure_lang = get_token(subscription_key)
-    with open("azure_raw.json", "w") as f:
+    with open("azure_raw.json", "w", encoding="utf-8") as f:
         json.dump(azure_lang, f, indent=2, ensure_ascii=False)
     azure_langs = []
 
