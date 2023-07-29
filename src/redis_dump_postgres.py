@@ -8,7 +8,7 @@ from natsort import natsorted
 with contextlib.suppress(ImportError):
     import dotenv
 
-import psycopg2
+import psycopg
 import redis
 
 with contextlib.suppress(NameError):
@@ -30,7 +30,7 @@ wfnm_redis = redis.Redis(
     decode_responses=True,
 )
 
-heroku_postgres = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
+heroku_postgres = psycopg.connect(os.environ["DATABASE_URL"], sslmode="require")
 cur = heroku_postgres.cursor()
 
 today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")

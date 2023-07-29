@@ -23,9 +23,9 @@ async def content_convert(ctx, lang: str, locale: dict, content: str) -> str:
     ).convert(ctx, content)
 
     # Emoji Replace
-    if re.findall("<a?:[^:]+:\d+>", content):
-        emoji_id = re.findall("<a?:[^:]+:\d+>", content)
-        emoji_text = re.findall("<a?:([^:]+):\d+>", content)
+    if re.findall(r"<a?:[^:]+:\d+>", content):
+        emoji_id = re.findall(r"<a?:[^:]+:\d+>", content)
+        emoji_text = re.findall(r"<a?:([^:]+):\d+>", content)
         for i in range(len(emoji_id)):
             content = content.replace(
                 emoji_id[i],
@@ -82,15 +82,17 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
         for j in i:
             content = content.replace(j, "")
 
+    web_regex = r"(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})"
+
     if not re.findall(
-        "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
+        web_regex,
         content,
         flags=re.IGNORECASE,
     ):
         return content
 
     url = re.findall(
-        "(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})",
+        web_regex,
         content,
         flags=re.IGNORECASE,
     )
@@ -99,7 +101,7 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
     url = list(set(url))
     if len(url) <= 3:
         headers = {
-            "user-agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+            "user-agent": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/115.0.5790.110 Safari/537.36"
         }
 
         async with httpx.AsyncClient(headers=headers, follow_redirects=True) as client:
