@@ -66,6 +66,7 @@ async def _get_web_title(client, url: str) -> (str, str):
         return url, ""
 
 
+# noinspection HttpUrlsUsage
 async def _content_link_replace(content: str, lang, locale: dict) -> str:
     """Return the head in the link if content has links"""
 
@@ -104,8 +105,14 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
             "user-agent": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/115.0.5790.110 Safari/537.36"
         }
 
+        new_url = []
+        for i in url:
+            if not i.startswith("http"):
+                i = i.replace(i, f"http://{i}")
+            new_url.append(i)
+
         async with httpx.AsyncClient(headers=headers, follow_redirects=True) as client:
-            tasks = [_get_web_title(client, i) for i in url]
+            tasks = [_get_web_title(client, i) for i in new_url]
             results = await asyncio.gather(*tasks)
             for i in results:
                 convert_text = tool_function.convert_msg(
