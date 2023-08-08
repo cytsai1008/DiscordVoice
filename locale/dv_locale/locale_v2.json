@@ -843,6 +843,17 @@
         "zh-cn": [
           "您缺少执行此指令的必要权限。\n"
         ]
+      },
+      "bot_cannot_read_history": {
+        "en": [
+          "Due to the bot's inability to access chat history in this channel, it is currently unable to function within this channel. We apologize for any inconvenience this may cause.\n"
+        ],
+        "zh-tw": [
+          "由於機器人無法獲取此頻道內的聊天歷史記錄權限，目前無法在此頻道內運作，造成不便，我們深感抱歉。\n"
+        ],
+        "zh-cn": [
+          "由于机器人无法获取此频道内的聊天历史记录权限，目前无法在此频道内运作，造成不便，我们深感抱歉。\n"
+        ]
       }
     }
   },

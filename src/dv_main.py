@@ -231,6 +231,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         wrong_cmd = True
 
         if command == "setchannel":
+            # TODO: Get systemchannel check
             guild_system_channel = ctx.guild.system_channel
             await ctx.reply(
                 tool_function.convert_msg(
@@ -474,7 +475,10 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     ):
         return
 
-    # limited some commands to only be used in guilds because it wasn't designed to be used in DMs, group messages WIP (May never work because I'm lazy) (Imagine you're calling to a robot just to hear the robot voice)
+    # limited some commands to only be used in guilds because it wasn't designed to be used in DMs, group messages WIP
+    # (May never work because I'm lazy)
+    # (Imagine you're calling to a robot just to hear the robot voice)
+
     # NoPrivateMessage
     elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
         await ctx.reply(
@@ -518,6 +522,34 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 None,
             )
         )
+        return
+
+    # Command raised an exception: Forbidden: 403 Forbidden (error code: 160002): Cannot reply without permission to read message history
+    elif isinstance(
+        error, discord.ext.commands.errors.CommandInvokeError
+    ) and "Cannot reply without permission to read message history" in str(error):
+        try:
+            await ctx.send(
+                tool_function.convert_msg(
+                    locale,
+                    lang,
+                    "command",
+                    "on_command_error",
+                    "bot_cannot_read_history",
+                    None,
+                )
+            )
+        except Exception:
+            await ctx.author.send(
+                tool_function.convert_msg(
+                    locale,
+                    lang,
+                    "command",
+                    "on_command_error",
+                    "bot_cannot_read_history",
+                    None,
+                )
+            )
         return
 
     # Auto report unknown command error to owner (Mostly doesn't work actually...)
