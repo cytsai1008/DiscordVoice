@@ -942,13 +942,14 @@ async def join_error(ctx, error):
 
 
 @bot.command(Name="leave", aliases=command_alias["leave"])
-async def leave(ctx):
+async def leave(ctx, emoji: bool = True):
     try:
         await ctx.voice_client.disconnect()
     except AttributeError:
         pass
     else:
-        await ctx.message.add_reaction("🖐")
+        if emoji:
+            await ctx.message.add_reaction("🖐")
         # delete channel id from joined_vc dict
     joined_vc = tool_function.read_db_json("joined_vc")
     with contextlib.suppress(KeyError):
@@ -1260,37 +1261,16 @@ async def wrong_msg(ctx, msg: str):
         await ctx.message.add_reaction("🤔")
 
 
+# TODO: rewrite to disconnect & connect
 @bot.command(Name="move", aliases=command_alias["move"])
 @commands.cooldown(1, 10, commands.BucketType.user)
 @commands.guild_only()
 async def move(ctx, *, channel: discord.VoiceChannel):
-    joined_vc = tool_function.read_db_json("joined_vc")
-    with contextlib.suppress(KeyError):
-        del joined_vc[str(ctx.guild.id)]
-    # get user voice channel
-    user_voice_channel = channel
-    try:
-        with contextlib.suppress(AttributeError):
-            await ctx.voice_client.disconnect()
-        await asyncio.sleep(1)
-        await user_voice_channel.connect()
-    except discord.errors.ClientException:
-        connect_failed: bool = True
-    except Exception:
-        await tool_function.postgres_logging(
-            f"Move Failed:\n"
-            f"{ctx.guild.id}\n"
-            f"{ctx.message.author.id}\n"
-            f"{traceback.format_exc()}"
-        )
-        connect_failed: bool = True
-    else:
-        await ctx.message.add_reaction("✅")
-        connect_failed: bool = False
-    # get joined_vc
-    if not connect_failed:
-        joined_vc[ctx.guild.id] = user_voice_channel.id
-    tool_function.write_db_json("joined_vc", joined_vc)
+    leave_cmd = bot.get_command("leave")
+    join_cmd = bot.get_command("join")
+    await ctx.invoke(leave_cmd, emoji=False)
+    await asyncio.sleep(0.5)
+    await ctx.invoke(join_cmd, channel=channel)
 
 
 @move.error
