@@ -2053,7 +2053,7 @@ async def unban(ctx, member: str | int | discord.Member):
                 locale,
                 tool_function.check_db_lang(ctx),
                 "command",
-                "ban",
+                "unban",
                 "unban_not_allowed",
                 [
                     "ban_time",
