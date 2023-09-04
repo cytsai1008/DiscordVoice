@@ -9,7 +9,7 @@ jobs:
   create-pull-request:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: pr
         run: |
           if gh pr list --state open --head public --base heroku | grep -q "No pull requests found"; then 
