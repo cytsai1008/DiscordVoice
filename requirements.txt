@@ -10,6 +10,6 @@ beautifulsoup4==4.12.2
 lxml==4.9.4
 psycopg[binary,pool]==3.1.16
 natsort==8.4.0
-pycryptodome==3.19.0
+pycryptodome==3.19.1
 # openai==0.27.8
 openai-async==0.0.3
