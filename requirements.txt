@@ -1,5 +1,5 @@
 discord.py[speed,voice]==2.3.2
-google-cloud-texttospeech==2.16.1
+google-cloud-texttospeech==2.16.2
 azure-cognitiveservices-speech==1.35.0
 httpx==0.27.0
 redis==5.0.1
