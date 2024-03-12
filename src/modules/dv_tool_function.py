@@ -38,16 +38,12 @@ async def postgres_logging(logging_data: str):
     heroku_postgres.commit()
     heroku_postgres.close()
     '''
-    today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
+    today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     logging_data = str(logging_data)
     print(f"{today_datetime}: {logging_data}")
     if os.getenv("TEST_ENV"):
         return
-    async with await psycopg.AsyncConnection.connect(
-        os.environ["DATABASE_URL"], sslmode="require"
-    ) as heroku_postgres:
+    async with await psycopg.AsyncConnection.connect(os.environ["DATABASE_URL"], sslmode="require") as heroku_postgres:
         async with heroku_postgres.cursor() as cur:
             await cur.execute(
                 """
@@ -87,10 +83,7 @@ def _db_data_encrypt(data: dict) -> str:
     pub_key = RSA.importKey(str(os.environ["DV_RSA_PUBLIC"]))
     cipher = PKCS1_cipher.new(pub_key)
     byte_data = bytes(data.encode("utf8"))
-    sep_data = [
-        cipher.encrypt(byte_data[i : i + max_length])
-        for i in range(0, len(byte_data), max_length)
-    ]
+    sep_data = [cipher.encrypt(byte_data[i : i + max_length]) for i in range(0, len(byte_data), max_length)]
     rsa_text = base64.b64encode(b"".join(sep_data))
     return rsa_text.decode("utf-8")
 
@@ -102,10 +95,7 @@ def _db_data_decrypt(data: str) -> dict:
     data = base64.b64decode(data)
     pri_key = RSA.importKey(str(os.environ["DV_RSA_PRIVATE"]))
     cipher = PKCS1_cipher.new(pri_key)
-    sep_data = [
-        cipher.decrypt(data[i : i + max_length], 0)
-        for i in range(0, len(data), max_length)
-    ]
+    sep_data = [cipher.decrypt(data[i : i + max_length], 0) for i in range(0, len(data), max_length)]
     back_text = b"".join(sep_data)
     return json.loads(back_text.decode("utf-8"))
 
@@ -117,9 +107,7 @@ def read_local_json(filename) -> dict | list:
     return data
 
 
-def write_db_json(
-    filename: str, data: dict, path: str = ".", ttl: int | None = None
-) -> None:
+def write_db_json(filename: str, data: dict, path: str = ".", ttl: int | None = None) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
     if filename not in system_filename:
         ttl = 2592000
@@ -219,10 +207,7 @@ async def auto_reconnect_vc(bot) -> str:
     """Reconnect to voice channel on reboot"""
     joined_vc = read_db_json("joined_vc")
     await postgres_logging(f"joined_vc: \n" f"{joined_vc}")
-    tasks = [
-        _connect_vc(bot, server_id, channel_id)
-        for server_id, channel_id in joined_vc.items()
-    ]
+    tasks = [_connect_vc(bot, server_id, channel_id) for server_id, channel_id in joined_vc.items()]
 
     results = await asyncio.gather(*tasks)
     remove_vc = [result[1] for result in results if result[0] is False]
@@ -235,11 +220,7 @@ async def auto_reconnect_vc(bot) -> str:
     channel_list = f"```\n" f"{channel_list}\n" f"```"
     if remove_vc:
         new_line = "\n"
-        channel_list += (
-            f"Fail to connect to the following channels:\n```\n"
-            f"{new_line.join(remove_vc)}\n"
-            f"```"
-        )
+        channel_list += f"Fail to connect to the following channels:\n```\n" f"{new_line.join(remove_vc)}\n" f"```"
     return channel_list
 
 

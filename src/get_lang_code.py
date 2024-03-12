@@ -25,9 +25,7 @@ async def google_get_languages():
     client = tts.TextToSpeechClient()
     response = client.list_voices()
     languages = google_process_voice_languages(response.voices)
-    languages = (
-        str(languages).replace("{", "").replace("}", "").replace("'", "").lower()
-    )
+    languages = str(languages).replace("{", "").replace("}", "").replace("'", "").lower()
     languages = languages.replace("cmn", "zh")
     languages = list(languages.split(", "))
     languages = sorted(languages)
@@ -44,9 +42,7 @@ async def azure_get_languages():
     subscription_key = os.getenv("AZURE_TTS_KEY")
 
     def get_token(sub_key):
-        fetch_token_url = (
-            "https://eastus.tts.speech.microsoft.com/cognitiveservices/voices/list"
-        )
+        fetch_token_url = "https://eastus.tts.speech.microsoft.com/cognitiveservices/voices/list"
         headers = {"Ocp-Apim-Subscription-Key": sub_key}
         response = httpx.get(fetch_token_url, headers=headers)
         return response.json()

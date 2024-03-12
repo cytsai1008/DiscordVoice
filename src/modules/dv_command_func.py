@@ -18,9 +18,7 @@ from src.modules import tts_func
 
 
 async def content_convert(ctx, lang: str, locale: dict, content: str) -> str:
-    content = await commands.clean_content(
-        fix_channel_mentions=True, use_nicknames=True
-    ).convert(ctx, content)
+    content = await commands.clean_content(fix_channel_mentions=True, use_nicknames=True).convert(ctx, content)
 
     # Emoji Replace
     if re.findall(r"<a?:[^:]+:\d+>", content):
@@ -47,16 +45,12 @@ async def _get_web_title(client, url: str) -> (str, str):
     try:
         await tool_function.postgres_logging(f"Fetching web title: {url}")
         resp = await client.get(url)
-        metadata = metadata_parser.MetadataParser(
-            html=resp.text, search_head_only=False
-        )
+        metadata = metadata_parser.MetadataParser(html=resp.text, search_head_only=False)
         title = metadata.get_metadatas("title")[0]
         # resp.headers.get('Server', '').startswith('cloudflare')
         if title.find("Attention Required!") != -1:
             resp = httpx.get(url, follow_redirects=True)
-            metadata = metadata_parser.MetadataParser(
-                html=resp.text, search_head_only=False
-            )
+            metadata = metadata_parser.MetadataParser(html=resp.text, search_head_only=False)
             title = metadata.get_metadatas("title")[0]
         if title == "":
             soup = bs4.BeautifulSoup(resp.text, "lxml")
@@ -72,18 +66,21 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
 
     # clear localhost 0.0.0.0 127.0.0.1
     local_list = [
-        re.findall("(https?://127.0.0.1:\d{1,5}/?[^ ]+)", content),
-        re.findall("(localhost:\d{1,5}/?[^ ]+)", content, flags=re.IGNORECASE),
-        re.findall("(https?://0.0.0.0:\d{1,5}/?[^ ]+)", content),
-        re.findall("(127.0.0.1:\d{1,5}/?[^ ]+)", content),
-        re.findall("(0.0.0.1:\d{1,5}/?[^ ]+)", content),
+        re.findall(r"(https?://127.0.0.1:\d{1,5}/?[^ ]+)", content),
+        re.findall(r"(localhost:\d{1,5}/?[^ ]+)", content, flags=re.IGNORECASE),
+        re.findall(r"(https?://0.0.0.0:\d{1,5}/?[^ ]+)", content),
+        re.findall(r"(127.0.0.1:\d{1,5}/?[^ ]+)", content),
+        re.findall(r"(0.0.0.1:\d{1,5}/?[^ ]+)", content),
     ]
 
     for i in local_list:
         for j in i:
             content = content.replace(j, "")
 
-    web_regex = r"(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})"
+    web_regex = (
+        r"(https?://(?:www\.|(?!www))[a-zA-Z\d][a-zA-Z\d-]+[a-zA-Z\d]\.\S{2,}|www\.[a-zA-Z\d][a-zA-Z\d-]+["
+        r"a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})"
+    )
 
     if not re.findall(
         web_regex,
@@ -102,7 +99,8 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
     url = list(set(url))
     if len(url) <= 3:
         headers = {
-            "user-agent": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/115.0.5790.110 Safari/537.36"
+            "user-agent": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; "
+            "+http://www.google.com/bot.html) Chrome/115.0.5790.110 Safari/537.36"
         }
 
         new_url = []
@@ -115,9 +113,7 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
             tasks = [_get_web_title(client, i) for i in new_url]
             results = await asyncio.gather(*tasks)
             for i in results:
-                convert_text = tool_function.convert_msg(
-                    locale, lang, "variable", "say", "link", ["data_link", i[1]]
-                )
+                convert_text = tool_function.convert_msg(locale, lang, "variable", "say", "link", ["data_link", i[1]])
 
                 content = content.replace(i[0], convert_text)
 
@@ -137,51 +133,27 @@ async def check_voice_platform(
 ) -> str:
     """Return the platform of the user or guild (default: Google)"""
     if (
-        lang
-        in tool_function.read_local_json("lang_list/google_languages.json")[
-            "Support_Language"
-        ]
-        and lang
-        not in tool_function.read_local_json("lang_list/azure_languages.json")[
-            "Support_Language"
-        ]
+        lang in tool_function.read_local_json("lang_list/google_languages.json")["Support_Language"]
+        and lang not in tool_function.read_local_json("lang_list/azure_languages.json")["Support_Language"]
     ):
         return "Google"
     if (
-        lang
-        in tool_function.read_local_json("lang_list/azure_languages.json")[
-            "Support_Language"
-        ]
-        and lang
-        not in tool_function.read_local_json("lang_list/google_languages.json")[
-            "Support_Language"
-        ]
+        lang in tool_function.read_local_json("lang_list/azure_languages.json")["Support_Language"]
+        and lang not in tool_function.read_local_json("lang_list/google_languages.json")["Support_Language"]
     ):
         return "Azure"
     user_id = f"user_{str(user_id)}"
-    if (
-        user_platform_set
-        and tool_function.read_db_json("user_config")[user_id]["platform"] == "Google"
-    ):
+    if user_platform_set and tool_function.read_db_json("user_config")[user_id]["platform"] == "Google":
         await tool_function.postgres_logging("Init Google TTS API 1")
         return "Google"
 
-    elif (
-        user_platform_set
-        and tool_function.read_db_json("user_config")[user_id]["platform"] == "Azure"
-    ):
+    elif user_platform_set and tool_function.read_db_json("user_config")[user_id]["platform"] == "Azure":
         await tool_function.postgres_logging("Init Azure TTS API 1")
         return "Azure"
-    elif (
-        guild_platform_set
-        and tool_function.read_db_json(f"{guild_id}")["platform"] == "Google"
-    ):
+    elif guild_platform_set and tool_function.read_db_json(f"{guild_id}")["platform"] == "Google":
         await tool_function.postgres_logging("Init Google TTS API 2")
         return "Google"
-    elif (
-        guild_platform_set
-        and tool_function.read_db_json(f"{guild_id}")["platform"] == "Azure"
-    ):
+    elif guild_platform_set and tool_function.read_db_json(f"{guild_id}")["platform"] == "Azure":
         await tool_function.postgres_logging("Init Azure TTS API 2")
         return "Azure"
     elif not user_platform_set and not guild_platform_set:
@@ -198,9 +170,7 @@ async def check_voice_platform(
         return "Something wrong"
 
 
-def name_convert(
-    ctx, lang: str, locale: dict, content: str, gpt: None | bool = False
-) -> str:
+def name_convert(ctx, lang: str, locale: dict, content: str, gpt: None | bool = False) -> str:
     if gpt:
         return tool_function.convert_msg(
             locale,
@@ -224,9 +194,7 @@ def name_convert(
         username = ctx.author.name
     # get username length
     no_name = False
-    send_time = int(
-        time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple())
-    )
+    send_time = int(time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple()))
     if tool_function.check_local_file(f"msg_temp/{guild_id}.json"):
         old_msg_temp = tool_function.read_local_json(f"msg_temp/{guild_id}.json")
         if old_msg_temp["1"] == user_id and send_time - int(old_msg_temp["0"]) <= 15:
@@ -329,9 +297,9 @@ async def tts_convert(ctx, lang: str, content: str, platform_result: str) -> [bo
 
 def is_banned(user_id: int | str, guild_id: int | str) -> bool:
     ban_list = tool_function.read_db_json("ban")
-    if tool_function.check_dict_data(
-        ban_list, f"{user_id}"
-    ) and tool_function.check_dict_data(ban_list[f"{user_id}"], f"{guild_id}"):
+    if tool_function.check_dict_data(ban_list, f"{user_id}") and tool_function.check_dict_data(
+        ban_list[f"{user_id}"], f"{guild_id}"
+    ):
         if int(ban_list[f"{user_id}"][f"{guild_id}"]["expire"]) >= int(
             time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple())
         ):
@@ -371,7 +339,8 @@ async def gpt_process(lang: str, content: str) -> str:
             "messages": [
                 {
                     "role": "system",
-                    "content": f"If no specific language is requested, use {lang} as a friendly human to respond. Otherwise, reply in the language requested by the user.",
+                    "content": f"If no specific language is requested, use {lang} as a friendly human to respond. "
+                    f"Otherwise, reply in the language requested by the user.",
                 },
                 {"role": "user", "content": content},
             ],

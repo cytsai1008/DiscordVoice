@@ -188,9 +188,7 @@ async def on_guild_join(guild):
     guild_id = guild.id
     # send about new server to owner
     owner = await bot.fetch_user(int(config["owner"]))
-    await owner.send(
-        f"New server joined!\n" f"Guild Name: {guild_name}\n" f"Guild ID: {guild_id}\n"
-    )
+    await owner.send(f"New server joined!\n" f"Guild Name: {guild_name}\n" f"Guild ID: {guild_id}\n")
 
 
 @bot.event
@@ -209,18 +207,14 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         ),
     ):
         await ctx.reply(
-            tool_function.convert_msg(
-                locale, lang, "command", "on_command_error", "command_not_found", None
-            )
+            tool_function.convert_msg(locale, lang, "command", "on_command_error", "command_not_found", None)
         )
         await ctx.message.add_reaction("❌")
         return
 
     elif isinstance(error, discord.ext.commands.errors.MissingPermissions):
         await ctx.reply(
-            tool_function.convert_msg(
-                locale, lang, "command", "on_command_error", "missing_permissions", None
-            )
+            tool_function.convert_msg(locale, lang, "command", "on_command_error", "missing_permissions", None)
         )
         await ctx.message.add_reaction("❌")
         return
@@ -251,9 +245,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
 
         elif command == "setlang":
             # read language lists
-            support_lang = tool_function.read_local_json(
-                "lang_list/google_languages.json"
-            )
+            support_lang = tool_function.read_local_json("lang_list/google_languages.json")
             azure_lang = tool_function.read_local_json("lang_list/azure_languages.json")
 
             await ctx.reply(
@@ -287,9 +279,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             )
 
         elif command == "say_lang" or command in command_alias["say_lang"]:
-            support_lang = tool_function.read_local_json(
-                "lang_list/google_languages.json"
-            )
+            support_lang = tool_function.read_local_json("lang_list/google_languages.json")
             azure_lang = tool_function.read_local_json("lang_list/azure_languages.json")
 
             await ctx.reply(
@@ -524,7 +514,8 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         )
         return
 
-    # Command raised an exception: Forbidden: 403 Forbidden (error code: 160002): Cannot reply without permission to read message history
+    # Command raised an exception: Forbidden: 403 Forbidden (error code: 160002):
+    # Cannot reply without permission to read message history
     elif isinstance(
         error, discord.ext.commands.errors.CommandInvokeError
     ) and "Cannot reply without permission to read message history" in str(error):
@@ -907,10 +898,7 @@ async def join(ctx, *, channel: discord.VoiceChannel):
         )
     except Exception:
         await tool_function.postgres_logging(
-            f"Join Failed:\n"
-            f"{ctx.guild.id}\n"
-            f"{ctx.message.author.id}\n"
-            f"{traceback.format_exc()}"
+            f"Join Failed:\n" f"{ctx.guild.id}\n" f"{ctx.message.author.id}\n" f"{traceback.format_exc()}"
         )
 
         await ctx.message.add_reaction("❌")
@@ -960,9 +948,7 @@ async def leave(ctx, emoji: bool = True):
 @bot.command(Name="setchannel")
 @commands.cooldown(1, 20, commands.BucketType.user)
 @commands.guild_only()
-async def setchannel(
-    ctx, channel: discord.TextChannel | discord.VoiceChannel | discord.ForumChannel
-):
+async def setchannel(ctx, channel: discord.TextChannel | discord.VoiceChannel | discord.ForumChannel):
     # get channel id
     channel_id = channel.id
     # get guild id
@@ -1067,10 +1053,7 @@ async def setlang(ctx, lang: str):
     azure_lang = tool_function.read_local_json("lang_list/azure_languages.json")
     lang = lang.lower()
     lang = lang.replace("_", "-")
-    if (
-        lang in support_lang["Support_Language"]
-        or lang in azure_lang["Support_Language"]
-    ):
+    if lang in support_lang["Support_Language"] or lang in azure_lang["Support_Language"]:
         if tool_function.check_db_file(f"{guild_id}"):
             # read db file
             db = tool_function.read_db_json(f"{guild_id}")
@@ -1294,9 +1277,7 @@ async def move_error(ctx, error):
 @bot.command(Name="say_lang", aliases=command_alias["say_lang"])
 # @commands.cooldown(1, 3, commands.BucketType.user)
 @commands.guild_only()
-async def say_lang(
-    ctx, lang: str, *, content: str, gpt: bool = False
-):  # sourcery no-metrics
+async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourcery no-metrics
     # sourcery skip: low-code-quality
     # get message channel id
 
@@ -1304,12 +1285,8 @@ async def say_lang(
 
     user_id = ctx.author.id
     user_platform_set = bool(
-        tool_function.check_dict_data(
-            tool_function.read_db_json("user_config"), f"user_{user_id}"
-        )
-        and tool_function.check_dict_data(
-            tool_function.read_db_json("user_config")[f"user_{user_id}"], "platform"
-        )
+        tool_function.check_dict_data(tool_function.read_db_json("user_config"), f"user_{user_id}")
+        and tool_function.check_dict_data(tool_function.read_db_json("user_config")[f"user_{user_id}"], "platform")
     )
 
     channel_id = ctx.channel.id
@@ -1335,29 +1312,20 @@ async def say_lang(
                 del joined_vc[str(guild_id)]
             tool_function.write_db_json("joined_vc", joined_vc)
 
-        google_lang_code_list = tool_function.read_local_json(
-            "lang_list/google_languages.json"
-        )["Support_Language"]
-        azure_lang_code_list = tool_function.read_local_json(
-            "lang_list/azure_languages.json"
-        )["Support_Language"]
+        google_lang_code_list = tool_function.read_local_json("lang_list/google_languages.json")["Support_Language"]
+        azure_lang_code_list = tool_function.read_local_json("lang_list/azure_languages.json")["Support_Language"]
 
         lang = lang.lower()
         lang = lang.replace("_", "-")
 
-        lang_code_is_right = (
-            lang in google_lang_code_list or lang in azure_lang_code_list
-        )
+        lang_code_is_right = lang in google_lang_code_list or lang in azure_lang_code_list
         channelissetup = tool_function.check_dict_data(db, "channel")
 
         if (
             is_connected
             and channelissetup
             and lang_code_is_right
-            and (
-                channel_id == db["channel"]
-                or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"])
-            )
+            and (channel_id == db["channel"] or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"]))
         ):
             # export content to mp3 by google tts api
             # get username
@@ -1380,20 +1348,14 @@ async def say_lang(
             if gpt:
                 content = await command_func.gpt_process(db["lang"], content)
 
-            say_this = (
-                ctx.author.id in (int(config["owner"]), 890234177767755849)
-                or len(content) < 50
-            )
+            say_this = ctx.author.id in (int(config["owner"]), 890234177767755849) or len(content) < 50
 
             content = command_func.name_convert(ctx, lang, locale, content, gpt)
 
             if say_this:
                 if not ctx.voice_client.is_playing():
                     await tool_function.postgres_logging(
-                        f"Playing content: \n"
-                        f"{content}\n"
-                        f"From {ctx.author.name}\n"
-                        f"In {ctx.guild.name}"
+                        f"Playing content: \n" f"{content}\n" f"From {ctx.author.name}\n" f"In {ctx.guild.name}"
                     )
 
                     platform_result = await command_func.check_voice_platform(
@@ -1401,9 +1363,7 @@ async def say_lang(
                     )
 
                     # process tts file (false if went wrong)
-                    if not await command_func.tts_convert(
-                        ctx, lang, content, platform_result
-                    ):
+                    if not await command_func.tts_convert(ctx, lang, content, platform_result):
                         owner = await bot.fetch_user(int(config["owner"]))
                         await owner.send(
                             f"Something went wrong return triggered!\n"
@@ -1415,19 +1375,13 @@ async def say_lang(
                         # add bug emoji reaction
                         await ctx.message.add_reaction("🐛")
 
-                    voice_file = await discord.FFmpegOpusAudio.from_probe(
-                        f"tts_temp/{guild_id}.mp3"
-                    )
+                    voice_file = await discord.FFmpegOpusAudio.from_probe(f"tts_temp/{guild_id}.mp3")
                     ctx.voice_client.play(
                         voice_file,
                         after=await queue_job(ctx, lang, content, platform_result),
                     )
                     await ctx.message.add_reaction("🔊")
-                    send_time = int(
-                        time.mktime(
-                            datetime.datetime.now(datetime.timezone.utc).timetuple()
-                        )
-                    )
+                    send_time = int(time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple()))
                     msg_tmp = {0: send_time, 1: user_id}
                     tool_function.write_local_json(f"msg_temp/{guild_id}.json", msg_tmp)
 
@@ -1488,10 +1442,7 @@ async def say_lang(
         elif (
             channelissetup
             and channel_id != db["channel"]
-            and (
-                not tool_function.check_dict_data(db, "not_this_channel_msg")
-                or db["not_this_channel_msg"] != "off"
-            )
+            and (not tool_function.check_dict_data(db, "not_this_channel_msg") or db["not_this_channel_msg"] != "off")
         ):
             channel_msg = tool_function.convert_msg(
                 locale,
@@ -1523,10 +1474,7 @@ async def say_lang(
             )
             await ctx.message.add_reaction("🤔")
 
-        elif (
-            tool_function.check_dict_data(db, "not_this_channel_msg")
-            and db["not_this_channel_msg"] == "off"
-        ):
+        elif tool_function.check_dict_data(db, "not_this_channel_msg") and db["not_this_channel_msg"] == "off":
             return
             # reply to sender
         else:
@@ -1592,9 +1540,7 @@ async def say_lang(
 @bot.command(name="force_say", aliases=command_alias["force_say"])
 @commands.guild_only()
 @commands.is_owner()
-async def force_say(
-    ctx, *, content: str
-):  # sourcery no-metrics skip: for-index-replacement
+async def force_say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # sourcery skip: low-code-quality
     # get message channel id
 
@@ -1647,9 +1593,7 @@ async def force_say(
 @bot.command(Name="gpt_say", aliases=command_alias["gpt_say"])
 @commands.is_owner()
 @commands.cooldown(1, 10, commands.BucketType.user)
-async def gpt_say(
-    ctx, *, content: str
-):  # sourcery no-metrics skip: for-index-replacement
+async def gpt_say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # sourcery skip: low-code-quality
 
     locale_lang = tool_function.check_db_lang(ctx)
@@ -1720,12 +1664,8 @@ async def setvoice(ctx, platform: str):
 
     if platform.lower() == "reset":
         if not is_guild and (
-            not tool_function.check_dict_data(
-                tool_function.read_db_json("user_config"), guild_id
-            )
-            or not tool_function.check_dict_data(
-                tool_function.read_db_json("user_config")[guild_id], "platform"
-            )
+            not tool_function.check_dict_data(tool_function.read_db_json("user_config"), guild_id)
+            or not tool_function.check_dict_data(tool_function.read_db_json("user_config")[guild_id], "platform")
         ):
             await ctx.reply(
                 tool_function.convert_msg(
@@ -1741,9 +1681,7 @@ async def setvoice(ctx, platform: str):
 
         if is_guild and (
             not tool_function.check_db_file(guild_id)
-            or not tool_function.check_dict_data(
-                tool_function.read_db_json(guild_id), "platform"
-            )
+            or not tool_function.check_dict_data(tool_function.read_db_json(guild_id), "platform")
         ):
             await ctx.reply(
                 tool_function.convert_msg(
@@ -1946,13 +1884,8 @@ async def ban(ctx, member: str | int | discord.Member, expire: int = 300):
                 "expire": expire_sec,
             }
         }
-    elif (
-        server_id in ban_list[member_id]
-        and ban_list[member_id][server_id]["expire"] > now_sec
-    ):
-        ban_list[member_id][server_id]["expire"] = (
-            ban_list[member_id][server_id]["expire"] + expire
-        )
+    elif server_id in ban_list[member_id] and ban_list[member_id][server_id]["expire"] > now_sec:
+        ban_list[member_id][server_id]["expire"] = ban_list[member_id][server_id]["expire"] + expire
     else:
         ban_list[member_id][server_id] = {
             "expire": expire_sec,
@@ -2042,11 +1975,7 @@ async def unban(ctx, member: str | int | discord.Member):
     user_id = str(ctx.author.id)
     now_sec = int(time.mktime(datetime.datetime.now(datetime.timezone.utc).timetuple()))
     ban_list = tool_function.read_db_json("ban")
-    if (
-        user_id in ban_list
-        and server_id in ban_list[user_id]
-        and now_sec <= ban_list[user_id][server_id]["expire"]
-    ):
+    if user_id in ban_list and server_id in ban_list[user_id] and now_sec <= ban_list[user_id][server_id]["expire"]:
         await ctx.message.add_reaction("❌")
         await ctx.reply(
             tool_function.convert_msg(
