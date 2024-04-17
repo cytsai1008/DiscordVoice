@@ -6,7 +6,7 @@ httpx
 cloudscraper
 redis
 flask
-gunicorn==21.2.0
+gunicorn==22.0.0
 metadata_parser
 beautifulsoup4
 lxml
