@@ -43,15 +43,11 @@ def process_voice(content: str, lang_code: str, filename: str) -> None:
     )
 
     # Select the type of audio file you want returned
-    audio_config = texttospeech.AudioConfig(
-        audio_encoding=texttospeech.AudioEncoding.MP3
-    )
+    audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
 
     # Perform the text-to-speech request on the text input with the selected
     # voice parameters and audio file type
-    response = client.synthesize_speech(
-        input=synthesis_input, voice=voice, audio_config=audio_config
-    )
+    response = client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
 
     # The response's audio_content is binary.
     with open(f"tts_temp/{filename}", "wb") as out:
@@ -78,9 +74,7 @@ def azure_tts_converter(content: str, lang_code: str, filename: str) -> None:
     speech_config.speech_synthesis_language = lang_code
 
     # Set output format to mp3
-    speech_config.set_speech_synthesis_output_format(
-        SpeechSynthesisOutputFormat["Audio16Khz128KBitRateMonoMp3"]
-    )
+    speech_config.set_speech_synthesis_output_format(SpeechSynthesisOutputFormat["Audio16Khz128KBitRateMonoMp3"])
 
     # special case for Chinese Simplified
     if lang_code == "zh-cn":
