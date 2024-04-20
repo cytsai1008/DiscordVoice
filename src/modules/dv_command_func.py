@@ -82,18 +82,10 @@ async def _content_link_replace(content: str, lang, locale: dict) -> str:
         r"a-zA-Z\d]\.\S{2,}|https?://(?:www\.|(?!www))[a-zA-Z\d]+\.\S{2,}|www\.[a-zA-Z\d]+\.\S{2,})"
     )
 
-    if not re.findall(
-        web_regex,
-        content,
-        flags=re.IGNORECASE,
-    ):
+    if not re.findall(web_regex, content, flags=re.IGNORECASE):
         return content
 
-    url = re.findall(
-        web_regex,
-        content,
-        flags=re.IGNORECASE,
-    )
+    url = re.findall(web_regex, content, flags=re.IGNORECASE)
 
     # remove duplicate
     url = list(set(url))
