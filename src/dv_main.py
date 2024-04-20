@@ -2,6 +2,7 @@ import asyncio
 import contextlib
 import datetime
 import os
+import re
 import shutil
 import signal
 import subprocess
@@ -1348,7 +1349,13 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
             if gpt:
                 content = await command_func.gpt_process(db["lang"], content)
 
-            say_this = ctx.author.id in (int(config["owner"]), 890234177767755849) or len(content) < 50
+            text_split = re.split(r"\s|\n", content)
+
+            too_long = any(len(i) > 50 for i in text_split) or len(text_split) > 30 or len(content) > 300
+
+            say_this = (
+                not os.getenv("TEST_ENV") and ctx.author.id in (int(config["owner"]), 890234177767755849)
+            ) or not too_long
 
             content = command_func.name_convert(ctx, lang, locale, content, gpt)
 
