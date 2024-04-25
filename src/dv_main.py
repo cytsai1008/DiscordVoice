@@ -566,14 +566,14 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         else:
             owner_full_id = f"@{owner_name}"
         await owner_data.send(
-            f"Unknown command error, please report to developer (<@{config['owner']}> or `{owner_full_id}`).\n"
+            f"Unknown command error\n"
             "```"
             f"Command: {command_name}\n"
             f"Error: {error}\n"
             f"Error Type: {type(error)}\n"
             f"Server Name: {server_name}\n"
             f"Server ID: {server_id}\n"
-            f"Sender: {sender_name}#{ctx.author.discriminator}\n"
+            f"Sender: {sender_name}\n"
             "```"
         )
         await owner_data.send(ctx.message.content)
