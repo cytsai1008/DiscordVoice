@@ -6,9 +6,12 @@ import re
 import time
 
 import bs4
+import emoji
+
 # import cloudscraper
 import httpx
 import metadata_parser
+
 # import openai
 import openai_async
 from discord.ext import commands
@@ -36,6 +39,25 @@ async def content_convert(ctx, lang: str, locale: dict, content: str) -> str:
                     ["data_emoji", emoji_text[i]],
                 ),
             )
+
+    # Unicode Emoji Replace
+    emoji.config.demojize_keep_zwj = False
+    content = emoji.demojize(
+        content,
+        delimiters=(
+            str(
+                tool_function.convert_msg(
+                    locale,
+                    lang,
+                    "variable",
+                    "say",
+                    "emoji",
+                    ["data_emoji", ""],
+                )
+            )[:-1],
+            "",
+        ),
+    )
 
     content = await _content_link_replace(content, lang, locale)
     return content
