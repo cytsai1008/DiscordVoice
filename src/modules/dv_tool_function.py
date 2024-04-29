@@ -179,7 +179,7 @@ def convert_msg(
     convert_text: list | None = None,
 ) -> str:
     """
-    Convert message from locale
+    Convert message from LOCALE
     """
     lang = _get_translate_lang(lang, locale_dict)
     a = "".join(locale_dict[msg_type][command][name][lang])

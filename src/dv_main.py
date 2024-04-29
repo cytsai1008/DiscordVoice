@@ -57,7 +57,7 @@ command_alias = {
 }
 
 # setup global variables
-locale = tool_function.read_local_json("locale/dv_locale/locale_v2.json")
+LOCALE = tool_function.read_local_json("locale/dv_locale/locale_v2.json")
 supported_platform = ("Google", "Azure")
 
 # initialize bot
@@ -208,14 +208,14 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         ),
     ):
         await ctx.reply(
-            tool_function.convert_msg(locale, lang, "command", "on_command_error", "command_not_found", None)
+            tool_function.convert_msg(LOCALE, lang, "command", "on_command_error", "command_not_found", None)
         )
         await ctx.message.add_reaction("❌")
         return
 
     elif isinstance(error, discord.ext.commands.errors.MissingPermissions):
         await ctx.reply(
-            tool_function.convert_msg(locale, lang, "command", "on_command_error", "missing_permissions", None)
+            tool_function.convert_msg(LOCALE, lang, "command", "on_command_error", "missing_permissions", None)
         )
         await ctx.message.add_reaction("❌")
         return
@@ -230,7 +230,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             guild_system_channel = ctx.guild.system_channel
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     lang,
                     "command",
                     "setchannel",
@@ -251,7 +251,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
 
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     lang,
                     "command",
                     "setlang",
@@ -270,7 +270,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         elif command == "say" or command in command_alias["say"]:
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     lang,
                     "command",
                     "say",
@@ -285,7 +285,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
 
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     lang,
                     "command",
                     "say_lang",
@@ -304,7 +304,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         elif command == "setvoice":
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     lang,
                     "command",
                     "setvoice",
@@ -328,7 +328,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             except AttributeError:
                 await ctx.reply(
                     tool_function.convert_msg(
-                        locale,
+                        LOCALE,
                         lang,
                         "command",
                         "join",
@@ -360,7 +360,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
             except AttributeError:
                 await ctx.reply(
                     tool_function.convert_msg(
-                        locale,
+                        LOCALE,
                         lang,
                         "command",
                         "move",
@@ -378,7 +378,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         elif command == "ban":
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     lang,
                     "command",
                     "ban",
@@ -393,7 +393,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         elif command == "unban":
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     lang,
                     "command",
                     "unban",
@@ -408,7 +408,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         elif command == "set_nochannel":
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     lang,
                     "command",
                     "set_nochannel",
@@ -424,7 +424,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         else:
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     lang,
                     "command",
                     "on_command_error",
@@ -443,7 +443,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 lang,
                 "command",
                 "on_command_error",
@@ -474,7 +474,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 lang,
                 "command",
                 "on_command_error",
@@ -490,7 +490,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     elif isinstance(error, discord.ext.commands.errors.TooManyArguments):
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 lang,
                 "command",
                 "on_command_error",
@@ -505,7 +505,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     elif isinstance(error, discord.ext.commands.errors.BotMissingPermissions):
         await ctx.author.send(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 lang,
                 "command",
                 "on_command_error",
@@ -523,7 +523,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         try:
             await ctx.send(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     lang,
                     "command",
                     "on_command_error",
@@ -534,7 +534,7 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
         except Exception:
             await ctx.author.send(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     lang,
                     "command",
                     "on_command_error",
@@ -594,7 +594,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         # lang help text change to current if settings exist
         if tool_function.check_dict_data(data, "lang"):
             lang_msg = tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "variable",
                 "help",
@@ -607,7 +607,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
 
             # default lang command text
             lang_msg = tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "variable",
                 "help",
@@ -621,7 +621,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         # channel help text change to current if settings exist
         if tool_function.check_dict_data(data, "channel"):
             channel_msg = tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "variable",
                 "help",
@@ -632,7 +632,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
             # default channel command text
             guild_system_channel = ctx.guild.system_channel
             channel_msg = tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "variable",
                 "help",
@@ -643,7 +643,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         # voice platform help text change to current if settings exist
         if tool_function.check_dict_data(data, "platform"):
             platform_msg = tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "variable",
                 "help",
@@ -653,7 +653,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         else:
             # default platform command text
             platform_msg = tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "variable",
                 "help",
@@ -669,7 +669,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         if tool_function.check_dict_data(data, "nochannel"):
             nochannel_status = "on" if data["nochannel"] else "off"
             nochannel_msg = tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "variable",
                 "help",
@@ -678,7 +678,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
             )
         else:
             nochannel_msg = tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "variable",
                 "help",
@@ -689,7 +689,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         # mix all together and send
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "command",
                 "help",
@@ -730,7 +730,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         # voice platform help text change to current if settings exist
         if tool_function.check_dict_data(data, "platform"):
             platform_msg = tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "variable",
                 "help",
@@ -741,7 +741,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         else:
             # default platform command text
             platform_msg = tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "variable",
                 "help",
@@ -757,7 +757,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         # mix all together and send
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "command",
                 "help",
@@ -769,7 +769,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
                     platform_msg,
                     "channel_msg",
                     tool_function.convert_msg(
-                        locale,
+                        LOCALE,
                         locale_lang,
                         "variable",
                         "help",
@@ -781,7 +781,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
                     ),
                     "lang_msg",
                     tool_function.convert_msg(
-                        locale,
+                        LOCALE,
                         locale_lang,
                         "variable",
                         "help",
@@ -793,7 +793,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
                     ),
                     "nochannel_msg",
                     tool_function.convert_msg(
-                        locale,
+                        LOCALE,
                         locale_lang,
                         "variable",
                         "help",
@@ -810,7 +810,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
         # azure_lang = tool_function.read_local_json("azure_languages.json")
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "command",
                 "help",
@@ -820,7 +820,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
                     config["prefix"],
                     "platform_msg",
                     tool_function.convert_msg(
-                        locale,
+                        LOCALE,
                         locale_lang,
                         "variable",
                         "help",
@@ -834,7 +834,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
                     ),
                     "channel_msg",
                     tool_function.convert_msg(
-                        locale,
+                        LOCALE,
                         locale_lang,
                         "variable",
                         "help",
@@ -846,7 +846,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
                     ),
                     "lang_msg",
                     tool_function.convert_msg(
-                        locale,
+                        LOCALE,
                         locale_lang,
                         "variable",
                         "help",
@@ -858,7 +858,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
                     ),
                     "nochannel_msg",
                     tool_function.convert_msg(
-                        locale,
+                        LOCALE,
                         locale_lang,
                         "variable",
                         "help",
@@ -889,7 +889,7 @@ async def join(ctx, *, channel: discord.VoiceChannel):
         bot_voice_channel = ctx.guild.voice_client.channel
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "command",
                 "join",
@@ -917,7 +917,7 @@ async def join_error(ctx, error):
     if isinstance(error, (commands.BadArgument, commands.BadUnionArgument)):
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "join",
@@ -964,7 +964,7 @@ async def setchannel(ctx, channel: discord.TextChannel | discord.VoiceChannel | 
     tool_function.write_db_json(f"{guild_id}", data)
     await ctx.reply(
         tool_function.convert_msg(
-            locale,
+            LOCALE,
             tool_function.check_db_lang(ctx),
             "command",
             "setchannel",
@@ -984,7 +984,7 @@ async def setchannel_error(ctx, error):
         guild_system_channel = ctx.guild.system_channel
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "setchannel",
@@ -1016,7 +1016,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
             errormsg = ""
             if not langissetup:
                 errormsg += tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     locale_lang,
                     "variable",
                     "say",
@@ -1031,7 +1031,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
     else:
         await ctx.send(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "command",
                 "say",
@@ -1066,7 +1066,7 @@ async def setlang(ctx, lang: str):
             tool_function.write_db_json(f"{guild_id}", {"lang": lang})
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 lang,
                 "command",
                 "setlang",
@@ -1081,7 +1081,7 @@ async def setlang(ctx, lang: str):
     elif lang == "supported-languages":
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "command",
                 "setlang",
@@ -1097,7 +1097,7 @@ async def setlang(ctx, lang: str):
     else:
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 "en",
                 "command",
                 "setlang",
@@ -1142,7 +1142,7 @@ async def clear(ctx):
     # TODO: Json Remove
     await ctx.reply(
         tool_function.convert_msg(
-            locale,
+            LOCALE,
             tool_function.check_db_lang(ctx),
             "command",
             "clear",
@@ -1173,7 +1173,7 @@ async def stop(ctx):
 async def invite(ctx):
     await ctx.reply(
         tool_function.convert_msg(
-            locale,
+            LOCALE,
             tool_function.check_db_lang(ctx),
             "command",
             "invite",
@@ -1196,7 +1196,7 @@ async def wrong_msg(ctx, msg: str):
             tool_function.write_db_json(f"{ctx.guild.id}", db)
             if msg == "on":
                 reply_msg = tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     tool_function.check_db_lang(ctx),
                     "command",
                     "wrong_msg",
@@ -1205,7 +1205,7 @@ async def wrong_msg(ctx, msg: str):
                 )
             elif msg == "off":
                 reply_msg = tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     tool_function.check_db_lang(ctx),
                     "command",
                     "wrong_msg",
@@ -1219,7 +1219,7 @@ async def wrong_msg(ctx, msg: str):
         else:
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     tool_function.check_db_lang(ctx),
                     "command",
                     "wrong_msg",
@@ -1234,7 +1234,7 @@ async def wrong_msg(ctx, msg: str):
     else:
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "wrong_msg",
@@ -1262,7 +1262,7 @@ async def move_error(ctx, error):
     if isinstance(error, (commands.BadArgument, commands.BadUnionArgument)):
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "move",
@@ -1344,7 +1344,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
                 await ctx.message.add_reaction("🔇")
                 return
 
-            content = await command_func.content_convert(ctx, lang, locale, content)
+            content = await command_func.content_convert(ctx, lang, LOCALE, content)
 
             if gpt:
                 content = await command_func.gpt_process(db["lang"], content)
@@ -1357,7 +1357,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
                 not os.getenv("TEST_ENV") and ctx.author.id in (int(config["owner"]), 890234177767755849)
             ) or not too_long
 
-            content = command_func.name_convert(ctx, lang, locale, content, gpt)
+            content = command_func.name_convert(ctx, lang, LOCALE, content, gpt)
 
             if say_this:
                 if not ctx.voice_client.is_playing():
@@ -1413,7 +1413,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
                         await ctx.reply(
                             f"""
                                 {tool_function.convert_msg(
-                                locale,
+                                LOCALE,
                                 db["lang"],
                                 "command",
                                 "say",
@@ -1425,7 +1425,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
                     else:
                         await ctx.reply(
                             tool_function.convert_msg(
-                                locale,
+                                LOCALE,
                                 lang,
                                 "command",
                                 "say",
@@ -1437,7 +1437,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
             else:
                 await ctx.reply(
                     tool_function.convert_msg(
-                        locale,
+                        LOCALE,
                         lang,
                         "command",
                         "say",
@@ -1452,7 +1452,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
             and (not tool_function.check_dict_data(db, "not_this_channel_msg") or db["not_this_channel_msg"] != "off")
         ):
             channel_msg = tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "variable",
                 "say",
@@ -1464,7 +1464,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
             )
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     locale_lang,
                     "command",
                     "say",
@@ -1488,7 +1488,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
             errormsg = ""
             if not is_connected:
                 errormsg += tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     locale_lang,
                     "variable",
                     "say",
@@ -1500,7 +1500,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
                 )
             if not channelissetup:
                 errormsg += tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     locale_lang,
                     "variable",
                     "say",
@@ -1512,7 +1512,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
                 )
             if not lang_code_is_right:
                 errormsg += tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     locale_lang,
                     "variable",
                     "say_lang",
@@ -1531,7 +1531,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
     else:
         await ctx.send(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "command",
                 "say_lang",
@@ -1569,7 +1569,7 @@ async def force_say(ctx, *, content: str):  # sourcery no-metrics skip: for-inde
             errormsg = ""
             if not langissetup:
                 errormsg += tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     locale_lang,
                     "variable",
                     "say",
@@ -1584,7 +1584,7 @@ async def force_say(ctx, *, content: str):  # sourcery no-metrics skip: for-inde
     else:
         await ctx.send(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "command",
                 "say",
@@ -1618,7 +1618,7 @@ async def gpt_say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-
             errormsg = ""
             if not langissetup:
                 errormsg += tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     locale_lang,
                     "variable",
                     "say",
@@ -1633,7 +1633,7 @@ async def gpt_say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-
     else:
         await ctx.send(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 locale_lang,
                 "command",
                 "say",
@@ -1652,7 +1652,7 @@ async def setvoice(ctx, platform: str):
     if platform.capitalize() not in supported_platform and platform.lower() != "reset":
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "setvoice",
@@ -1676,7 +1676,7 @@ async def setvoice(ctx, platform: str):
         ):
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     tool_function.check_db_lang(ctx),
                     "command",
                     "setvoice",
@@ -1692,7 +1692,7 @@ async def setvoice(ctx, platform: str):
         ):
             await ctx.reply(
                 tool_function.convert_msg(
-                    locale,
+                    LOCALE,
                     tool_function.check_db_lang(ctx),
                     "command",
                     "setvoice",
@@ -1715,7 +1715,7 @@ async def setvoice(ctx, platform: str):
 
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "setvoice",
@@ -1741,7 +1741,7 @@ async def setvoice(ctx, platform: str):
 
     await ctx.reply(
         tool_function.convert_msg(
-            locale,
+            LOCALE,
             tool_function.check_db_lang(ctx),
             "command",
             "setvoice",
@@ -1765,7 +1765,7 @@ async def set_nochannel(ctx, setup: str):
         await ctx.message.add_reaction("❌")
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "set_nochannel",
@@ -1782,7 +1782,7 @@ async def set_nochannel(ctx, setup: str):
         await ctx.message.add_reaction("✅")
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "set_nochannel",
@@ -1794,7 +1794,7 @@ async def set_nochannel(ctx, setup: str):
     else:
         await ctx.message.add_reaction("❌")
         await ctx.reply(
-            locale,
+            LOCALE,
             tool_function.check_db_lang(ctx),
             "command",
             "set_nochannel",
@@ -1814,7 +1814,7 @@ async def ban(ctx, member: str | int | discord.Member, expire: int = 300):
         await ctx.message.add_reaction("❌")
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "ban",
@@ -1834,7 +1834,7 @@ async def ban(ctx, member: str | int | discord.Member, expire: int = 300):
         await ctx.message.add_reaction("❓")
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "ban",
@@ -1848,7 +1848,7 @@ async def ban(ctx, member: str | int | discord.Member, expire: int = 300):
         await ctx.message.add_reaction("❌")
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "ban",
@@ -1872,7 +1872,7 @@ async def ban(ctx, member: str | int | discord.Member, expire: int = 300):
         await ctx.message.add_reaction("❌")
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "ban",
@@ -1907,7 +1907,7 @@ async def ban(ctx, member: str | int | discord.Member, expire: int = 300):
     await ctx.message.add_reaction("🚫")
     await ctx.reply(
         tool_function.convert_msg(
-            locale,
+            LOCALE,
             tool_function.check_db_lang(ctx),
             "command",
             "ban",
@@ -1932,7 +1932,7 @@ async def unban(ctx, member: str | int | discord.Member):
         await ctx.message.add_reaction("❌")
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "unban",
@@ -1953,7 +1953,7 @@ async def unban(ctx, member: str | int | discord.Member):
         await ctx.message.add_reaction("❓")
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "ban",
@@ -1967,7 +1967,7 @@ async def unban(ctx, member: str | int | discord.Member):
         await ctx.message.add_reaction("❌")
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "unban",
@@ -1986,7 +1986,7 @@ async def unban(ctx, member: str | int | discord.Member):
         await ctx.message.add_reaction("❌")
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "unban",
@@ -2014,7 +2014,7 @@ async def unban(ctx, member: str | int | discord.Member):
         await ctx.message.add_reaction("❓")
         await ctx.reply(
             tool_function.convert_msg(
-                locale,
+                LOCALE,
                 tool_function.check_db_lang(ctx),
                 "command",
                 "unban",
@@ -2037,7 +2037,7 @@ async def unban(ctx, member: str | int | discord.Member):
     await ctx.message.add_reaction("⭕")
     await ctx.reply(
         tool_function.convert_msg(
-            locale,
+            LOCALE,
             tool_function.check_db_lang(ctx),
             "command",
             "unban",
