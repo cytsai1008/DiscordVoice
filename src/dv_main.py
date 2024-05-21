@@ -420,6 +420,36 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
                 )
             )
 
+        elif command == "wrong_msg":
+            await ctx.reply(
+                tool_function.convert_msg(
+                    LOCALE,
+                    lang,
+                    "command",
+                    "wrong_msg",
+                    "wrong_msg_bad_arg",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
+            )
+
+        elif command == "set_noname":
+            await ctx.reply(
+                tool_function.convert_msg(
+                    LOCALE,
+                    lang,
+                    "command",
+                    "no_name",
+                    "no_name_bad_arg",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
+            )
+
         # other not defined command missing arguments message
         else:
             await ctx.reply(
@@ -686,6 +716,26 @@ async def help(ctx):  # sourcery skip: low-code-quality
                 ["prefix", config["prefix"]],
             )
 
+        if tool_function.check_dict_data(data, "no_name"):
+            noname_status = "on" if data["no_name"] else "off"
+            noname_msg = tool_function.convert_msg(
+                LOCALE,
+                locale_lang,
+                "variable",
+                "help",
+                "noname_msg_current",
+                ["prefix", config["prefix"], "data_noname", noname_status],
+            )
+        else:
+            noname_msg = tool_function.convert_msg(
+                LOCALE,
+                locale_lang,
+                "variable",
+                "help",
+                "noname_msg_default",
+                ["prefix", config["prefix"]],
+            )
+
         # mix all together and send
         await ctx.reply(
             tool_function.convert_msg(
@@ -705,6 +755,8 @@ async def help(ctx):  # sourcery skip: low-code-quality
                     platform_msg,
                     "nochannel_msg",
                     nochannel_msg,
+                    "noname_msg",
+                    noname_msg,
                 ],
             )
         )
@@ -946,6 +998,7 @@ async def leave(ctx, emoji: bool = True):
     tool_function.write_db_json("joined_vc", joined_vc)
 
 
+# TODO: Migrate to settings command
 @bot.command(Name="setchannel")
 @commands.cooldown(1, 20, commands.BucketType.user)
 @commands.guild_only()
@@ -1044,6 +1097,7 @@ async def say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-repl
         )
 
 
+# TODO: Migrate to settings command
 @bot.command(Name="setlang")
 @commands.guild_only()
 async def setlang(ctx, lang: str):
@@ -1186,6 +1240,67 @@ async def invite(ctx):
     )
 
 
+# TODO: Migrate to settings command
+@bot.command(name="set_noname")
+@commands.guild_only()
+async def set_noname(ctx, value: str):
+    if tool_function.check_db_file(f"{ctx.guild.id}"):
+        db = tool_function.read_db_json(f"{ctx.guild.id}")
+        if value in {"on", "off"}:
+            db["no_name"] = True if value == "on" else False
+            tool_function.write_db_json(f"{ctx.guild.id}", db)
+            if value:
+                reply_msg = tool_function.convert_msg(
+                    LOCALE,
+                    tool_function.check_db_lang(ctx),
+                    "command",
+                    "no_name",
+                    "no_name_on",
+                    None,
+                )
+            elif not value:
+                reply_msg = tool_function.convert_msg(
+                    LOCALE,
+                    tool_function.check_db_lang(ctx),
+                    "command",
+                    "no_name",
+                    "no_name_off",
+                    None,
+                )
+            else:
+                reply_msg = "How did you trigger this?"
+            await ctx.reply(f"{reply_msg}")
+            await ctx.message.add_reaction("✅")
+        else:
+            await ctx.reply(
+                tool_function.convert_msg(
+                    LOCALE,
+                    tool_function.check_db_lang(ctx),
+                    "command",
+                    "no_name",
+                    "no_name_bad_arg",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
+            )
+            await ctx.message.add_reaction("❌")
+    else:
+        await ctx.reply(
+            tool_function.convert_msg(
+                LOCALE,
+                tool_function.check_db_lang(ctx),
+                "command",
+                "no_name",
+                "no_name_no_setting",
+                None,
+            )
+        )
+        await ctx.message.add_reaction("🤔")
+
+
+# TODO: Migrate to settings command
 @bot.command(Name="wrong_msg")
 @commands.guild_only()
 async def wrong_msg(ctx, msg: str):
@@ -1357,7 +1472,8 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
                 not os.getenv("TEST_ENV") and ctx.author.id in (int(config["owner"]), 890234177767755849)
             ) or not too_long
 
-            content = command_func.name_convert(ctx, lang, LOCALE, content, gpt)
+            if gpt or not tool_function.check_dict_data(db, "no_name") or not db["no_name"]:
+                content = command_func.name_convert(ctx, lang, LOCALE, content, gpt)
 
             if say_this:
                 if not ctx.voice_client.is_playing():
@@ -1646,6 +1762,7 @@ async def gpt_say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-
         )
 
 
+# TODO: Migrate to settings command
 @bot.command(name="setvoice")
 @commands.cooldown(1, 20, commands.BucketType.user)
 async def setvoice(ctx, platform: str):
@@ -1754,6 +1871,7 @@ async def setvoice(ctx, platform: str):
     )
 
 
+# TODO: Migrate to settings command
 @bot.command(name="set_nochannel")
 @commands.guild_only()
 @commands.cooldown(1, 20, commands.BucketType.user)
@@ -2045,6 +2163,12 @@ async def unban(ctx, member: str | int | discord.Member):
             ["username", user_name],
         )
     )
+
+
+# TODO: Migrate this
+@bot.command(name="settings")
+async def settings(ctx, key, *, value):
+    raise NotImplementedError
 
 
 if __name__ == "__main__":
