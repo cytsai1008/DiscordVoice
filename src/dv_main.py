@@ -1249,7 +1249,7 @@ async def set_noname(ctx, value: str):
         if value in {"on", "off"}:
             db["no_name"] = True if value == "on" else False
             tool_function.write_db_json(f"{ctx.guild.id}", db)
-            if value:
+            if db["no_name"]:
                 reply_msg = tool_function.convert_msg(
                     LOCALE,
                     tool_function.check_db_lang(ctx),
@@ -1258,7 +1258,7 @@ async def set_noname(ctx, value: str):
                     "no_name_on",
                     None,
                 )
-            elif not value:
+            elif not db["no_name"]:
                 reply_msg = tool_function.convert_msg(
                     LOCALE,
                     tool_function.check_db_lang(ctx),
@@ -1441,7 +1441,10 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
             is_connected
             and channelissetup
             and lang_code_is_right
-            and (channel_id == db["channel"] or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"]))
+            and (
+                channel_id == db["channel"]
+                or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"] == "on")
+            )
         ):
             # export content to mp3 by google tts api
             # get username
