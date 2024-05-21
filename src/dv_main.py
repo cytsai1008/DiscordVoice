@@ -1441,10 +1441,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
             is_connected
             and channelissetup
             and lang_code_is_right
-            and (
-                channel_id == db["channel"]
-                or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"] == "on")
-            )
+            and (channel_id == db["channel"] or (tool_function.check_dict_data(db, "nochannel") and db["nochannel"]))
         ):
             # export content to mp3 by google tts api
             # get username
