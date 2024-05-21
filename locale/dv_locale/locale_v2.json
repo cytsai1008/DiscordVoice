@@ -7,6 +7,7 @@
           "{{channel_msg}}\n",
           "{{nochannel_msg}}\n",
           "{{lang_msg}}\n",
+          "{{noname_msg}}\n",
           "{{platform_msg}}\n",
           "Use `{{prefix}}say` to speak in voice channel. (ex. `{{prefix}}say ABCD`)\n",
           "Use `{{prefix}}say_lang` to speak in voice channel with another language. (ex. `{{prefix}}say_lang en-us ABCD`)\n",
@@ -24,6 +25,7 @@
           "{{channel_msg}}\n",
           "{{nochannel_msg}}\n",
           "{{lang_msg}}\n",
+          "{{noname_msg}}\n",
           "{{platform_msg}}\n",
           "使用 `{{prefix}}say` 以在語音頻道說話。 (ex. `{{prefix}}say ABCD`)\n",
           "使用 `{{prefix}}say_lang` 以透過指定語言在語音頻道說話。 (ex. `{{prefix}}say_lang en-us ABCD`)\n",
@@ -41,6 +43,7 @@
           "{{channel_msg}}\n",
           "{{nochannel_msg}}\n",
           "{{lang_msg}}\n",
+          "{{noname_msg}}\n",
           "{{platform_msg}}\n",
           "使用 `{{prefix}}say` 以在语音频道说话。 (ex. `{{prefix}}say ABCD`)\n",
           "使用 `{{prefix}}say_lang` 以透过指定语言在语音频道说话。 (ex. `{{prefix}}say_lang en-us ABCD`)\n",
@@ -543,6 +546,56 @@
         ]
       }
     },
+    "no_name": {
+      "no_name_on": {
+        "en": [
+          "From now on I won't say sender's name."
+        ],
+        "zh-tw": [
+          "已開啟不說出發送者名稱。"
+        ],
+        "zh-cn": [
+          "已开启不说出发送者名称。"
+        ]
+      },
+      "no_name_off": {
+        "en": [
+          "From now on I will say sender's name."
+        ],
+        "zh-tw": [
+          "已關閉不說出發送者名稱。"
+        ],
+        "zh-cn": [
+          "已关闭不说出发送者名称。"
+        ]
+      },
+      "no_name_bad_arg": {
+        "en": [
+          "Not recognized command.\n",
+          "Usage: `{{prefix}}set_noname on` or `{{prefix}}set_noname off`"
+        ],
+        "zh-tw": [
+          "不明指令\n",
+          "請使用 `{{prefix}}set_noname on` 或 `{{prefix}}set_noname off` 來開啟或關閉此功能。"
+        ],
+        "zh-cn": [
+          "不明指令\n",
+          "请使用 `{{prefix}}set_noname on` 或 `{{prefix}}set_noname off` 来开启或关闭此功能。"
+        ]
+      },
+      "no_name_no_setting": {
+        "en": [
+          "Please setup other settings first.\n"
+        ],
+        "zh-tw": [
+          "請先設定其他選項。\n"
+        ],
+        "zh-cn": [
+          "请先设定其他选项。\n"
+        ]
+      }
+    },
+
     "ban": {
       "ban_success": {
         "en": [
@@ -962,6 +1015,28 @@
         ],
         "zh-cn": [
           "使用 `{{prefix}}set_nochannel` 停用单文字频道模式。 (目前: `{{data_nochannel}}`)"
+        ]
+      },
+      "noname_msg_default": {
+        "en": [
+          "Use `{{prefix}}set_noname` to disable sender's name. (ex. `{{prefix}}set_noname <on | off>`)"
+        ],
+        "zh-tw": [
+          "使用 `{{prefix}}set_noname` 停用發送者名稱。 (ex. `{{prefix}}set_noname <on | off>`)"
+        ],
+        "zh-cn": [
+          "使用 `{{prefix}}set_noname` 停用发送者名称。 (ex. `{{prefix}}set_noname <on | off>`)"
+        ]
+      },
+      "noname_msg_current": {
+        "en": [
+          "Use `{{prefix}}set_noname` to disable sender's name. (Current: `{{data_noname}}`)"
+        ],
+        "zh-tw": [
+          "使用 `{{prefix}}set_noname` 停用發送者名稱。 (目前: `{{data_noname}}`)"
+        ],
+        "zh-cn": [
+          "使用 `{{prefix}}set_noname` 停用发送者名称。 (目前: `{{data_noname}}`)"
         ]
       }
     },
