@@ -2040,6 +2040,24 @@ async def ban(ctx, member: str | int | discord.Member, expire: int = 300):
     )
 
 
+@ban.error
+async def ban_error(ctx, error):
+    if isinstance(error, (commands.BadArgument, commands.BadUnionArgument)):
+        await ctx.reply(
+            tool_function.convert_msg(
+                LOCALE,
+                tool_function.check_db_lang(ctx),
+                "command",
+                "ban",
+                "ban_bad_arg",
+                ["prefix", config["prefix"]],
+            )
+        )
+
+        await ctx.message.add_reaction("❌")
+        return
+
+
 @bot.command(name="unban")
 @commands.guild_only()
 @commands.cooldown(1, 20, commands.BucketType.user)
