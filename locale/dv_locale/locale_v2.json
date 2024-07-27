@@ -18,7 +18,7 @@
           "Use `{{prefix}}ping` to check my latency.\n",
           "Use `{{prefix}}invite` to get the bot's invite link.\n",
           "Admin only:\n",
-          "Use `{{prefix}}ban @username <seconds>` to temporarily ban someone abusing the bot.\n"
+          "Use `{{prefix}}ban @username seconds` to temporarily ban someone abusing the bot.\n"
         ],
         "zh-tw": [
           "使用 `{{prefix}}help` 以取得指令說明。\n",
@@ -36,7 +36,7 @@
           "使用 `{{prefix}}ping` 以取得機器人的通訊延遲。\n",
           "使用 `{{prefix}}invite` 以取得機器人的邀請連結。\n",
           "管理員指令:\n",
-          "使用 `{{prefix}}ban @username <秒>` 以將使用者暫時封鎖。\n"
+          "使用 `{{prefix}}ban @username 秒數` 以將使用者暫時封鎖。\n"
         ],
         "zh-cn": [
           "使用 `{{prefix}}help` 以取得指令说明。\n",
@@ -54,7 +54,7 @@
           "使用 `{{prefix}}ping` 以取得机器人的通讯延迟。\n",
           "使用 `{{prefix}}invite` 以取得机器人的邀请连结。\n",
           "管理员指令:\n",
-          "使用 `{{prefix}}ban @username <秒>` 以将使用者暂时封锁。\n"
+          "使用 `{{prefix}}ban @username 秒数` 以将使用者暂时封锁。\n"
         ]
       }
     },
@@ -622,29 +622,29 @@
       "ban_no_arg": {
         "en": [
           "Who should I ban? :(\n",
-          "`{{prefix}}ban @user <seconds>`"
+          "`{{prefix}}ban @user seconds`"
         ],
         "zh-tw": [
           "我要封鎖誰? :(\n",
-          "`{{prefix}}ban @使用者名稱 <秒>`"
+          "`{{prefix}}ban @使用者名稱 秒數`"
         ],
         "zh-cn": [
           "我要封禁谁? :(\n",
-          "`{{prefix}}ban @用户名 <秒>`"
+          "`{{prefix}}ban @用户名 秒数`"
         ]
       },
       "ban_bad_arg": {
         "en": [
           "Not recognized arguments.\n",
-          "Usage: `{{prefix}}ban @user <seconds>`"
+          "Usage: `{{prefix}}ban @user seconds`"
         ],
         "zh-tw": [
           "不明參數\n",
-          "請使用 `{{prefix}}ban @使用者名稱 <秒>`"
+          "請使用 `{{prefix}}ban @使用者名稱 秒數`"
         ],
         "zh-cn": [
           "不明参数\n",
-          "请使用 `{{prefix}}ban @用户名 <秒>`"
+          "请使用 `{{prefix}}ban @用户名 秒数`"
         ]
       },
       "ban_not_allowed": {
