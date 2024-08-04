@@ -14,7 +14,9 @@ RUN add-apt-repository 'deb [trusted=yes arch=amd64] http://archive.ubuntu.com/u
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y python3-full python3-pip build-essential libssl-dev wget libssl1.1 ffmpeg opus-tools libpq-dev htop nano
 RUN apt autoremove -y
-RUN python3 -m pip install -r requirements.txt
+RUN python3 -m venv ./venv
+RUN . ./venv/bin/activate && python3 -m pip install --upgrade pip setuptools wheel && python3 -m pip install -r requirements.txt
+# RUN python3 -m pip install -r requirements.txt
 # RUN pip install python-dotenv
 
 # Setup Environments

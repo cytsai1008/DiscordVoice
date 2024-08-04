@@ -2,7 +2,7 @@
 
 # Start the first process
 # gunicorn src.website:app &
-
+source venv/bin/activate
 # Start the second process
 python3 src/dv_main.py &
 
