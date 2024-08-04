@@ -6,7 +6,7 @@ source venv/bin/activate
 # Start the second process
 python3 src/dv_main.py &
 
-python3 src/wfnm_main.py &
+# python3 src/wfnm_main.py &
 
 # Wait for any process to exit
 wait -n
