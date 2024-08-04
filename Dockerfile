@@ -3,9 +3,9 @@ COPY . /app
 WORKDIR /app
 
 # RUN --mount=type=secret,id=_env,dst=/etc/secrets/.env cat /etc/secrets/.env
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
 # Install dependencies
-RUN apt-get update && apt install software-properties-common -y
+RUN apt-get update && apt install software-properties-common gnupg -y
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
 RUN add-apt-repository 'deb [trusted=yes arch=amd64] http://security.ubuntu.com/ubuntu bionic-security main' -y
 RUN add-apt-repository 'deb [trusted=yes arch=amd64] http://archive.ubuntu.com/ubuntu jammy main universe' -y
 RUN add-apt-repository 'deb [trusted=yes arch=amd64] http://archive.ubuntu.com/ubuntu jammy main main' -y
