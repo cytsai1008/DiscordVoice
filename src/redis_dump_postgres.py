@@ -8,7 +8,7 @@ from natsort import natsorted
 with contextlib.suppress(ImportError):
     import dotenv
 
-import psycopg2
+import psycopg
 import redis
 
 with contextlib.suppress(NameError):
@@ -30,7 +30,7 @@ wfnm_redis = redis.Redis(
     decode_responses=True,
 )
 
-heroku_postgres = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
+heroku_postgres = psycopg.connect(os.environ["DATABASE_URL"], sslmode="require")
 cur = heroku_postgres.cursor()
 
 today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
@@ -52,11 +52,10 @@ print("Dumping DV data")
 keys = dv_redis.keys("*")
 for key in keys:
     key_type = dv_redis.type(key)
-    if key_type == "ReJSON-RL":
-        data: dict = dv_redis.json().get(key)
+    data: str = dv_redis.get(key)
 
-        # append data to dump_data
-        dv_dump_data[key] = data
+    # append data to dump_data
+    dv_dump_data[key] = data
 try:
     dv_dump_data = dict(natsorted(dv_dump_data.items()))
 except Exception:
@@ -127,7 +126,6 @@ cur.execute(
 )
 heroku_postgres.commit()
 
-
 # if `dv_log` table row larger than 3000, truncate it
 cur.execute(
     """
@@ -147,7 +145,6 @@ if count > 3000:
         """
     )
     heroku_postgres.commit()
-
 
 # delete dv_dump_data longer than 1 month
 

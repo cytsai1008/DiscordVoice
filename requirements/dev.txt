@@ -1,4 +1,4 @@
-py-cord[voice]
+discord.py[speed,voice]
 python-dotenv
 google-cloud-texttospeech
 azure-cognitiveservices-speech
@@ -10,6 +10,11 @@ gunicorn
 metadata_parser
 beautifulsoup4
 lxml
-psycopg2-binary
+# psycopg2-binary
+psycopg[binary,pool]
 black
 natsort
+pycryptodome
+# openai
+openai-async
+emoji

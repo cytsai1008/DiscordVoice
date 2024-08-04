@@ -1,31 +1,33 @@
 import asyncio
+import base64
 import contextlib
 import datetime
 import json
 import os
 import traceback
 
-# import psycopg2
+import psycopg
 import redis
+from Crypto.Cipher import PKCS1_v1_5 as PKCS1_cipher
+from Crypto.PublicKey import RSA
 from natsort import natsorted
 
+system_filename = ["ban", "joined_vc", "user_config"]
 
-def postgres_logging(logging_data: str):
+
+async def postgres_logging(logging_data: str):
     """Logging to postgres"""
-
-    """
-    heroku_postgres = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
+    '''
+     = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
     cur = heroku_postgres.cursor()
-    """
-
     today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%Y-%m-%d %H:%M:%S"
     )
+    logging_data = str(logging_data)
     print(f"{today_datetime}: {logging_data}")
     if os.getenv("TEST_ENV"):
         return
 
-    '''
     cur.execute(
         """
         INSERT INTO dv_log (datetime, log)
@@ -36,6 +38,22 @@ def postgres_logging(logging_data: str):
     heroku_postgres.commit()
     heroku_postgres.close()
     '''
+    today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    logging_data = str(logging_data)
+    print(f"{today_datetime}: {logging_data}")
+    if os.getenv("TEST_ENV"):
+        return
+    async with await psycopg.AsyncConnection.connect(os.environ["DATABASE_URL"], sslmode="require") as heroku_postgres:
+        async with heroku_postgres.cursor() as cur:
+            await cur.execute(
+                """
+                INSERT INTO dv_log (datetime, log)
+                VALUES (%s, %s);
+                """,
+                (today_datetime, logging_data),
+            )
+        await heroku_postgres.commit()
+        await heroku_postgres.close()
 
 
 def redis_client() -> redis.Redis:
@@ -52,23 +70,51 @@ def redis_client() -> redis.Redis:
 def read_db_json(filename, path: str = ".") -> dict:
     """Reads json value from redis (key: filename, value: data)"""
     client = redis_client()
-    return client.json().get(filename, path)
+    if cipher := client.get(filename):
+        if filename not in system_filename:
+            client.expire(filename, 2592000)
+        return _db_data_decrypt(cipher)
+
+
+def _db_data_encrypt(data: dict) -> str:
+    """Encrypt data with rsa2048 and returns encrypted string"""
+    max_length = 200
+    data = json.dumps(data)
+    pub_key = RSA.importKey(str(os.environ["DV_RSA_PUBLIC"]))
+    cipher = PKCS1_cipher.new(pub_key)
+    byte_data = bytes(data.encode("utf8"))
+    sep_data = [cipher.encrypt(byte_data[i : i + max_length]) for i in range(0, len(byte_data), max_length)]
+    rsa_text = base64.b64encode(b"".join(sep_data))
+    return rsa_text.decode("utf-8")
+
+
+def _db_data_decrypt(data: str) -> dict:
+    """Decrypt data with rsa2048 and returns decrypted string"""
+    max_length = 256
+    data = bytes(data.encode("utf8"))
+    data = base64.b64decode(data)
+    pri_key = RSA.importKey(str(os.environ["DV_RSA_PRIVATE"]))
+    cipher = PKCS1_cipher.new(pri_key)
+    sep_data = [cipher.decrypt(data[i : i + max_length], 0) for i in range(0, len(data), max_length)]
+    back_text = b"".join(sep_data)
+    return json.loads(back_text.decode("utf-8"))
 
 
 def read_local_json(filename) -> dict | list:
     """Returns dictionary from a json file"""
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding="UTF-8") as f:
         data = json.load(f)
     return data
 
 
-def write_db_json(
-    filename: str, data: dict, path: str = ".", ttl: int | None = None
-) -> None:
+def write_db_json(filename: str, data: dict, path: str = ".", ttl: int | None = None) -> None:
     """Writes dictionary to redis json (key: filename, value: data)"""
+    if filename not in system_filename:
+        ttl = 2592000
     with contextlib.suppress(Exception):
         data = dict(natsorted(data.items()))
-    redis_client().json().set(filename, path, data)
+    data = _db_data_encrypt(data)
+    redis_client().set(filename, data)
     if ttl:
         redis_client().expire(filename, ttl)
 
@@ -100,24 +146,14 @@ def check_local_file(filename) -> bool:
     return os.path.isfile(filename)
 
 
-def user_id_rename(self) -> str:
+def user_id_rename(ctx) -> str:
     """Return the id of the user or guild (user id start with `user_`)"""
-    try:
-        server_id = str(self.guild.id)
-    except Exception:
-        server_id = f"user_{str(self.author.id)}"
-    return server_id
+    return str(ctx.guild.id) if ctx.guild else f"user_{str(ctx.author.id)}"
 
 
-def check_guild_or_dm(self) -> bool:
-    """Return if this is a guild or a DM"""
-    try:
-        _ = str(self.guild.id)
-    except Exception:
-        _ = f"user_{str(self.author.id)}"
-        return False
-    else:
-        return True
+def check_guild_or_dm(ctx) -> bool:
+    """Return if this is a guild or a DM (True if guild)"""
+    return bool(ctx.guild)
 
 
 def del_db_json(filename) -> None:
@@ -143,7 +179,7 @@ def convert_msg(
     convert_text: list | None = None,
 ) -> str:
     """
-    Convert message from locale
+    Convert message from LOCALE
     """
     lang = _get_translate_lang(lang, locale_dict)
     a = "".join(locale_dict[msg_type][command][name][lang])
@@ -154,14 +190,14 @@ def convert_msg(
     return a
 
 
-def check_db_lang(self) -> str:
+def check_db_lang(ctx) -> str:
     """Return the language of the user or guild (default: en)"""
     return (
-        read_db_json(user_id_rename(self))["lang"]
+        read_db_json(user_id_rename(ctx))["lang"]
         if (
-            check_guild_or_dm(self)
-            and check_db_file(user_id_rename(self))
-            and check_dict_data(read_db_json(user_id_rename(self)), "lang")
+            check_guild_or_dm(ctx)
+            and check_db_file(user_id_rename(ctx))
+            and check_dict_data(read_db_json(user_id_rename(ctx)), "lang")
         )
         else "en"
     )
@@ -170,11 +206,8 @@ def check_db_lang(self) -> str:
 async def auto_reconnect_vc(bot) -> str:
     """Reconnect to voice channel on reboot"""
     joined_vc = read_db_json("joined_vc")
-    postgres_logging(f"joined_vc: \n" f"{joined_vc}")
-    tasks = [
-        _connect_vc(bot, server_id, channel_id)
-        for server_id, channel_id in joined_vc.items()
-    ]
+    await postgres_logging(f"joined_vc: \n" f"{joined_vc}")
+    tasks = [_connect_vc(bot, server_id, channel_id) for server_id, channel_id in joined_vc.items()]
 
     results = await asyncio.gather(*tasks)
     remove_vc = [result[1] for result in results if result[0] is False]
@@ -187,11 +220,7 @@ async def auto_reconnect_vc(bot) -> str:
     channel_list = f"```\n" f"{channel_list}\n" f"```"
     if remove_vc:
         new_line = "\n"
-        channel_list += (
-            f"Fail to connect to the following channels:\n```\n"
-            f"{new_line.join(remove_vc)}\n"
-            f"```"
-        )
+        channel_list += f"Fail to connect to the following channels:\n```\n" f"{new_line.join(remove_vc)}\n" f"```"
     return channel_list
 
 
@@ -201,9 +230,9 @@ async def _connect_vc(bot, server_id: int, channel_id: int) -> (bool, int | None
         # noinspection PyUnresolvedReferences
         await bot.get_channel(channel_id).connect()
     except Exception:
-        postgres_logging(f"Failed to connect to {channel_id}.\n")
-        postgres_logging(f"Reason: \n{traceback.format_exc()}")
+        await postgres_logging(f"Failed to connect to {channel_id}.\n")
+        await postgres_logging(f"Reason: \n{traceback.format_exc()}")
         return False, server_id
     else:
-        postgres_logging(f"Successfully connected to {channel_id}.\n")
+        await postgres_logging(f"Successfully connected to {channel_id}.\n")
         return True, None

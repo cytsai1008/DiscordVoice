@@ -3,7 +3,7 @@
 [![State-of-the-art Shitcode](https://img.shields.io/static/v1?label=State-of-the-art&message=Shitcode&color=7B5804)](https://github.com/trekhleb/state-of-the-art-shitcode)
 
 > **Warning**  
-> The [old](/cytsai1008/DiscordVoice/tree/old) and [replit](/cytsai1008/DiscordVoice/tree/replit) and [heroku](/cytsai1008/DiscordVoice/tree/heroku) branch has deprecated, do not use.
+> The [old](/cytsai1008/DiscordVoice/tree/old) and [replit](/cytsai1008/DiscordVoice/tree/replit) branch has deprecated, and [docker](/cytsai1008/DiscordVoice/tree/docker) is work in progress, DO NOT USE.
 
 ## What-For-Next-Meal
 
@@ -90,11 +90,3 @@ $invite : Get a link to invite this bot into your server.
  - [ ] Slash command
  - [ ] Embed message
  - [ ] No command prefix mode
-
-## Known Issues
-#### BYM
-* Azure TTS not working
-
-<!--
-https://github.com/Azure-Samples/cognitive-services-speech-sdk/issues/437#issuecomment-622592123
--->

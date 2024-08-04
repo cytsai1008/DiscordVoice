@@ -1,8 +1,8 @@
 import contextlib
-import logging
 import os
 import random
 import signal
+
 # import subprocess
 from datetime import datetime
 from datetime import timezone
@@ -18,17 +18,6 @@ from src.modules import load_command, wfnm_tool_function as tool_function
 
 # import time
 
-logger = logging.getLogger("discord")
-logger.setLevel(logging.DEBUG)
-if not os.path.exists("wfnm_log"):
-    os.mkdir("wfnm_log")
-handler = logging.FileHandler(
-    filename="wfnm_log/discord_wfnm.log", encoding="utf-8", mode="w"
-)
-handler.setFormatter(
-    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
-)
-logger.addHandler(handler)
 
 with contextlib.suppress(NameError):
     dotenv.load_dotenv()
@@ -83,10 +72,10 @@ async def on_guild_join(guild):
         await general.send(
             "Thanks for adding me into your server!\n"
             f"Please use `{token['prefix']}help` for more information.\n"
-            f"`{token['prefix']}time <hours from London>` to setup the timezone.\n"
+            f"`{token['prefix']}time <hours from UTC>` to setup the timezone.\n"
             "感謝您邀請我進入伺服器\n"
             f"請使用 `{token['prefix']}help` 取得更多資訊\n"
-            f"並透過 `{token['prefix']}time <與倫敦相差小時數>` 設定時區"
+            f"並透過 `{token['prefix']}time <與國際標準時間相差小時數>` 設定時區"
         )
 
 
@@ -112,8 +101,7 @@ async def ping(ctx):
 @bot.command(Name="sl")
 async def sl(ctx):
     await ctx.send(
-        "Social Credit 👎\n"
-        "https://www.idlememe.com/wp-content/uploads/2021/10/social-credit-meme-idlememe.jpg"
+        "Social Credit 👎\n" "https://www.idlememe.com/wp-content/uploads/2021/10/social-credit-meme-idlememe.jpg"
     )
 
 
@@ -157,14 +145,10 @@ async def add(ctx, *args):
             if not meal_list:
                 await ctx.send(f"0 food added to {args[0]}")
             elif len(meal_list) >= 2:
-                await ctx.send(
-                    f"{len(meal_list)} foods add into {args[0]} ({duplicate_len} duplicate)"
-                )
+                await ctx.send(f"{len(meal_list)} foods add into {args[0]} ({duplicate_len} duplicate)")
 
             elif len(meal_list) == 1:
-                await ctx.send(
-                    f"{len(meal_list)} food add into {args[0]} ({duplicate_len} duplicate)"
-                )
+                await ctx.send(f"{len(meal_list)} food add into {args[0]} ({duplicate_len} duplicate)")
 
             tool_function.write_json(f"{server_id}", data)
             # Save data to json
@@ -174,14 +158,10 @@ async def add(ctx, *args):
             tool_function.write_json(f"{server_id}", add_meal)
             duplicate_len = 0
             if len(meal_list) >= 2:
-                await ctx.send(
-                    f"{len(meal_list)} foods add into {args[0]} ({duplicate_len} duplicate)"
-                )
+                await ctx.send(f"{len(meal_list)} foods add into {args[0]} ({duplicate_len} duplicate)")
 
             else:
-                await ctx.send(
-                    f"{len(meal_list)} food add into {args[0]} ({duplicate_len} duplicate)"
-                )
+                await ctx.send(f"{len(meal_list)} food add into {args[0]} ({duplicate_len} duplicate)")
 
                 # Add new json to db
                 # print("Warning 01")
@@ -229,18 +209,12 @@ async def remove(ctx, *args):
 
             wrong_data = before_del - after_del
             if not del_key:
-                await ctx.send(
-                    f"0 food deleted from {args[0]} ({wrong_data} not found)"
-                )
+                await ctx.send(f"0 food deleted from {args[0]} ({wrong_data} not found)")
             elif len(del_key) >= 2:
-                await ctx.send(
-                    f"{len(del_key)} foods deleted from {args[0]} ({wrong_data} not found)"
-                )
+                await ctx.send(f"{len(del_key)} foods deleted from {args[0]} ({wrong_data} not found)")
 
             elif len(del_key) == 1:
-                await ctx.send(
-                    f"{len(del_key)} food deleted from {args[0]} ({wrong_data} not found)"
-                )
+                await ctx.send(f"{len(del_key)} food deleted from {args[0]} ({wrong_data} not found)")
 
             tool_function.write_json(f"{server_id}", data)
             # Save data to json
@@ -432,7 +406,6 @@ async def choose(ctx, *args):  # sourcery no-metrics
         current_utc = datetime.now(timezone.utc)
         current_utc = current_utc.hour
         if tool_function.check_file(f"{server_id}"):
-
             try:
                 data = tool_function.read_json(f"{server_id}")
                 print(data["timezone"])
@@ -469,9 +442,7 @@ async def choose(ctx, *args):  # sourcery no-metrics
                             random.seed(str(datetime.now()))
                             # print(datetime.now())
                             random_food = random.choice(data["afternoon_tea"])
-                            await ctx.send(
-                                f"Random food in afternoon tea: {random_food}"
-                            )
+                            await ctx.send(f"Random food in afternoon tea: {random_food}")
                     elif current_time in range(17, 23):
                         if len(data["dinner"]) == 0:
                             await ctx.send("No food in dinner")
@@ -483,9 +454,7 @@ async def choose(ctx, *args):  # sourcery no-metrics
                     elif current_time in range(23, 24) or current_time in range(5):
                         await ctx.send("Go to sleep.")
                     else:
-                        await ctx.send(
-                            "I don't know how did you trigger this, please contact `@(⊙ｏ⊙)#6773`."
-                        )
+                        await ctx.send("I don't know how did you trigger this, please contact `@(⊙ｏ⊙)#6773`.")
                 except KeyError:
                     if current_time in range(5, 10):
                         await ctx.send("No food in breakfast")
@@ -498,9 +467,7 @@ async def choose(ctx, *args):  # sourcery no-metrics
                     elif current_time in range(23, 24) or current_time in range(5):
                         await ctx.send("Go to sleep.")
                     else:
-                        await ctx.send(
-                            "I don't know how did you trigger this, please contact `@(⊙ｏ⊙)#6773`."
-                        )
+                        await ctx.send("I don't know how did you trigger this, please contact `@(⊙ｏ⊙)#6773`.")
 
         # print("Error 03")
 

@@ -44,12 +44,8 @@ def check_args_zero(args, arg_list) -> bool:
     return args in arg_list
 
 
-def id_check(self) -> str:
-    try:
-        server_id = str(self.guild.id)
-    except Exception:
-        server_id = f"user_{str(self.author.id)}"
-    return server_id
+def id_check(ctx) -> str:
+    return str(ctx.guild.id) if ctx.guild else f"user_{str(ctx.author.id)}"
 
 
 def check_args_one(args) -> bool:

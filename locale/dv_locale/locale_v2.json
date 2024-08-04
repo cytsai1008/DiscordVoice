@@ -7,6 +7,7 @@
           "{{channel_msg}}\n",
           "{{nochannel_msg}}\n",
           "{{lang_msg}}\n",
+          "{{noname_msg}}\n",
           "{{platform_msg}}\n",
           "Use `{{prefix}}say` to speak in voice channel. (ex. `{{prefix}}say ABCD`)\n",
           "Use `{{prefix}}say_lang` to speak in voice channel with another language. (ex. `{{prefix}}say_lang en-us ABCD`)\n",
@@ -17,13 +18,14 @@
           "Use `{{prefix}}ping` to check my latency.\n",
           "Use `{{prefix}}invite` to get the bot's invite link.\n",
           "Admin only:\n",
-          "Use `{{prefix}}ban @username <seconds>` to temporarily ban someone abusing the bot.\n"
+          "Use `{{prefix}}ban @username seconds` to temporarily ban someone abusing the bot.\n"
         ],
         "zh-tw": [
           "使用 `{{prefix}}help` 以取得指令說明。\n",
           "{{channel_msg}}\n",
           "{{nochannel_msg}}\n",
           "{{lang_msg}}\n",
+          "{{noname_msg}}\n",
           "{{platform_msg}}\n",
           "使用 `{{prefix}}say` 以在語音頻道說話。 (ex. `{{prefix}}say ABCD`)\n",
           "使用 `{{prefix}}say_lang` 以透過指定語言在語音頻道說話。 (ex. `{{prefix}}say_lang en-us ABCD`)\n",
@@ -34,13 +36,14 @@
           "使用 `{{prefix}}ping` 以取得機器人的通訊延遲。\n",
           "使用 `{{prefix}}invite` 以取得機器人的邀請連結。\n",
           "管理員指令:\n",
-          "使用 `{{prefix}}ban @username <秒>` 以將使用者暫時封鎖。\n"
+          "使用 `{{prefix}}ban @username 秒數` 以將使用者暫時封鎖。\n"
         ],
         "zh-cn": [
           "使用 `{{prefix}}help` 以取得指令说明。\n",
           "{{channel_msg}}\n",
           "{{nochannel_msg}}\n",
           "{{lang_msg}}\n",
+          "{{noname_msg}}\n",
           "{{platform_msg}}\n",
           "使用 `{{prefix}}say` 以在语音频道说话。 (ex. `{{prefix}}say ABCD`)\n",
           "使用 `{{prefix}}say_lang` 以透过指定语言在语音频道说话。 (ex. `{{prefix}}say_lang en-us ABCD`)\n",
@@ -51,7 +54,7 @@
           "使用 `{{prefix}}ping` 以取得机器人的通讯延迟。\n",
           "使用 `{{prefix}}invite` 以取得机器人的邀请连结。\n",
           "管理员指令:\n",
-          "使用 `{{prefix}}ban @username <秒>` 以将使用者暂时封锁。\n"
+          "使用 `{{prefix}}ban @username 秒数` 以将使用者暂时封锁。\n"
         ]
       }
     },
@@ -361,19 +364,22 @@
           "This channel is not made for me to speaking.\n",
           "{{channel_msg}}",
           "To change channel, use {{prefix}}setchannel <#{{current_channel}}>.\n",
-          "To disable this message, use `{{prefix}}wrong_msg off`."
+          "To disable this message, use `{{prefix}}wrong_msg off`.\n",
+          "To let bot not specified channel, use `{{prefix}}set_nochannel on`."
         ],
         "zh-tw": [
           "此頻道並非用於讓我說話。\n",
           "{{channel_msg}}",
           "要更改設定至此頻道，輸入 {{prefix}}setchannel <#{{current_channel}}>。\n",
-          "要禁用此通知，輸入 `{{prefix}}wrong_msg off`。"
+          "要禁用此通知，輸入 `{{prefix}}wrong_msg off`。\n",
+          "要讓機器人不指定頻道，輸入 `{{prefix}}set_nochannel on`。"
         ],
         "zh-cn": [
           "此频道并非用于让我说话。\n",
           "{{channel_msg}}",
           "要更改设定至此频道，输入 {{prefix}}setchannel <#{{current_channel}}>。\n",
-          "要禁用此通知，输入 `{{prefix}}wrong_msg off`。"
+          "要禁用此通知，输入 `{{prefix}}wrong_msg off`。\n",
+          "要让机器人不指定频道，输入 `{{prefix}}set_nochannel on`。"
         ]
       },
       "say_no_setting": {
@@ -426,15 +432,39 @@
       "say_lang_no_arg": {
         "en": [
           "What can I say? :(\n",
-          "`{{prefix}}say_lang some-lang-code say-something`"
+          "`{{prefix}}say_lang some-lang-code say-something`\n",
+          "Google supported languages: \n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```\n",
+          "Azure supported languages: \n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
         ],
         "zh-tw": [
           "我能說甚麼? :(\n",
-          "`{{prefix}}say_lang 某個-語言-代碼 說點甚麼`"
+          "`{{prefix}}say_lang 某個-語言-代碼 說點甚麼`\n",
+          "Google支援的語言有：\n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```\n",
+          "Azure支援的語言有：\n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
         ],
         "zh-cn": [
           "我能说什么? :(\n",
-          "`{{prefix}}say_lang 某个-语言-代码 说点什么`"
+          "`{{prefix}}say_lang 某个-语言-代码 说点什么`\n",
+          "Google支持的语言有：\n",
+          "```\n",
+          "{{google_lang_list}}\n",
+          "```\n",
+          "Azure支持的语言有：\n",
+          "```\n",
+          "{{azure_lang_list}}\n",
+          "```"
         ]
       }
     },
@@ -516,6 +546,56 @@
         ]
       }
     },
+    "no_name": {
+      "no_name_on": {
+        "en": [
+          "From now on I won't say sender's name."
+        ],
+        "zh-tw": [
+          "已開啟不說出發送者名稱。"
+        ],
+        "zh-cn": [
+          "已开启不说出发送者名称。"
+        ]
+      },
+      "no_name_off": {
+        "en": [
+          "From now on I will say sender's name."
+        ],
+        "zh-tw": [
+          "已關閉不說出發送者名稱。"
+        ],
+        "zh-cn": [
+          "已关闭不说出发送者名称。"
+        ]
+      },
+      "no_name_bad_arg": {
+        "en": [
+          "Not recognized command.\n",
+          "Usage: `{{prefix}}set_noname on` or `{{prefix}}set_noname off`"
+        ],
+        "zh-tw": [
+          "不明指令\n",
+          "請使用 `{{prefix}}set_noname on` 或 `{{prefix}}set_noname off` 來開啟或關閉此功能。"
+        ],
+        "zh-cn": [
+          "不明指令\n",
+          "请使用 `{{prefix}}set_noname on` 或 `{{prefix}}set_noname off` 来开启或关闭此功能。"
+        ]
+      },
+      "no_name_no_setting": {
+        "en": [
+          "Please setup other settings first.\n"
+        ],
+        "zh-tw": [
+          "請先設定其他選項。\n"
+        ],
+        "zh-cn": [
+          "请先设定其他选项。\n"
+        ]
+      }
+    },
+
     "ban": {
       "ban_success": {
         "en": [
@@ -542,29 +622,29 @@
       "ban_no_arg": {
         "en": [
           "Who should I ban? :(\n",
-          "`{{prefix}}ban @user <seconds>`"
+          "`{{prefix}}ban @user seconds`"
         ],
         "zh-tw": [
           "我要封鎖誰? :(\n",
-          "`{{prefix}}ban @使用者名稱 <秒>`"
+          "`{{prefix}}ban @使用者名稱 秒數`"
         ],
         "zh-cn": [
           "我要封禁谁? :(\n",
-          "`{{prefix}}ban @用户名 <秒>`"
+          "`{{prefix}}ban @用户名 秒数`"
         ]
       },
       "ban_bad_arg": {
         "en": [
           "Not recognized arguments.\n",
-          "Usage: `{{prefix}}ban @user <seconds>`"
+          "Usage: `{{prefix}}ban @user seconds`"
         ],
         "zh-tw": [
           "不明參數\n",
-          "請使用 `{{prefix}}ban @使用者名稱 <秒>`"
+          "請使用 `{{prefix}}ban @使用者名稱 秒數`"
         ],
         "zh-cn": [
           "不明参数\n",
-          "请使用 `{{prefix}}ban @用户名 <秒>`"
+          "请使用 `{{prefix}}ban @用户名 秒数`"
         ]
       },
       "ban_not_allowed": {
@@ -816,6 +896,17 @@
         "zh-cn": [
           "您缺少执行此指令的必要权限。\n"
         ]
+      },
+      "bot_cannot_read_history": {
+        "en": [
+          "Due to the bot's inability to access chat history in this channel, it is currently unable to function within this channel. We apologize for any inconvenience this may cause.\n"
+        ],
+        "zh-tw": [
+          "由於機器人無法獲取此頻道內的聊天歷史記錄權限，目前無法在此頻道內運作，造成不便，我們深感抱歉。\n"
+        ],
+        "zh-cn": [
+          "由于机器人无法获取此频道内的聊天历史记录权限，目前无法在此频道内运作，造成不便，我们深感抱歉。\n"
+        ]
       }
     }
   },
@@ -924,6 +1015,28 @@
         ],
         "zh-cn": [
           "使用 `{{prefix}}set_nochannel` 停用单文字频道模式。 (目前: `{{data_nochannel}}`)"
+        ]
+      },
+      "noname_msg_default": {
+        "en": [
+          "Use `{{prefix}}set_noname` to disable sender's name. (ex. `{{prefix}}set_noname <on | off>`)"
+        ],
+        "zh-tw": [
+          "使用 `{{prefix}}set_noname` 停用發送者名稱。 (ex. `{{prefix}}set_noname <on | off>`)"
+        ],
+        "zh-cn": [
+          "使用 `{{prefix}}set_noname` 停用发送者名称。 (ex. `{{prefix}}set_noname <on | off>`)"
+        ]
+      },
+      "noname_msg_current": {
+        "en": [
+          "Use `{{prefix}}set_noname` to disable sender's name. (Current: `{{data_noname}}`)"
+        ],
+        "zh-tw": [
+          "使用 `{{prefix}}set_noname` 停用發送者名稱。 (目前: `{{data_noname}}`)"
+        ],
+        "zh-cn": [
+          "使用 `{{prefix}}set_noname` 停用发送者名称。 (目前: `{{data_noname}}`)"
         ]
       }
     },
