@@ -1912,11 +1912,13 @@ async def set_nochannel(ctx, setup: str):
     else:
         await ctx.message.add_reaction("❌")
         await ctx.reply(
-            LOCALE,
-            tool_function.check_db_lang(ctx),
-            "command",
-            "set_nochannel",
-            "set_nochannel_no_settings",
+            tool_function.convert_msg(
+                LOCALE,
+                tool_function.check_db_lang(ctx),
+                "command",
+                "set_nochannel",
+                "set_nochannel_no_settings",
+            )
         )
 
     return
