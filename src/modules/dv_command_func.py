@@ -7,8 +7,10 @@ import time
 
 import bs4
 import emoji
+
 # import gemini
 import google.generativeai
+
 # import cloudscraper
 import httpx
 import metadata_parser
@@ -195,22 +197,7 @@ def name_convert(ctx, lang: str, locale: dict, content: str, gpt: None | bool = 
                 "user",
                 "Gemini",
                 "data_content",
-                emoji.demojize(
-                    content,
-                    delimiters=(
-                        str(
-                            tool_function.convert_msg(
-                                locale,
-                                lang,
-                                "variable",
-                                "say",
-                                "emoji",
-                                ["data_emoji", ""],
-                            )
-                        )[:-1],
-                        "",
-                    ),
-                ),
+                emoji.replace_emoji(content, replace=""),
             ],
         )
     user_id = ctx.author.id
@@ -358,11 +345,21 @@ async def gpt_process(lang: str, content: str) -> str:
     """
 
 
-async def gpt_process(lang: str, content: str) -> str:
+async def gpt_process(lang: str, content: str, LOCALE: dict) -> str:
     google.generativeai.configure(api_key=os.environ["GEMINI_API_KEY"])
     model = google.generativeai.GenerativeModel(
         model_name="models/gemini-1.5-flash-latest",
         system_instruction=f"""When no specific language is mentioned, respond in {lang} in a friendly and conversational tone. If the user requests a different language, reply in the requested language. Keep your responses as simple as possible, avoiding symbols, emojis, markdown, or any formatting, only plain text. If necessary, replace symbols or markdown with clear text descriptions. These are very important instructions, please follow them carefully.""",
     )
-    response = model.generate_content(content).text
+    try:
+        response = model.generate_content(content).text
+    except AttributeError:
+        response = tool_function.convert_msg(
+            LOCALE,
+            lang,
+            "command",
+            "gpt_say",
+            "trigger_safety",
+            [],
+        )
     return response
