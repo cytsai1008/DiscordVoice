@@ -24,14 +24,11 @@ if "src" in os.getcwd():
     os.chdir("../")
 
 # create temporary directory
-if not os.path.exists("tts_temp"):
-    os.mkdir("tts_temp")
+tmp_dirs = ["tts_temp", "msg_temp", "queue_temp"]
 
-if not os.path.exists("msg_temp"):
-    os.mkdir("msg_temp")
-
-if not os.path.exists("queue_temp"):
-    os.mkdir("queue_temp")
+for dirs in tmp_dirs:
+    if not os.path.exists(dirs):
+        os.mkdir(dirs)
 
 # loading env from testenv
 with contextlib.suppress(NameError):
@@ -1714,7 +1711,7 @@ async def force_say(ctx, *, content: str):  # sourcery no-metrics skip: for-inde
 
 
 @bot.command(Name="gpt_say", aliases=command_alias["gpt_say"])
-@commands.is_owner()
+# @commands.is_owner()
 @commands.cooldown(1, 10, commands.BucketType.user)
 async def gpt_say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # sourcery skip: low-code-quality
@@ -2215,4 +2212,4 @@ Note:
 
 """
 
-# TODO: `say_del` command
+# TODO: `say_del` command (delete msg after say)
