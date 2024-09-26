@@ -1459,7 +1459,7 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
             content = await command_func.content_convert(ctx, lang, LOCALE, content)
 
             if gpt:
-                content = await command_func.gpt_process(db["lang"], content)
+                content = await command_func.gpt_process(db["lang"], content, LOCALE)
 
             text_split = re.split(r"\s|\n", content)
 
