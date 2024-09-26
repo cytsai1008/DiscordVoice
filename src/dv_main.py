@@ -50,7 +50,7 @@ command_alias = {
     "move": ["m"],
     "say_lang": ["sl", "saylang", "say-lang"],
     "force_say": ["fs", "forcesay", "force-say"],
-    "gpt_say": ["gs", "gptsay", "gpt-say"],
+    "gpt_say": ["gs", "gptsay", "gpt-say", "gpt", "gemini-say", "gemini_say", "gemini", "geminisay"],
 }
 
 # setup global variables
