@@ -50,7 +50,7 @@ command_alias = {
     "move": ["m"],
     "say_lang": ["sl", "saylang", "say-lang"],
     "force_say": ["fs", "forcesay", "force-say"],
-    "gpt_say": ["gs", "gptsay", "gpt-say"],
+    "gpt_say": ["gs", "gptsay", "gpt-say", "gpt", "gemini-say", "gemini_say", "gemini", "geminisay"],
 }
 
 # setup global variables
@@ -1548,16 +1548,30 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
                         )
 
             else:
-                await ctx.reply(
-                    tool_function.convert_msg(
+                if not gpt:
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "say",
+                            "say_too_long",
+                            None,
+                        )
+                    )
+                else:
+                    await ctx.reply(
+                        f"""
+                        {tool_function.convert_msg(
                         LOCALE,
-                        lang,
+                        db["lang"],
                         "command",
                         "say",
                         "say_too_long",
                         None,
+                    )}\n```\n{content}```
+                    """
                     )
-                )
 
         elif (
             channelissetup
@@ -1711,7 +1725,7 @@ async def force_say(ctx, *, content: str):  # sourcery no-metrics skip: for-inde
 
 
 @bot.command(Name="gpt_say", aliases=command_alias["gpt_say"])
-@commands.is_owner()
+# @commands.is_owner()
 @commands.cooldown(1, 10, commands.BucketType.user)
 async def gpt_say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # sourcery skip: low-code-quality

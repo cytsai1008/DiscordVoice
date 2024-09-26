@@ -7,13 +7,11 @@ import time
 
 import bs4
 import emoji
-
+# import gemini
+import google.generativeai
 # import cloudscraper
 import httpx
 import metadata_parser
-
-# import openai
-import openai_async
 from discord.ext import commands
 
 import src.modules.dv_tool_function as tool_function
@@ -186,6 +184,7 @@ async def check_voice_platform(
 
 def name_convert(ctx, lang: str, locale: dict, content: str, gpt: None | bool = False) -> str:
     if gpt:
+        emoji.config.demojize_keep_zwj = False
         return tool_function.convert_msg(
             locale,
             lang,
@@ -194,9 +193,24 @@ def name_convert(ctx, lang: str, locale: dict, content: str, gpt: None | bool = 
             "inside_said",
             [
                 "user",
-                "ChatGPT",
+                "Gemini",
                 "data_content",
-                content,
+                emoji.demojize(
+                    content,
+                    delimiters=(
+                        str(
+                            tool_function.convert_msg(
+                                locale,
+                                lang,
+                                "variable",
+                                "say",
+                                "emoji",
+                                ["data_emoji", ""],
+                            )
+                        )[:-1],
+                        "",
+                    ),
+                ),
             ],
         )
     user_id = ctx.author.id
@@ -345,19 +359,10 @@ async def gpt_process(lang: str, content: str) -> str:
 
 
 async def gpt_process(lang: str, content: str) -> str:
-    response = await openai_async.chat_complete(
-        os.environ["OPENAI_API_KEY"],
-        timeout=20,
-        payload={
-            "model": "gpt-3.5-turbo",
-            "messages": [
-                {
-                    "role": "system",
-                    "content": f"If no specific language is requested, use {lang} as a friendly human to respond. "
-                    f"Otherwise, reply in the language requested by the user.",
-                },
-                {"role": "user", "content": content},
-            ],
-        },
+    google.generativeai.configure(api_key=os.environ["GEMINI_API_KEY"])
+    model = google.generativeai.GenerativeModel(
+        model_name="models/gemini-1.5-flash-latest",
+        system_instruction=f"""When no specific language is mentioned, respond in {lang} in a friendly and conversational tone. If the user requests a different language, reply in the requested language. Keep your responses as simple as possible, avoiding symbols, emojis, markdown, or any formatting, only plain text. If necessary, replace symbols or markdown with clear text descriptions. These are very important instructions, please follow them carefully.""",
     )
-    return response.json()["choices"][0]["message"]["content"]
+    response = model.generate_content(content).text
+    return response
