@@ -1548,16 +1548,30 @@ async def say_lang(ctx, lang: str, *, content: str, gpt: bool = False):  # sourc
                         )
 
             else:
-                await ctx.reply(
-                    tool_function.convert_msg(
+                if not gpt:
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "say",
+                            "say_too_long",
+                            None,
+                        )
+                    )
+                else:
+                    await ctx.reply(
+                        f"""
+                        {tool_function.convert_msg(
                         LOCALE,
-                        lang,
+                        db["lang"],
                         "command",
                         "say",
                         "say_too_long",
                         None,
+                    )}\n```\n{content}```
+                    """
                     )
-                )
 
         elif (
             channelissetup
