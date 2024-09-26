@@ -1711,7 +1711,7 @@ async def force_say(ctx, *, content: str):  # sourcery no-metrics skip: for-inde
 
 
 @bot.command(Name="gpt_say", aliases=command_alias["gpt_say"])
-@commands.is_owner()
+# @commands.is_owner()
 @commands.cooldown(1, 10, commands.BucketType.user)
 async def gpt_say(ctx, *, content: str):  # sourcery no-metrics skip: for-index-replacement
     # sourcery skip: low-code-quality

@@ -16,5 +16,6 @@ black
 natsort
 pycryptodome
 # openai
-openai-async
+# openai-async
 emoji
+google.generativeai

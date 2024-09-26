@@ -12,5 +12,6 @@ psycopg[binary,pool]==3.2.2
 natsort==8.4.0
 pycryptodome==3.20.0
 # openai==0.27.8
-openai-async==0.0.3
+# openai-async==0.0.3
 emoji==2.13.2
+google.generativeai==0.8.2
