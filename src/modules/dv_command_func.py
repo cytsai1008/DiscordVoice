@@ -362,8 +362,7 @@ async def gpt_process(lang: str, content: str) -> str:
     google.generativeai.configure(api_key=os.environ["GEMINI_API_KEY"])
     model = google.generativeai.GenerativeModel(
         model_name="models/gemini-1.5-flash-latest",
-        system_instruction=f"If no specific language is requested, use {lang} as a friendly human to respond. "
-        f"Otherwise, reply in the language requested by the user. Reduce using emojis.",
+        system_instruction=f"""When no specific language is mentioned, respond in {lang} in a friendly and conversational tone. If the user requests a different language, reply in the requested language. Keep your responses as simple as possible, avoiding symbols, emojis, markdown, or any formatting. If necessary, replace symbols or markdown with clear text descriptions since the user cannot see them.""",
     )
     response = model.generate_content(content).text
     return response
