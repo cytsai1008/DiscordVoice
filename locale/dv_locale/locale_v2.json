@@ -472,7 +472,7 @@
       }
     },
     "gpt_say":{
-      "trigger_safety": {
+      "gpt_say_trigger_safety": {
         "en": [
           "Gemini cannot process this message."
         ],
@@ -481,6 +481,17 @@
         ],
         "zh-cn": [
           "Gemini无法处理此对话。"
+        ]
+      },
+      "gpt_say_no_arg": {
+        "en": [
+          "What can I ask Gemini for? :("
+        ],
+        "zh-tw": [
+          "我能問 Gemini 什麼? :("
+        ],
+        "zh-cn": [
+          "我能问 Gemini 什么? :("
         ]
       }
     },
