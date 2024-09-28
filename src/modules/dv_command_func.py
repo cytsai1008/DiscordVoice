@@ -7,10 +7,8 @@ import time
 
 import bs4
 import emoji
-
 # import gemini
 import google.generativeai
-
 # import cloudscraper
 import httpx
 import metadata_parser
@@ -359,7 +357,7 @@ async def gpt_process(lang: str, content: str, LOCALE: dict) -> str:
             lang,
             "command",
             "gpt_say",
-            "trigger_safety",
+            "gpt_say_trigger_safety",
             [],
         )
     return response

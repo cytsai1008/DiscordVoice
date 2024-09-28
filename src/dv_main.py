@@ -196,415 +196,402 @@ async def on_command_error(ctx, error):  # sourcery no-metrics skip: remove-pass
     lang = tool_function.check_db_lang(ctx)
     command = ctx.invoked_with.lower()
 
-    # CommandNotFound
-    if isinstance(
-        error,
-        (
-            discord.ext.commands.errors.CommandNotFound,
-            discord.ext.commands.errors.NotOwner,
-        ),
-    ):
-        await ctx.reply(
-            tool_function.convert_msg(LOCALE, lang, "command", "on_command_error", "command_not_found", None)
-        )
-        await ctx.message.add_reaction("❌")
-        return
-
-    elif isinstance(error, discord.ext.commands.errors.MissingPermissions):
-        await ctx.reply(
-            tool_function.convert_msg(LOCALE, lang, "command", "on_command_error", "missing_permissions", None)
-        )
-        await ctx.message.add_reaction("❌")
-        return
-
-    # MissingRequiredArgument
-    elif isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
-        # Only add question emoji if exception really have problem (ex. join command no argument will join by user channel)
-        wrong_cmd = True
-
-        if command == "setchannel":
-            # TODO: Get systemchannel check
-            guild_system_channel = ctx.guild.system_channel
+    match error:
+        # CommandNotFound or NotOwner
+        case discord.ext.commands.errors.CommandNotFound() | discord.ext.commands.errors.NotOwner():
             await ctx.reply(
-                tool_function.convert_msg(
-                    LOCALE,
-                    lang,
-                    "command",
-                    "setchannel",
-                    "setchannel_no_arg",
-                    [
-                        "prefix",
-                        config["prefix"],
-                        "sys_channel",
-                        guild_system_channel.id,
-                    ],
-                )
+                tool_function.convert_msg(LOCALE, lang, "command", "on_command_error", "command_not_found", None)
             )
+            await ctx.message.add_reaction("❌")
+            return
 
-        elif command == "setlang":
-            # read language lists
-            support_lang = tool_function.read_local_json("lang_list/google_languages.json")
-            azure_lang = tool_function.read_local_json("lang_list/azure_languages.json")
-
+        # UserMissingPermissions
+        case discord.ext.commands.errors.MissingPermissions():
             await ctx.reply(
-                tool_function.convert_msg(
-                    LOCALE,
-                    lang,
-                    "command",
-                    "setlang",
-                    "setlang_no_arg",
-                    [
-                        "prefix",
-                        config["prefix"],
-                        "google_lang_list",
-                        ", ".join(support_lang["Support_Language"]),
-                        "azure_lang_list",
-                        ", ".join(azure_lang["Support_Language"]),
-                    ],
-                )
+                tool_function.convert_msg(LOCALE, lang, "command", "on_command_error", "missing_permissions", None)
             )
+            await ctx.message.add_reaction("❌")
+            return
 
-        elif command == "say" or command in command_alias["say"]:
-            await ctx.reply(
-                tool_function.convert_msg(
-                    LOCALE,
-                    lang,
-                    "command",
-                    "say",
-                    "say_no_arg",
-                    None,
-                )
-            )
+        # MissingRequiredArgument
+        case discord.ext.commands.errors.MissingRequiredArgument():
+            # Only add question emoji if exception really have problem (ex. join command no argument will join by user channel)
+            wrong_cmd = True
 
-        elif command == "say_lang" or command in command_alias["say_lang"]:
-            support_lang = tool_function.read_local_json("lang_list/google_languages.json")
-            azure_lang = tool_function.read_local_json("lang_list/azure_languages.json")
-
-            await ctx.reply(
-                tool_function.convert_msg(
-                    LOCALE,
-                    lang,
-                    "command",
-                    "say_lang",
-                    "say_lang_no_arg",
-                    [
-                        "prefix",
-                        config["prefix"],
-                        "google_lang_list",
-                        ", ".join(support_lang["Support_Language"]),
-                        "azure_lang_list",
-                        ", ".join(azure_lang["Support_Language"]),
-                    ],
-                )
-            )
-
-        elif command == "setvoice":
-            await ctx.reply(
-                tool_function.convert_msg(
-                    LOCALE,
-                    lang,
-                    "command",
-                    "setvoice",
-                    "setvoice_no_arg",
-                    [
-                        "prefix",
-                        config["prefix"],
-                        "data_support_platform",
-                        ", ".join(list(supported_platform)),
-                    ],
-                )
-            )
-
-        elif command == "join" or command in command_alias["join"]:
-            # not add question emoji
-            # wrong_cmd = False
-
-            # get if user is in vc or not
-            try:
-                user_voice_channel = ctx.author.voice.channel
-            except AttributeError:
-                await ctx.reply(
-                    tool_function.convert_msg(
-                        LOCALE,
-                        lang,
-                        "command",
-                        "join",
-                        "join_not_in",
-                        None,
+            match command:
+                case "setchannel":
+                    guild_system_channel = ctx.guild.system_channel
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "setchannel",
+                            "setchannel_no_arg",
+                            [
+                                "prefix",
+                                config["prefix"],
+                                "sys_channel",
+                                guild_system_channel.id,
+                            ],
+                        )
                     )
-                )
-                await ctx.message.add_reaction("❌")
-                return
-            # trying to connect to vc
-            else:
-                join_cmd = bot.get_command("join")
-                await ctx.invoke(join_cmd, channel=user_voice_channel)
-                return
 
-        elif command == "move" or command in command_alias["move"]:
-            # not to add question emoji
-            # wrong_cmd = False
+                case "setlang":
+                    support_lang = tool_function.read_local_json("lang_list/google_languages.json")
+                    azure_lang = tool_function.read_local_json("lang_list/azure_languages.json")
 
-            # read "joined_vc" to del the old vc id
-            joined_vc = tool_function.read_db_json("joined_vc")
-            # trying to del the old vc id
-            with contextlib.suppress(KeyError):
-                del joined_vc[str(ctx.guild.id)]
-
-            # get if user is in vc or not
-            try:
-                user_voice_channel = ctx.author.voice.channel
-            except AttributeError:
-                await ctx.reply(
-                    tool_function.convert_msg(
-                        LOCALE,
-                        lang,
-                        "command",
-                        "move",
-                        "move_not_in",
-                        None,
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "setlang",
+                            "setlang_no_arg",
+                            [
+                                "prefix",
+                                config["prefix"],
+                                "google_lang_list",
+                                ", ".join(support_lang["Support_Language"]),
+                                "azure_lang_list",
+                                ", ".join(azure_lang["Support_Language"]),
+                            ],
+                        )
                     )
-                )
-                await ctx.message.add_reaction("❌")
-                return
-            else:
-                move_cmd = bot.get_command("move")
-                await ctx.invoke(move_cmd, channel=user_voice_channel)
-                return
 
-        elif command == "ban":
-            await ctx.reply(
-                tool_function.convert_msg(
-                    LOCALE,
-                    lang,
-                    "command",
-                    "ban",
-                    "ban_no_arg",
-                    [
-                        "prefix",
-                        config["prefix"],
-                    ],
-                )
-            )
+                case "say" | _ if command in command_alias["say"]:
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "say",
+                            "say_no_arg",
+                            None,
+                        )
+                    )
 
-        elif command == "unban":
-            await ctx.reply(
-                tool_function.convert_msg(
-                    LOCALE,
-                    lang,
-                    "command",
-                    "unban",
-                    "unban_no_arg",
-                    [
-                        "prefix",
-                        config["prefix"],
-                    ],
-                )
-            )
+                case "say_lang" | _ if command in command_alias["say_lang"]:
+                    support_lang = tool_function.read_local_json("lang_list/google_languages.json")
+                    azure_lang = tool_function.read_local_json("lang_list/azure_languages.json")
 
-        elif command == "set_nochannel":
-            await ctx.reply(
-                tool_function.convert_msg(
-                    LOCALE,
-                    lang,
-                    "command",
-                    "set_nochannel",
-                    "set_nochannel_no_arg",
-                    [
-                        "prefix",
-                        config["prefix"],
-                    ],
-                )
-            )
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "say_lang",
+                            "say_lang_no_arg",
+                            [
+                                "prefix",
+                                config["prefix"],
+                                "google_lang_list",
+                                ", ".join(support_lang["Support_Language"]),
+                                "azure_lang_list",
+                                ", ".join(azure_lang["Support_Language"]),
+                            ],
+                        )
+                    )
 
-        elif command == "wrong_msg":
-            await ctx.reply(
-                tool_function.convert_msg(
-                    LOCALE,
-                    lang,
-                    "command",
-                    "wrong_msg",
-                    "wrong_msg_bad_arg",
-                    [
-                        "prefix",
-                        config["prefix"],
-                    ],
-                )
-            )
+                case "setvoice":
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "setvoice",
+                            "setvoice_no_arg",
+                            [
+                                "prefix",
+                                config["prefix"],
+                                "data_support_platform",
+                                ", ".join(list(supported_platform)),
+                            ],
+                        )
+                    )
 
-        elif command == "set_noname":
-            await ctx.reply(
-                tool_function.convert_msg(
-                    LOCALE,
-                    lang,
-                    "command",
-                    "no_name",
-                    "no_name_bad_arg",
-                    [
-                        "prefix",
-                        config["prefix"],
-                    ],
-                )
-            )
+                case "join" | _ if command in command_alias["join"]:
+                    try:
+                        user_voice_channel = ctx.author.voice.channel
+                    except AttributeError:
+                        await ctx.reply(
+                            tool_function.convert_msg(
+                                LOCALE,
+                                lang,
+                                "command",
+                                "join",
+                                "join_not_in",
+                                None,
+                            )
+                        )
+                        await ctx.message.add_reaction("❌")
+                        return
+                    # trying to connect to vc
+                    else:
+                        join_cmd = bot.get_command("join")
+                        await ctx.invoke(join_cmd, channel=user_voice_channel)
+                        return
 
-        # other not defined command missing arguments message
-        else:
+                case "move" | _ if command in command_alias["move"]:
+                    # read "joined_vc" to del the old vc id
+                    joined_vc = tool_function.read_db_json("joined_vc")
+                    # trying to del the old vc id
+                    with contextlib.suppress(KeyError):
+                        del joined_vc[str(ctx.guild.id)]
+
+                    # get if user is in vc or not
+                    try:
+                        user_voice_channel = ctx.author.voice.channel
+                    except AttributeError:
+                        await ctx.reply(
+                            tool_function.convert_msg(
+                                LOCALE,
+                                lang,
+                                "command",
+                                "move",
+                                "move_not_in",
+                                None,
+                            )
+                        )
+                        await ctx.message.add_reaction("❌")
+                        return
+                    else:
+                        move_cmd = bot.get_command("move")
+                        await ctx.invoke(move_cmd, channel=user_voice_channel)
+                        return
+
+                case "ban":
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "ban",
+                            "ban_no_arg",
+                            [
+                                "prefix",
+                                config["prefix"],
+                            ],
+                        )
+                    )
+
+                case "unban":
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "unban",
+                            "unban_no_arg",
+                            [
+                                "prefix",
+                                config["prefix"],
+                            ],
+                        )
+                    )
+
+                case "set_nochannel":
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "set_nochannel",
+                            "set_nochannel_no_arg",
+                            [
+                                "prefix",
+                                config["prefix"],
+                            ],
+                        )
+                    )
+
+                case "wrong_msg":
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "wrong_msg",
+                            "wrong_msg_bad_arg",
+                            [
+                                "prefix",
+                                config["prefix"],
+                            ],
+                        )
+                    )
+
+                case "set_noname":
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "no_name",
+                            "no_name_bad_arg",
+                            [
+                                "prefix",
+                                config["prefix"],
+                            ],
+                        )
+                    )
+
+                case _:
+                    await ctx.reply(
+                        tool_function.convert_msg(
+                            LOCALE,
+                            lang,
+                            "command",
+                            "on_command_error",
+                            "missing_required_argument",
+                            None,
+                        )
+                    )
+
+            if wrong_cmd:
+                await ctx.message.add_reaction("❓")
+            return
+
+        case discord.ext.commands.errors.CommandOnCooldown():
             await ctx.reply(
                 tool_function.convert_msg(
                     LOCALE,
                     lang,
                     "command",
                     "on_command_error",
-                    "missing_required_argument",
-                    None,
+                    "command_on_cooldown",
+                    [
+                        "cooldown_time",
+                        str(round(error.retry_after)),
+                    ],
                 )
             )
+            await ctx.message.add_reaction("⏳")
+            return
 
-        # add question emoji on missing arguments message
-        if wrong_cmd:
-            await ctx.message.add_reaction("❓")
-        return
+        # Commands that use channel as type of argument may raise this error, but I already defined by error function
+        case discord.ext.commands.errors.ChannelNotFound() if command in [
+            "setchannel",
+            "join",
+            "move",
+        ] or command in command_alias["join"] or command in command_alias["move"]:
+            return
 
-    # not used anymore, but keep it just in case
-    # CommandOnCooldown
-    elif isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
-        await ctx.reply(
-            tool_function.convert_msg(
-                LOCALE,
-                lang,
-                "command",
-                "on_command_error",
-                "command_on_cooldown",
-                [
-                    "cooldown_time",
-                    str(round(error.retry_after)),
-                ],
-            )
-        )
-        await ctx.message.add_reaction("⏳")
-        return
+        # limited some commands to only be used in guilds because it wasn't designed to be used in DMs, group messages WIP
+        # (May never work because I'm lazy)
+        # (Imagine you're calling to a robot just to hear the robot voice)
 
-    # Commands that use channel as type of argument may raise this error, but I already defined by error function
-    elif (
-        command in ["setchannel", "join", "move"]
-        or command in command_alias["join"]
-        or command_alias["move"]
-        and isinstance(error, discord.ext.commands.errors.ChannelNotFound)
-    ):
-        return
-
-    # limited some commands to only be used in guilds because it wasn't designed to be used in DMs, group messages WIP
-    # (May never work because I'm lazy)
-    # (Imagine you're calling to a robot just to hear the robot voice)
-
-    # NoPrivateMessage
-    elif isinstance(error, discord.ext.commands.errors.NoPrivateMessage):
-        await ctx.reply(
-            tool_function.convert_msg(
-                LOCALE,
-                lang,
-                "command",
-                "on_command_error",
-                "no_private_message",
-                None,
-            )
-        )
-        await ctx.message.add_reaction("❌")
-        return
-
-    # Seems nerver been used, but still keep it just in case
-    # TooManyArguments
-    elif isinstance(error, discord.ext.commands.errors.TooManyArguments):
-        await ctx.reply(
-            tool_function.convert_msg(
-                LOCALE,
-                lang,
-                "command",
-                "on_command_error",
-                "too_many_arguments",
-                None,
-            )
-        )
-        await ctx.message.add_reaction("❌")
-        return
-
-    # BotMissingPermissions
-    elif isinstance(error, discord.ext.commands.errors.BotMissingPermissions):
-        await ctx.author.send(
-            tool_function.convert_msg(
-                LOCALE,
-                lang,
-                "command",
-                "on_command_error",
-                "bot_missing_permissions",
-                None,
-            )
-        )
-        return
-
-    # Command raised an exception: Forbidden: 403 Forbidden (error code: 160002):
-    # Cannot reply without permission to read message history
-    elif isinstance(
-        error, discord.ext.commands.errors.CommandInvokeError
-    ) and "Cannot reply without permission to read message history" in str(error):
-        try:
-            await ctx.send(
+        # NoPrivateMessage
+        case discord.ext.commands.errors.NoPrivateMessage():
+            await ctx.reply(
                 tool_function.convert_msg(
                     LOCALE,
                     lang,
                     "command",
                     "on_command_error",
-                    "bot_cannot_read_history",
+                    "no_private_message",
                     None,
                 )
             )
-        except Exception:
+            await ctx.message.add_reaction("❌")
+            return
+
+        # Seems nerver been used, but still keep it just in case
+        # TooManyArguments
+        case discord.ext.commands.errors.TooManyArguments():
+            await ctx.reply(
+                tool_function.convert_msg(
+                    LOCALE,
+                    lang,
+                    "command",
+                    "on_command_error",
+                    "too_many_arguments",
+                    None,
+                )
+            )
+            await ctx.message.add_reaction("❌")
+            return
+
+        # BotMissingPermissions
+        case discord.ext.commands.errors.BotMissingPermissions():
             await ctx.author.send(
                 tool_function.convert_msg(
                     LOCALE,
                     lang,
                     "command",
                     "on_command_error",
-                    "bot_cannot_read_history",
+                    "bot_missing_permissions",
                     None,
                 )
             )
-        return
+            return
 
-    # Auto report unknown command error to owner (Mostly doesn't work actually...)
-    else:
-        await tool_function.postgres_logging(error)
-        try:
-            server_name = ctx.guild.name
-        except AttributeError:
-            server_name = ""
-        try:
-            server_id = ctx.guild.id
-        except AttributeError:
-            server_id = ""
-        sender_name = ctx.author.name
-        command_name = ctx.invoked_with
+        # Command raised an exception: Forbidden: 403 Forbidden (error code: 160002):
+        # Cannot reply without permission to read message history
+        case (
+            discord.ext.commands.errors.CommandInvokeError()
+        ) if "Cannot reply without permission to read message history" in str(error):
+            try:
+                await ctx.send(
+                    tool_function.convert_msg(
+                        LOCALE,
+                        lang,
+                        "command",
+                        "on_command_error",
+                        "bot_cannot_read_history",
+                        None,
+                    )
+                )
+            except Exception:
+                await ctx.author.send(
+                    tool_function.convert_msg(
+                        LOCALE,
+                        lang,
+                        "command",
+                        "on_command_error",
+                        "bot_cannot_read_history",
+                        None,
+                    )
+                )
+            return
 
-        owner_data = await bot.fetch_user(config["owner"])
-        owner_name = owner_data.name
-        owner_discriminator = owner_data.discriminator
-        if str(owner_discriminator) != "0":
-            owner_full_id = f"{owner_name}#{owner_discriminator}"
-        else:
-            owner_full_id = f"@{owner_name}"
-        await owner_data.send(
-            f"Unknown command error\n"
-            "```"
-            f"Command: {command_name}\n"
-            f"Error: {error}\n"
-            f"Error Type: {type(error)}\n"
-            f"Server Name: {server_name}\n"
-            f"Server ID: {server_id}\n"
-            f"Sender: {sender_name}\n"
-            "```"
-        )
-        await owner_data.send(ctx.message.content)
-        raise error
+        # Auto report unknown command error to owner (fuck it my dm are fill with error msgs)
+        case _:
+            await tool_function.postgres_logging(error)
+            try:
+                server_name = ctx.guild.name
+            except AttributeError:
+                server_name = ""
+            try:
+                server_id = ctx.guild.id
+            except AttributeError:
+                server_id = ""
+            sender_name = ctx.author.name
+            command_name = ctx.invoked_with
+
+            owner_data = await bot.fetch_user(config["owner"])
+            owner_name = owner_data.name
+            owner_discriminator = owner_data.discriminator
+            """
+            # Never used it anymore, discord change their username system
+            # But keep it just for memorial
+            if str(owner_discriminator) != "0":
+                owner_full_id = f"{owner_name}#{owner_discriminator}"
+            else:
+                owner_full_id = f"@{owner_name}"
+            """
+            await owner_data.send(
+                f"Unknown command error\n"
+                "```"
+                f"Command: {command_name}\n"
+                f"Error: {error}\n"
+                f"Error Type: {type(error)}\n"
+                f"Server Name: {server_name}\n"
+                f"Server ID: {server_id}\n"
+                f"Sender: {sender_name}\n"
+                "```"
+            )
+            await owner_data.send(ctx.message.content)
+            raise error
 
 
 # noinspection PyShadowingBuiltins
@@ -619,119 +606,121 @@ async def help(ctx):  # sourcery skip: low-code-quality
         data = tool_function.read_db_json(f"{ctx.guild.id}")
 
         # lang help text change to current if settings exist
-        if tool_function.check_dict_data(data, "lang"):
-            lang_msg = tool_function.convert_msg(
-                LOCALE,
-                locale_lang,
-                "variable",
-                "help",
-                "lang_msg_current",
-                ["prefix", config["prefix"], "data_lang", data["lang"]],
-            )
-        else:
-            # support_lang = tool_function.read_local_json("google_languages.json")
-            # azure_lang = tool_function.read_local_json("azure_languages.json")
-
-            # default lang command text
-            lang_msg = tool_function.convert_msg(
-                LOCALE,
-                locale_lang,
-                "variable",
-                "help",
-                "lang_msg_default",
-                [
-                    "prefix",
-                    config["prefix"],
-                ],
-            )
+        match tool_function.check_dict_data(data, "lang"):
+            case True:
+                lang_msg = tool_function.convert_msg(
+                    LOCALE,
+                    locale_lang,
+                    "variable",
+                    "help",
+                    "lang_msg_current",
+                    ["prefix", config["prefix"], "data_lang", data["lang"]],
+                )
+            case False:
+                lang_msg = tool_function.convert_msg(
+                    LOCALE,
+                    locale_lang,
+                    "variable",
+                    "help",
+                    "lang_msg_default",
+                    [
+                        "prefix",
+                        config["prefix"],
+                    ],
+                )
 
         # channel help text change to current if settings exist
-        if tool_function.check_dict_data(data, "channel"):
-            channel_msg = tool_function.convert_msg(
-                LOCALE,
-                locale_lang,
-                "variable",
-                "help",
-                "channel_msg_current",
-                ["prefix", config["prefix"], "data_channel", data["channel"]],
-            )
-        else:
-            # default channel command text
-            guild_system_channel = ctx.guild.system_channel
-            channel_msg = tool_function.convert_msg(
-                LOCALE,
-                locale_lang,
-                "variable",
-                "help",
-                "channel_msg_default",
-                ["prefix", config["prefix"], "sys_channel", guild_system_channel.id],
-            )
+        match tool_function.check_dict_data(data, "channel"):
+            case True:
+                channel_msg = tool_function.convert_msg(
+                    LOCALE,
+                    locale_lang,
+                    "variable",
+                    "help",
+                    "channel_msg_current",
+                    ["prefix", config["prefix"], "data_channel", data["channel"]],
+                )
+            case False:
+                # default channel command text
+                guild_system_channel = ctx.guild.system_channel
+                channel_msg = tool_function.convert_msg(
+                    LOCALE,
+                    locale_lang,
+                    "variable",
+                    "help",
+                    "channel_msg_default",
+                    ["prefix", config["prefix"], "sys_channel", guild_system_channel.id],
+                )
 
         # voice platform help text change to current if settings exist
-        if tool_function.check_dict_data(data, "platform"):
-            platform_msg = tool_function.convert_msg(
-                LOCALE,
-                locale_lang,
-                "variable",
-                "help",
-                "platform_msg_current",
-                ["prefix", config["prefix"], "data_platform", data["platform"]],
-            )
-        else:
-            # default platform command text
-            platform_msg = tool_function.convert_msg(
-                LOCALE,
-                locale_lang,
-                "variable",
-                "help",
-                "platform_msg_default",
-                [
-                    "prefix",
-                    config["prefix"],
-                    "data_support_platform",
-                    ", ".join(list(supported_platform)),
-                ],
-            )
+        match tool_function.check_dict_data(data, "platform"):
+            case True:
+                platform_msg = tool_function.convert_msg(
+                    LOCALE,
+                    locale_lang,
+                    "variable",
+                    "help",
+                    "platform_msg_current",
+                    ["prefix", config["prefix"], "data_platform", data["platform"]],
+                )
+            case False:
+                platform_msg = tool_function.convert_msg(
+                    LOCALE,
+                    locale_lang,
+                    "variable",
+                    "help",
+                    "platform_msg_default",
+                    [
+                        "prefix",
+                        config["prefix"],
+                        "data_support_platform",
+                        ", ".join(list(supported_platform)),
+                    ],
+                )
 
-        if tool_function.check_dict_data(data, "nochannel"):
-            nochannel_status = "on" if data["nochannel"] else "off"
-            nochannel_msg = tool_function.convert_msg(
-                LOCALE,
-                locale_lang,
-                "variable",
-                "help",
-                "nochannel_msg_current",
-                ["prefix", config["prefix"], "data_nochannel", nochannel_status],
-            )
-        else:
-            nochannel_msg = tool_function.convert_msg(
-                LOCALE,
-                locale_lang,
-                "variable",
-                "help",
-                "nochannel_msg_default",
-                ["prefix", config["prefix"]],
-            )
+        # nochannel help text change to current if settings exist
+        match tool_function.check_dict_data(data, "nochannel"):
+            case True:
+                nochannel_status = "on" if data["nochannel"] else "off"
+                nochannel_msg = tool_function.convert_msg(
+                    LOCALE,
+                    locale_lang,
+                    "variable",
+                    "help",
+                    "nochannel_msg_current",
+                    ["prefix", config["prefix"], "data_nochannel", nochannel_status],
+                )
+            case False:
+                nochannel_msg = tool_function.convert_msg(
+                    LOCALE,
+                    locale_lang,
+                    "variable",
+                    "help",
+                    "nochannel_msg_default",
+                    ["prefix", config["prefix"]],
+                )
 
-        if tool_function.check_dict_data(data, "no_name"):
-            noname_status = "on" if data["no_name"] else "off"
-            noname_msg = tool_function.convert_msg(
-                LOCALE,
-                locale_lang,
-                "variable",
-                "help",
-                "noname_msg_current",
-                ["prefix", config["prefix"], "data_noname", noname_status],
-            )
-        else:
-            noname_msg = tool_function.convert_msg(
-                LOCALE,
-                locale_lang,
-                "variable",
-                "help",
-                "noname_msg_default",
-                ["prefix", config["prefix"]],
-            )
+        # noname help text change to current if settings exist
+        match tool_function.check_dict_data(data, "no_name"):
+            case True:
+                noname_status = "on" if data["no_name"] else "off"
+                noname_msg = tool_function.convert_msg(
+                    LOCALE,
+                    locale_lang,
+                    "variable",
+                    "help",
+                    "noname_msg_current",
+                    ["prefix", config["prefix"], "data_noname", noname_status],
+                )
+            case False:
+                noname_msg = tool_function.convert_msg(
+                    LOCALE,
+                    locale_lang,
+                    "variable",
+                    "help",
+                    "noname_msg_default",
+                    ["prefix", config["prefix"]],
+                )
 
         # mix all together and send
         await ctx.reply(
@@ -758,7 +747,7 @@ async def help(ctx):  # sourcery skip: low-code-quality
             )
         )
 
-    # messages for not guilds and user settings exists
+    # messages for not guilds and user settings exists (private message)
     elif (
         not guild_msg
         and tool_function.check_dict_data(
@@ -770,38 +759,76 @@ async def help(ctx):  # sourcery skip: low-code-quality
             "platform",
         )
     ):
-        # support_lang = tool_function.read_local_json("google_languages.json")
-        # azure_lang = tool_function.read_local_json("azure_languages.json")
-
         # read user config
         data = tool_function.read_db_json("user_config")[f"user_{int(ctx.author.id)}"]
 
         # voice platform help text change to current if settings exist
-        if tool_function.check_dict_data(data, "platform"):
-            platform_msg = tool_function.convert_msg(
-                LOCALE,
-                locale_lang,
-                "variable",
-                "help",
-                "platform_msg_current",
-                ["prefix", config["prefix"], "data_platform", data["platform"]],
-            )
+        match tool_function.check_dict_data(data, "platform"):
+            case True:
+                platform_msg = tool_function.convert_msg(
+                    LOCALE,
+                    locale_lang,
+                    "variable",
+                    "help",
+                    "platform_msg_current",
+                    ["prefix", config["prefix"], "data_platform", data["platform"]],
+                )
+            case False:
+                platform_msg = tool_function.convert_msg(
+                    LOCALE,
+                    locale_lang,
+                    "variable",
+                    "help",
+                    "platform_msg_default",
+                    [
+                        "prefix",
+                        config["prefix"],
+                        "data_support_platform",
+                        ", ".join(list(supported_platform)),
+                    ],
+                )
 
-        else:
-            # default platform command text
-            platform_msg = tool_function.convert_msg(
-                LOCALE,
-                locale_lang,
-                "variable",
-                "help",
-                "platform_msg_default",
-                [
-                    "prefix",
-                    config["prefix"],
-                    "data_support_platform",
-                    ", ".join(list(supported_platform)),
-                ],
-            )
+        channel_msg = tool_function.convert_msg(
+            LOCALE,
+            locale_lang,
+            "variable",
+            "help",
+            "channel_msg_else",
+            [
+                "prefix",
+                config["prefix"],
+            ],
+        )
+
+        lang_msg = tool_function.convert_msg(
+            LOCALE,
+            locale_lang,
+            "variable",
+            "help",
+            "lang_msg_default",
+            [
+                "prefix",
+                config["prefix"],
+            ],
+        )
+
+        nochannel_msg = tool_function.convert_msg(
+            LOCALE,
+            locale_lang,
+            "variable",
+            "help",
+            "nochannel_msg_default",
+            ["prefix", config["prefix"]],
+        )
+
+        noname_msg = tool_function.convert_msg(
+            LOCALE,
+            locale_lang,
+            "variable",
+            "help",
+            "noname_msg_default",
+            ["prefix", config["prefix"]],
+        )
 
         # mix all together and send
         await ctx.reply(
@@ -817,38 +844,13 @@ async def help(ctx):  # sourcery skip: low-code-quality
                     "platform_msg",
                     platform_msg,
                     "channel_msg",
-                    tool_function.convert_msg(
-                        LOCALE,
-                        locale_lang,
-                        "variable",
-                        "help",
-                        "channel_msg_else",
-                        [
-                            "prefix",
-                            config["prefix"],
-                        ],
-                    ),
+                    channel_msg,
                     "lang_msg",
-                    tool_function.convert_msg(
-                        LOCALE,
-                        locale_lang,
-                        "variable",
-                        "help",
-                        "lang_msg_default",
-                        [
-                            "prefix",
-                            config["prefix"],
-                        ],
-                    ),
+                    lang_msg,
                     "nochannel_msg",
-                    tool_function.convert_msg(
-                        LOCALE,
-                        locale_lang,
-                        "variable",
-                        "help",
-                        "nochannel_msg_default",
-                        ["prefix", config["prefix"]],
-                    ),
+                    nochannel_msg,
+                    "noname_msg",
+                    noname_msg,
                 ],
             )
         )
@@ -912,6 +914,15 @@ async def help(ctx):  # sourcery skip: low-code-quality
                         "variable",
                         "help",
                         "nochannel_msg_default",
+                        ["prefix", config["prefix"]],
+                    ),
+                    "noname_msg",
+                    tool_function.convert_msg(
+                        LOCALE,
+                        locale_lang,
+                        "variable",
+                        "help",
+                        "noname_msg_default",
                         ["prefix", config["prefix"]],
                     ),
                 ],
