@@ -8,6 +8,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     software-properties-common gnupg && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32 && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 871920D1991BC93C && \
     add-apt-repository 'deb [trusted=yes arch=amd64] http://security.ubuntu.com/ubuntu bionic-security main' -y && \
     add-apt-repository 'deb [trusted=yes arch=amd64] http://archive.ubuntu.com/ubuntu jammy main universe' -y && \
     add-apt-repository 'deb [trusted=yes arch=amd64] http://archive.ubuntu.com/ubuntu jammy main main' -y && \
