@@ -1,23 +1,32 @@
-FROM ubuntu:latest
+FROM python:slim
 COPY . /app
 WORKDIR /app
 
 # RUN --mount=type=secret,id=_env,dst=/etc/secrets/.env cat /etc/secrets/.env
 # Install dependencies
-RUN apt-get update && apt install software-properties-common gnupg -y
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
-RUN add-apt-repository 'deb [trusted=yes arch=amd64] http://security.ubuntu.com/ubuntu bionic-security main' -y
-RUN add-apt-repository 'deb [trusted=yes arch=amd64] http://archive.ubuntu.com/ubuntu jammy main universe' -y
-RUN add-apt-repository 'deb [trusted=yes arch=amd64] http://archive.ubuntu.com/ubuntu jammy main main' -y
-# RUN add-apt-repository ppa:savoury1/ffmpeg4 -y
-# RUN add-apt-repository ppa:savoury1/ffmpeg5 -y
-RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y python3-full python3-pip libssl-dev wget libssl1.1 ffmpeg opus-tools libpq-dev htop nano
-RUN apt autoremove -y
-RUN python3 -m venv ./venv
-RUN . ./venv/bin/activate && python3 -m pip install --upgrade pip setuptools wheel && python3 -m pip install -r requirements.txt
-# RUN python3 -m pip install -r requirements.txt
-# RUN pip install python-dotenv
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    software-properties-common gnupg && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32 && \
+    add-apt-repository 'deb [trusted=yes arch=amd64] http://security.ubuntu.com/ubuntu bionic-security main' -y && \
+    add-apt-repository 'deb [trusted=yes arch=amd64] http://archive.ubuntu.com/ubuntu jammy main universe' -y && \
+    add-apt-repository 'deb [trusted=yes arch=amd64] http://archive.ubuntu.com/ubuntu jammy main main' -y && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libssl-dev wget libssl1.1 ffmpeg opus-tools libpq-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set up working directory
+WORKDIR /app
+COPY . /app
+
+# Set up Python environment
+RUN python3 -m venv /app/venv && \
+    . /app/venv/bin/activate && \
+    pip install --upgrade pip setuptools wheel && \
+    pip install -r requirements.txt
+
 
 # Setup Environments
 # RUN --mount=type=secret,id=_env,dst=./.env cat ./.env
