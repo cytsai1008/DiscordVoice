@@ -12,9 +12,10 @@ RUN apt-get update && \
     add-apt-repository 'deb [trusted=yes arch=amd64] http://security.ubuntu.com/ubuntu bionic-security main' -y && \
     add-apt-repository 'deb [trusted=yes arch=amd64] http://archive.ubuntu.com/ubuntu jammy main universe' -y && \
     add-apt-repository 'deb [trusted=yes arch=amd64] http://archive.ubuntu.com/ubuntu jammy main main' -y && \
+    add-apt-repository 'deb [trusted=yes arch=amd64] http://http.us.debian.org/debian bullseye main' -y && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-    libssl-dev wget libssl1.1 ffmpeg opus-tools libpq-dev && \
+    libssl-dev libssl1.1 wget ffmpeg opus-tools libpq-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
