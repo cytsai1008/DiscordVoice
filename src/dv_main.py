@@ -2222,6 +2222,9 @@ if __name__ == "__main__":
         test_env = False
 
     if test_env:
+        import sys
+        if sys.platform == 'win32':
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         bot.run(os.environ["DISCORD_DV_TEST_TOKEN"])
     else:
         subprocess.call(["python", "src/gcp-token-generator.py"])
