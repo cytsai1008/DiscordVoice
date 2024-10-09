@@ -3,7 +3,7 @@ python-dotenv
 google-cloud-texttospeech
 azure-cognitiveservices-speech
 httpx
-cloudscraper
+# cloudscraper
 redis
 flask
 gunicorn
@@ -19,3 +19,4 @@ pycryptodome
 # openai-async
 emoji
 google.generativeai
+winloop
