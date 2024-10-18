@@ -21,8 +21,17 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ github.token }}
+      - id: changes
+        run: |
+          if git diff --quiet; then
+            echo "changes_exist=false";
+            echo "No changes found."
+          else
+            echo "changes_exist=true";
+            echo "Changes found."
+          fi
       - name: Create Pull Request
-        if: steps.pr.outputs.pr_exist == 'false' || steps.pr.outputs.pr_exist == ''
+        if: steps.pr.outputs.pr_exist == 'false' && steps.changes.outputs.changes_exist == 'true'
         run: gh pr create --title "Automatic Pull Request" --body "This pull request was automatically generated when the `public` branch was updated." --base heroku --head public
         env:
           GH_TOKEN: ${{ github.token }}
