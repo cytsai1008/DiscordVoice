@@ -1,6 +1,9 @@
 import argparse
 
-import dotenv
+import contextlib
+
+with contextlib.suppress(ImportError):
+    import dotenv
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--content", required=True)
@@ -16,7 +19,8 @@ str(content)
 str(lang_code)
 str(filename)
 
-dotenv.load_dotenv()
+with contextlib.suppress(NameError):
+    dotenv.load_dotenv()
 
 
 # noinspection PyTypeChecker

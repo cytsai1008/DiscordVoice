@@ -2221,6 +2221,7 @@ if __name__ == "__main__":
         print("Running on production environment")
         test_env = False
 
+    subprocess.call(["python3", "src/gcp-token-generator.py"])
     if test_env:
         import sys
 
@@ -2228,8 +2229,8 @@ if __name__ == "__main__":
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         bot.run(os.environ["DISCORD_DV_TEST_TOKEN"])
     else:
-        subprocess.call(["python", "src/gcp-token-generator.py"])
-        subprocess.call(["python", "src/get_lang_code.py"])
+        subprocess.call(["python3", "src/gcp-token-generator.py"])
+        subprocess.call(["python3", "src/get_lang_code.py"])
         bot.run(os.environ["DISCORD_DV_TOKEN"])
 
 """
