@@ -41,7 +41,7 @@ async def postgres_logging(logging_data: str):
     today_datetime = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     logging_data = str(logging_data)
     print(f"{today_datetime}: {logging_data}")
-    if os.getenv("TEST_ENV"):
+    if os.getenv("TEST_ENV") or not os.getenv("DATABASE_URL"):
         return
     async with await psycopg.AsyncConnection.connect(os.environ["DATABASE_URL"], sslmode="require") as heroku_postgres:
         async with heroku_postgres.cursor() as cur:

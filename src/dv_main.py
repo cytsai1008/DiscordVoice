@@ -136,7 +136,7 @@ async def check_is_not_playing(ctx):
 # setup jobs on ready
 async def on_ready():
     await tool_function.postgres_logging(f"Login as: {bot.user}")
-    game = discord.Game(f"{config['prefix']}help")
+    game = discord.CustomActivity(f"{config['prefix']}help")
     channel_list = ""
 
     # reconnect vc in "joined_vc" if not TEST_ENV
