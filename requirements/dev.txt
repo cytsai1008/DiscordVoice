@@ -18,5 +18,6 @@ pycryptodome
 # openai
 # openai-async
 emoji
-google.generativeai
+# google.generativeai
+google-genai
 winloop
