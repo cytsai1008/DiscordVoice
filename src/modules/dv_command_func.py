@@ -7,12 +7,13 @@ import time
 
 import bs4
 import emoji
-# import gemini
-import google.generativeai
 # import cloudscraper
 import httpx
 import metadata_parser
 from discord.ext import commands
+# import gemini
+from google import genai
+from google.genai import types as genai_types
 
 import src.modules.dv_tool_function as tool_function
 from src.modules import tts_func
@@ -344,13 +345,16 @@ async def gpt_process(lang: str, content: str) -> str:
 
 
 async def gpt_process(lang: str, content: str, LOCALE: dict) -> str:
-    google.generativeai.configure(api_key=os.environ["GEMINI_API_KEY"])
-    model = google.generativeai.GenerativeModel(
-        model_name="models/gemini-1.5-flash-latest",
-        system_instruction=f"""When no specific language is mentioned, respond in {lang} in a friendly and conversational tone. If the user requests a different language, reply in the requested language. Keep your responses as simple as possible, avoiding symbols, emojis, markdown, or any formatting, only plain text. If necessary, replace symbols or markdown with clear text descriptions. These are very important instructions, please follow them carefully.""",
-    )
+    gemini_client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
     try:
-        response = model.generate_content(content).text
+        model = await gemini_client.aio.models.generate_content(
+            model="gemini-2.0-flash-exp",
+            contents=content,
+            config=genai_types.GenerateContentConfig(
+                system_instruction=f"""When no specific language is mentioned, respond in {lang} in a friendly and conversational tone. If the user requests a different language, reply in the requested language. Keep your responses as simple as possible, avoiding symbols, emojis, markdown, or any formatting, only plain text. If necessary, replace symbols or markdown with clear text descriptions. These are very important instructions, please follow them carefully.""",
+            ),
+        )
+        response = model.text
     except AttributeError:
         response = tool_function.convert_msg(
             LOCALE,
