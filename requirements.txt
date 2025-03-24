@@ -5,7 +5,7 @@ httpx==0.28.1
 redis==5.2.1
 Flask==3.1.0
 gunicorn==23.0.0
-metadata_parser==0.12.2
+metadata_parser==0.12.3
 beautifulsoup4==4.13.3
 lxml==5.3.1
 psycopg[binary,pool]==3.2.6
