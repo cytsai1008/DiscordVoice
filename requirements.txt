@@ -15,4 +15,4 @@ pycryptodome==3.23.0
 # openai-async==0.0.3
 emoji==2.14.1
 # google.generativeai==0.8.3
-google-genai==1.35.0
+google-genai==1.36.0
