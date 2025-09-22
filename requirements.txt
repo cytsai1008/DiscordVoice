@@ -13,6 +13,6 @@ natsort==8.4.0
 pycryptodome==3.23.0
 # openai==0.27.8
 # openai-async==0.0.3
-emoji==2.14.1
+emoji==2.15.0
 # google.generativeai==0.8.3
 google-genai==1.38.0
