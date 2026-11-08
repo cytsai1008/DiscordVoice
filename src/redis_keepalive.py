@@ -1,11 +1,11 @@
-"""Keeps the Redis DB active with read-only PINGs. Separate from the website."""
+"""Keeps the Redis DB active with read-only GETs. Separate from the website."""
 
 import os
 import time
 
 import redis
 
-INTERVAL = 3600  # seconds between pings
+INTERVAL = 3600  # seconds between reads
 
 client = redis.Redis(
     host=os.environ["REDIS_DV_URL"],
@@ -17,8 +17,10 @@ client = redis.Redis(
 
 while True:
     try:
-        client.ping()
-        print("redis keepalive: ping ok", flush=True)
+        # read-only: GET does not change the value or its TTL
+        if key := client.randomkey():
+            client.get(key)
+        print(f"redis keepalive: read ok (key: {key})", flush=True)
     except redis.RedisError as e:
-        print(f"redis keepalive: ping failed: {e}", flush=True)
+        print(f"redis keepalive: read failed: {e}", flush=True)
     time.sleep(INTERVAL)
